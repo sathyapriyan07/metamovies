@@ -88,6 +88,10 @@ const AdminDashboard = () => {
             <h3 className="text-xl font-bold mb-2">🔄 Update Persons</h3>
             <p className="text-gray-400 text-sm">Fetch full cast/crew details</p>
           </Link>
+          <Link to="/admin/manage-links" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
+            <h3 className="text-xl font-bold mb-2">🔗 Manage Links</h3>
+            <p className="text-gray-400 text-sm">Add trailer & music links</p>
+          </Link>
         </div>
       </div>
     </div>

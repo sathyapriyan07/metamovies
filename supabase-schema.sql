@@ -254,3 +254,9 @@ CREATE POLICY "Public read collections" ON collections FOR SELECT USING (true);
 CREATE POLICY "Public read collection_items" ON collection_items FOR SELECT USING (true);
 CREATE POLICY "Admin manage collections" ON collections FOR ALL USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
 CREATE POLICY "Admin manage collection_items" ON collection_items FOR ALL USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+
+-- Add music links support to movies and series
+ALTER TABLE movies ADD COLUMN IF NOT EXISTS music_links JSONB;
+ALTER TABLE series ADD COLUMN IF NOT EXISTS music_links JSONB;
+
+-- Example structure: {"spotify": "url", "apple_music": "url", "youtube_music": "url"}

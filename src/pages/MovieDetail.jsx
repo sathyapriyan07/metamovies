@@ -123,21 +123,40 @@ const MovieDetail = () => {
             </div>
 
             {/* Music Platforms */}
-            {movie.external_links && movie.external_links.length > 0 && (
+            {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music) && (
               <div className="mb-8">
-                <h3 className="text-xl font-bold mb-3">Listen on</h3>
+                <h3 className="text-xl font-bold mb-3">Listen to Soundtrack</h3>
                 <div className="flex flex-wrap gap-3">
-                  {movie.external_links.map((link, i) => (
+                  {movie.music_links.spotify && (
                     <a
-                      key={i}
-                      href={link.url}
+                      href={movie.music_links.spotify}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition"
                     >
-                      {link.platform}
+                      Spotify
                     </a>
-                  ))}
+                  )}
+                  {movie.music_links.apple_music && (
+                    <a
+                      href={movie.music_links.apple_music}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-pink-600 hover:bg-pink-700 rounded-lg transition"
+                    >
+                      Apple Music
+                    </a>
+                  )}
+                  {movie.music_links.youtube_music && (
+                    <a
+                      href={movie.music_links.youtube_music}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
+                    >
+                      YouTube Music
+                    </a>
+                  )}
                 </div>
               </div>
             )}
