@@ -8,7 +8,7 @@ const MobileNav = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass md:hidden border-t border-white/10">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black md:hidden border-t border-white/10">
       <div className="flex items-center justify-around py-4">
         <Link to="/" className={`transition-colors font-medium ${
           isActive('/') ? 'text-red-500' : 'text-gray-400'
