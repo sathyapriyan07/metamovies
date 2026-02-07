@@ -9,53 +9,46 @@ const MobileNav = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass md:hidden border-t border-white/10">
-      <div className="flex items-center justify-around py-3">
-        <Link to="/" className={`flex flex-col items-center gap-1 transition-colors ${
+      <div className="flex items-center justify-around py-4">
+        <Link to="/" className={`transition-colors font-medium ${
           isActive('/') ? 'text-red-500' : 'text-gray-400'
         }`}>
-          <span className="text-2xl">🏠</span>
-          <span className="text-xs font-medium">Home</span>
+          Home
         </Link>
-        <Link to="/movies" className={`flex flex-col items-center gap-1 transition-colors ${
+        <Link to="/movies" className={`transition-colors font-medium ${
           isActive('/movies') ? 'text-red-500' : 'text-gray-400'
         }`}>
-          <span className="text-2xl">🎬</span>
-          <span className="text-xs font-medium">Movies</span>
+          Movies
         </Link>
-        <Link to="/series" className={`flex flex-col items-center gap-1 transition-colors ${
+        <Link to="/series" className={`transition-colors font-medium ${
           isActive('/series') ? 'text-red-500' : 'text-gray-400'
         }`}>
-          <span className="text-2xl">📺</span>
-          <span className="text-xs font-medium">Series</span>
+          Series
         </Link>
-        <Link to="/search" className={`flex flex-col items-center gap-1 transition-colors ${
+        <Link to="/search" className={`transition-colors font-medium ${
           isActive('/search') ? 'text-red-500' : 'text-gray-400'
         }`}>
-          <span className="text-2xl">🔍</span>
-          <span className="text-xs font-medium">Search</span>
+          Search
         </Link>
         {user ? (
           isAdmin ? (
-            <Link to="/admin" className={`flex flex-col items-center gap-1 transition-colors ${
+            <Link to="/admin" className={`transition-colors font-medium ${
               location.pathname.startsWith('/admin') ? 'text-red-500' : 'text-gray-400'
             }`}>
-              <span className="text-2xl">⚙️</span>
-              <span className="text-xs font-medium">Admin</span>
+              Admin
             </Link>
           ) : (
-            <Link to="/watchlist" className={`flex flex-col items-center gap-1 transition-colors ${
+            <Link to="/watchlist" className={`transition-colors font-medium ${
               isActive('/watchlist') ? 'text-red-500' : 'text-gray-400'
             }`}>
-              <span className="text-2xl">📋</span>
-              <span className="text-xs font-medium">List</span>
+              Watchlist
             </Link>
           )
         ) : (
-          <Link to="/login" className={`flex flex-col items-center gap-1 transition-colors ${
+          <Link to="/login" className={`transition-colors font-medium ${
             isActive('/login') ? 'text-red-500' : 'text-gray-400'
           }`}>
-            <span className="text-2xl">👤</span>
-            <span className="text-xs font-medium">Login</span>
+            Login
           </Link>
         )}
       </div>
