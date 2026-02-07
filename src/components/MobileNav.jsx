@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 
 const MobileNav = () => {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   const isActive = (path) => location.pathname === path;
 
@@ -35,12 +35,21 @@ const MobileNav = () => {
           <span className="text-xs font-medium">Search</span>
         </Link>
         {user ? (
-          <Link to="/watchlist" className={`flex flex-col items-center gap-1 transition-colors ${
-            isActive('/watchlist') ? 'text-red-500' : 'text-gray-400'
-          }`}>
-            <span className="text-2xl">📋</span>
-            <span className="text-xs font-medium">List</span>
-          </Link>
+          isAdmin ? (
+            <Link to="/admin" className={`flex flex-col items-center gap-1 transition-colors ${
+              location.pathname.startsWith('/admin') ? 'text-red-500' : 'text-gray-400'
+            }`}>
+              <span className="text-2xl">⚙️</span>
+              <span className="text-xs font-medium">Admin</span>
+            </Link>
+          ) : (
+            <Link to="/watchlist" className={`flex flex-col items-center gap-1 transition-colors ${
+              isActive('/watchlist') ? 'text-red-500' : 'text-gray-400'
+            }`}>
+              <span className="text-2xl">📋</span>
+              <span className="text-xs font-medium">List</span>
+            </Link>
+          )
         ) : (
           <Link to="/login" className={`flex flex-col items-center gap-1 transition-colors ${
             isActive('/login') ? 'text-red-500' : 'text-gray-400'
