@@ -6,7 +6,6 @@ const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [trendingSeries, setTrendingSeries] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
-  const [streamingNow, setStreamingNow] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,18 +15,16 @@ const Home = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [trending, series, upcoming, streaming, cols] = await Promise.all([
+    const [trending, series, upcoming, cols] = await Promise.all([
       getTrendingMovies(),
       getTrendingSeries(),
       getUpcomingMovies(),
-      getMovies(20, 0),
       getCollections()
     ]);
     
     setTrendingMovies(trending.data || []);
     setTrendingSeries(series.data || []);
     setUpcomingMovies(upcoming.data || []);
-    setStreamingNow(streaming.data || []);
     
     // Load collection items
     const collectionsWithItems = await Promise.all(
@@ -54,7 +51,6 @@ const Home = () => {
         <PosterRow title="Trending Movies" items={trendingMovies} type="movie" loading={loading} />
         <PosterRow title="Trending Series" items={trendingSeries} type="series" loading={loading} />
         <PosterRow title="Upcoming Movies" items={upcomingMovies} type="movie" loading={loading} />
-        <PosterRow title="Streaming Now" items={streamingNow} type="movie" loading={loading} />
         
         {/* Custom Collections */}
         {collections.map((collection) => (

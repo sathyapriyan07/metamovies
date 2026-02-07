@@ -1,11 +1,11 @@
 const SkeletonCard = () => (
-  <div className="w-full">
+  <div className="flex-shrink-0 w-[140px] md:w-[180px]">
     <div className="skeleton w-full aspect-[2/3] rounded-2xl" />
   </div>
 );
 
 export const SkeletonRow = ({ count = 10 }) => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
     {Array.from({ length: count }).map((_, i) => (
       <SkeletonCard key={i} />
     ))}
