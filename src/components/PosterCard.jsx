@@ -8,8 +8,8 @@ const PosterCard = ({ item, type = 'movie' }) => {
   };
 
   return (
-    <div className="poster-card min-w-[120px] md:min-w-[160px] relative" onClick={handleClick}>
-      <div className="relative aspect-[2/3] overflow-hidden rounded-xl">
+    <div className="poster-card relative group" onClick={handleClick}>
+      <div className="relative aspect-[2/3] overflow-hidden rounded-2xl">
         <img
           src={item.poster_url || 'https://via.placeholder.com/300x450?text=No+Image'}
           alt={item.title || item.name}
@@ -25,11 +25,6 @@ const PosterCard = ({ item, type = 'movie' }) => {
             <span className="text-xs font-semibold text-yellow-400">⭐ {item.rating.toFixed(1)}</span>
           </div>
         )}
-      </div>
-      
-      <div className="mt-3">
-        <h3 className="text-sm md:text-base font-semibold line-clamp-2 leading-tight">{item.title || item.name}</h3>
-        <p className="text-xs text-gray-400 mt-1">{item.release_date?.split('-')[0] || item.first_air_date?.split('-')[0]}</p>
       </div>
     </div>
   );

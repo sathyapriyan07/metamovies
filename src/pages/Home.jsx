@@ -73,7 +73,7 @@ const Home = () => {
       </div>
 
       {/* Content Rows */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="max-w-7xl mx-auto">
         <PosterRow title="Trending Movies" items={trendingMovies} type="movie" loading={loading} />
         <PosterRow title="Trending Series" items={trendingSeries} type="series" loading={loading} />
         <PosterRow title="Upcoming Movies" items={upcomingMovies} type="movie" loading={loading} />
