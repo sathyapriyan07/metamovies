@@ -1,0 +1,236 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getSeriesById } from '../services/supabase';
+import { useAuth } from '../context/AuthContext';
+import { useWatchlist } from '../hooks/useWatchlist';
+
+const SeriesDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addItem, removeItem, checkInWatchlist } = useWatchlist();
+  const [series, setSeries] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('cast');
+  const [selectedSeason, setSelectedSeason] = useState(null);
+  const [showFullOverview, setShowFullOverview] = useState(false);
+  const [inWatchlist, setInWatchlist] = useState(false);
+
+  useEffect(() => {
+    loadSeries();
+  }, [id]);
+
+  const loadSeries = async () => {
+    setLoading(true);
+    const { data } = await getSeriesById(id);
+    setSeries(data);
+    if (data?.seasons?.length > 0) {
+      setSelectedSeason(data.seasons[0]);
+    }
+    if (user && data) {
+      const isIn = await checkInWatchlist(data.id, 'series');
+      setInWatchlist(isIn);
+    }
+    setLoading(false);
+  };
+
+  const toggleWatchlist = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (inWatchlist) {
+      await removeItem(series.id, 'series');
+      setInWatchlist(false);
+    } else {
+      await addItem(series.id, 'series');
+      setInWatchlist(true);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-600"></div>
+      </div>
+    );
+  }
+
+  if (!series) return <div className="min-h-screen flex items-center justify-center">Series not found</div>;
+
+  return (
+    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
+      {/* Hero Section */}
+      <div className="relative h-[50vh] md:h-[70vh]">
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent z-10" />
+        <img
+          src={series.backdrop_url || 'https://via.placeholder.com/1920x1080'}
+          alt={series.title}
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="container mx-auto px-4 -mt-32 relative z-20">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Poster */}
+          <img
+            src={series.poster_url || 'https://via.placeholder.com/300x450'}
+            alt={series.title}
+            className="w-48 md:w-64 rounded-xl shadow-2xl"
+          />
+
+          {/* Info */}
+          <div className="flex-1">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{series.title}</h1>
+            
+            <div className="flex flex-wrap gap-4 mb-4">
+              {series.rating && (
+                <span className="text-yellow-400 text-xl">⭐ {series.rating.toFixed(1)}</span>
+              )}
+              <span className="text-gray-400">{series.first_air_date?.split('-')[0]}</span>
+              <span className="text-gray-400">{series.seasons?.length} Seasons</span>
+            </div>
+
+            {/* Genres */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {series.genres?.map((genre, i) => (
+                <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-sm">{genre}</span>
+              ))}
+            </div>
+
+            {/* Overview */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2">Overview</h2>
+              <p className={`text-gray-300 ${!showFullOverview && 'line-clamp-3'}`}>
+                {series.overview}
+              </p>
+              {series.overview?.length > 200 && (
+                <button
+                  onClick={() => setShowFullOverview(!showFullOverview)}
+                  className="text-red-500 mt-2"
+                >
+                  {showFullOverview ? 'Read Less' : 'Read More'}
+                </button>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-wrap gap-4 mb-8">
+              {series.trailer_url && (
+                <a href={series.trailer_url} target="_blank" rel="noopener noreferrer" className="btn-primary">
+                  ▶ Watch Trailer
+                </a>
+              )}
+              <button onClick={toggleWatchlist} className="btn-secondary">
+                {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
+              </button>
+            </div>
+
+            {/* Seasons Dropdown */}
+            {series.seasons && series.seasons.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-bold mb-3">Seasons</h3>
+                <select
+                  value={selectedSeason?.id}
+                  onChange={(e) => setSelectedSeason(series.seasons.find(s => s.id === parseInt(e.target.value)))}
+                  className="w-full md:w-64 px-4 py-2 bg-white/10 rounded-lg border border-white/20"
+                >
+                  {series.seasons.map((season) => (
+                    <option key={season.id} value={season.id} className="bg-black">
+                      Season {season.season_number}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Episodes */}
+                {selectedSeason && (
+                  <div className="mt-6 space-y-4">
+                    {selectedSeason.episodes?.map((episode) => (
+                      <div key={episode.id} className="glass-dark p-4 rounded-lg">
+                        <div className="flex gap-4">
+                          <img
+                            src={episode.still_url || 'https://via.placeholder.com/300x169'}
+                            alt={episode.title}
+                            className="w-32 h-18 object-cover rounded"
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-bold">
+                              {episode.episode_number}. {episode.title}
+                            </h4>
+                            <p className="text-sm text-gray-400 mt-1 line-clamp-2">{episode.overview}</p>
+                            <p className="text-xs text-gray-500 mt-2">{episode.air_date}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Tabs */}
+            <div className="border-b border-gray-700 mb-6">
+              <div className="flex gap-6">
+                <button
+                  onClick={() => setActiveTab('cast')}
+                  className={`pb-2 ${activeTab === 'cast' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
+                >
+                  Cast
+                </button>
+                <button
+                  onClick={() => setActiveTab('crew')}
+                  className={`pb-2 ${activeTab === 'crew' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
+                >
+                  Crew
+                </button>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'cast' && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {series.cast?.map((c) => (
+                  <div
+                    key={c.id}
+                    onClick={() => navigate(`/person/${c.person.id}`)}
+                    className="cursor-pointer hover:scale-105 transition"
+                  >
+                    <img
+                      src={c.person.profile_url || 'https://via.placeholder.com/200x300'}
+                      alt={c.person.name}
+                      className="w-full h-48 object-cover rounded-lg mb-2"
+                    />
+                    <p className="font-semibold text-sm">{c.person.name}</p>
+                    <p className="text-xs text-gray-400">{c.character}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'crew' && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {series.crew?.map((c) => (
+                  <div
+                    key={c.id}
+                    onClick={() => navigate(`/person/${c.person.id}`)}
+                    className="cursor-pointer hover:scale-105 transition"
+                  >
+                    <img
+                      src={c.person.profile_url || 'https://via.placeholder.com/200x300'}
+                      alt={c.person.name}
+                      className="w-full h-48 object-cover rounded-lg mb-2"
+                    />
+                    <p className="font-semibold text-sm">{c.person.name}</p>
+                    <p className="text-xs text-gray-400">{c.job}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SeriesDetail;
