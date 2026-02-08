@@ -40,7 +40,7 @@ const PersonDetail = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Profile Image */}
-          <div className="md:w-1/3">
+          <div className="md:w-1/4">
             <img
               src={person.profile_url || 'https://via.placeholder.com/400x600'}
               alt={person.name}
