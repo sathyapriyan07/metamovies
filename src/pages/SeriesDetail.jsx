@@ -184,7 +184,7 @@ const SeriesDetail = () => {
 
             {/* Tab Content */}
             {activeTab === 'cast' && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 {series.cast?.map((c) => (
                   <div
                     key={c.id}
@@ -336,7 +336,7 @@ const SeriesDetail = () => {
             )}
 
             {activeTab === 'crew' && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 {series.crew?.map((c) => (
                   <div
                     key={c.id}
