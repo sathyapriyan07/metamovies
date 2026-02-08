@@ -43,6 +43,20 @@ export const searchMulti = async (query) => {
   return data.results;
 };
 
+export const searchMovies = async (query) => {
+  const { data } = await tmdbApi.get('/search/movie', {
+    params: { query }
+  });
+  return data.results;
+};
+
+export const searchSeries = async (query) => {
+  const { data } = await tmdbApi.get('/search/tv', {
+    params: { query }
+  });
+  return data.results;
+};
+
 export const getTrendingMovies = async () => {
   const { data } = await tmdbApi.get('/trending/movie/week');
   return data.results;

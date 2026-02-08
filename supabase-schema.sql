@@ -260,3 +260,19 @@ ALTER TABLE movies ADD COLUMN IF NOT EXISTS music_links JSONB;
 ALTER TABLE series ADD COLUMN IF NOT EXISTS music_links JSONB;
 
 -- Example structure: {"spotify": "url", "apple_music": "url", "youtube_music": "url"}
+
+-- Add telegram and OTT links support
+ALTER TABLE movies ADD COLUMN IF NOT EXISTS telegram_link TEXT;
+ALTER TABLE movies ADD COLUMN IF NOT EXISTS watch_links JSONB;
+ALTER TABLE series ADD COLUMN IF NOT EXISTS telegram_link TEXT;
+ALTER TABLE series ADD COLUMN IF NOT EXISTS watch_links JSONB;
+
+-- Example watch_links structure: {"netflix": "url", "prime": "url", "hotstar": "url", "zee5": "url"}
+
+-- Add composer/music director links
+ALTER TABLE movies ADD COLUMN IF NOT EXISTS composer_name TEXT;
+ALTER TABLE movies ADD COLUMN IF NOT EXISTS composer_links JSONB;
+ALTER TABLE series ADD COLUMN IF NOT EXISTS composer_name TEXT;
+ALTER TABLE series ADD COLUMN IF NOT EXISTS composer_links JSONB;
+
+-- Example composer_links structure: {"spotify": "url", "apple_music": "url", "youtube_music": "url"}

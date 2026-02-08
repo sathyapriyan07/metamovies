@@ -5,7 +5,9 @@ import { useNavigate } from 'react-router-dom';
 const ManageSeries = () => {
   const navigate = useNavigate();
   const [series, setSeries] = useState([]);
+  const [filteredSeries, setFilteredSeries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     loadSeries();
@@ -13,9 +15,22 @@ const ManageSeries = () => {
 
   const loadSeries = async () => {
     setLoading(true);
-    const { data } = await getSeries(100, 0);
+    const { data } = await getSeries(null, 0);
     setSeries(data || []);
+    setFilteredSeries(data || []);
     setLoading(false);
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredSeries(series);
+    } else {
+      const filtered = series.filter(item => 
+        item.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredSeries(filtered);
+    }
   };
 
   const handleToggleTrending = async (item) => {
@@ -35,11 +50,21 @@ const ManageSeries = () => {
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold mb-8">Manage Series</h1>
 
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search series..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+          />
+        </div>
+
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : (
           <div className="grid gap-4">
-            {series.map((item) => (
+            {filteredSeries.map((item) => (
               <div key={item.id} className="glass-dark p-4 rounded-xl flex gap-4">
                 <img
                   src={item.poster_url || 'https://via.placeholder.com/100x150'}

@@ -4,13 +4,24 @@ import { getMovies, getSeries, updateMovie, updateSeries } from '../../services/
 const ManageLinks = () => {
   const [type, setType] = useState('movie');
   const [items, setItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     trailer_url: '',
     spotify: '',
     apple_music: '',
-    youtube_music: ''
+    youtube_music: '',
+    telegram_link: '',
+    netflix: '',
+    prime: '',
+    hotstar: '',
+    zee5: '',
+    composer_name: '',
+    composer_spotify: '',
+    composer_apple_music: '',
+    composer_youtube_music: ''
   });
 
   useEffect(() => {
@@ -19,9 +30,23 @@ const ManageLinks = () => {
 
   const loadItems = async () => {
     setLoading(true);
-    const { data } = type === 'movie' ? await getMovies(100, 0) : await getSeries(100, 0);
+    const { data } = type === 'movie' ? await getMovies(null, 0) : await getSeries(null, 0);
     setItems(data || []);
+    setFilteredItems(data || []);
+    setSearchQuery('');
     setLoading(false);
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredItems(items);
+    } else {
+      const filtered = items.filter(item => 
+        item.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredItems(filtered);
+    }
   };
 
   const handleSelectItem = (item) => {
@@ -30,7 +55,16 @@ const ManageLinks = () => {
       trailer_url: item.trailer_url || '',
       spotify: item.music_links?.spotify || '',
       apple_music: item.music_links?.apple_music || '',
-      youtube_music: item.music_links?.youtube_music || ''
+      youtube_music: item.music_links?.youtube_music || '',
+      telegram_link: item.telegram_link || '',
+      netflix: item.watch_links?.netflix || '',
+      prime: item.watch_links?.prime || '',
+      hotstar: item.watch_links?.hotstar || '',
+      zee5: item.watch_links?.zee5 || '',
+      composer_name: item.composer_name || '',
+      composer_spotify: item.composer_links?.spotify || '',
+      composer_apple_music: item.composer_links?.apple_music || '',
+      composer_youtube_music: item.composer_links?.youtube_music || ''
     });
   };
 
@@ -44,6 +78,19 @@ const ManageLinks = () => {
         spotify: formData.spotify || null,
         apple_music: formData.apple_music || null,
         youtube_music: formData.youtube_music || null
+      },
+      telegram_link: formData.telegram_link || null,
+      watch_links: {
+        netflix: formData.netflix || null,
+        prime: formData.prime || null,
+        hotstar: formData.hotstar || null,
+        zee5: formData.zee5 || null
+      },
+      composer_name: formData.composer_name || null,
+      composer_links: {
+        spotify: formData.composer_spotify || null,
+        apple_music: formData.composer_apple_music || null,
+        youtube_music: formData.composer_youtube_music || null
       }
     };
 
@@ -61,7 +108,7 @@ const ManageLinks = () => {
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
       <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8">Manage Trailer & Music Links</h1>
+        <h1 className="text-4xl font-bold mb-8">Manage Links</h1>
 
         <div className="mb-6">
           <select
@@ -78,11 +125,18 @@ const ManageLinks = () => {
           {/* Items List */}
           <div>
             <h2 className="text-2xl font-bold mb-4">Select {type === 'movie' ? 'Movie' : 'Series'}</h2>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 mb-4"
+            />
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
               {loading ? (
                 <div>Loading...</div>
               ) : (
-                items.map((item) => (
+                filteredItems.map((item) => (
                   <div
                     key={item.id}
                     onClick={() => handleSelectItem(item)}
@@ -150,6 +204,117 @@ const ManageLinks = () => {
                       placeholder="https://music.youtube.com/..."
                       className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Telegram Download Link</label>
+                    <input
+                      type="url"
+                      value={formData.telegram_link}
+                      onChange={(e) => setFormData({ ...formData, telegram_link: e.target.value })}
+                      placeholder="https://t.me/..."
+                      className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                    />
+                  </div>
+
+                  <div className="border-t border-white/20 pt-4 mt-4">
+                    <h3 className="text-lg font-bold mb-3">Watch Now Links (OTT Platforms)</h3>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Netflix</label>
+                        <input
+                          type="url"
+                          value={formData.netflix}
+                          onChange={(e) => setFormData({ ...formData, netflix: e.target.value })}
+                          placeholder="https://www.netflix.com/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Prime Video</label>
+                        <input
+                          type="url"
+                          value={formData.prime}
+                          onChange={(e) => setFormData({ ...formData, prime: e.target.value })}
+                          placeholder="https://www.primevideo.com/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">JioHotstar</label>
+                        <input
+                          type="url"
+                          value={formData.hotstar}
+                          onChange={(e) => setFormData({ ...formData, hotstar: e.target.value })}
+                          placeholder="https://www.hotstar.com/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">ZEE5</label>
+                        <input
+                          type="url"
+                          value={formData.zee5}
+                          onChange={(e) => setFormData({ ...formData, zee5: e.target.value })}
+                          placeholder="https://www.zee5.com/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-white/20 pt-4 mt-4">
+                    <h3 className="text-lg font-bold mb-3">Music Composer/Director</h3>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Composer Name</label>
+                        <input
+                          type="text"
+                          value={formData.composer_name}
+                          onChange={(e) => setFormData({ ...formData, composer_name: e.target.value })}
+                          placeholder="e.g., A.R. Rahman"
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Composer Spotify</label>
+                        <input
+                          type="url"
+                          value={formData.composer_spotify}
+                          onChange={(e) => setFormData({ ...formData, composer_spotify: e.target.value })}
+                          placeholder="https://open.spotify.com/artist/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Composer Apple Music</label>
+                        <input
+                          type="url"
+                          value={formData.composer_apple_music}
+                          onChange={(e) => setFormData({ ...formData, composer_apple_music: e.target.value })}
+                          placeholder="https://music.apple.com/artist/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Composer YouTube Music</label>
+                        <input
+                          type="url"
+                          value={formData.composer_youtube_music}
+                          onChange={(e) => setFormData({ ...formData, composer_youtube_music: e.target.value })}
+                          placeholder="https://music.youtube.com/channel/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   <button type="submit" className="w-full btn-primary py-3">

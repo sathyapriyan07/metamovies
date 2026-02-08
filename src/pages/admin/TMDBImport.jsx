@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getMovieDetails, getSeriesDetails, getSeasonDetails, getImageUrl, getPersonDetails } from '../../services/tmdb';
+import { getMovieDetails, getSeriesDetails, getSeasonDetails, getImageUrl, getPersonDetails, searchMovies, searchSeries } from '../../services/tmdb';
 import { createMovie, createSeries, createCast, createCrew, createSeason, createEpisode, createPerson } from '../../services/supabase';
 import { supabase } from '../../services/supabase';
 
@@ -10,9 +10,37 @@ const TMDBImport = () => {
   const [preview, setPreview] = useState(null);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
-  const handleFetch = async () => {
-    if (!tmdbId) return;
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const results = type === 'movie' 
+        ? await searchMovies(searchQuery)
+        : await searchSeries(searchQuery);
+      setSearchResults(results.slice(0, 10));
+    } catch (err) {
+      setError('Search failed. Please try again.');
+    }
+    
+    setLoading(false);
+  };
+
+  const handleSelectFromSearch = (item) => {
+    setTmdbId(item.id.toString());
+    setSearchResults([]);
+    setSearchQuery('');
+    handleFetch(item.id);
+  };
+
+  const handleFetch = async (id = null) => {
+    const fetchId = id || tmdbId;
+    if (!fetchId) return;
     
     setLoading(true);
     setError('');
@@ -20,8 +48,8 @@ const TMDBImport = () => {
     
     try {
       const data = type === 'movie' 
-        ? await getMovieDetails(tmdbId)
-        : await getSeriesDetails(tmdbId);
+        ? await getMovieDetails(fetchId)
+        : await getSeriesDetails(fetchId);
       
       setPreview(data);
     } catch (err) {
@@ -307,7 +335,7 @@ const TMDBImport = () => {
               <label className="block text-sm font-medium mb-2">Type</label>
               <select
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => { setType(e.target.value); setSearchResults([]); }}
                 className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
               >
                 <option value="movie" className="bg-black">Movie</option>
@@ -316,23 +344,67 @@ const TMDBImport = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">TMDB ID</label>
+              <label className="block text-sm font-medium mb-2">Search TMDB</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="Search for movies or series..."
+                  className="flex-1 px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="btn-secondary"
+                  disabled={loading || !searchQuery.trim()}
+                >
+                  Search
+                </button>
+              </div>
+            </div>
+
+            {searchResults.length > 0 && (
+              <div className="max-h-80 overflow-y-auto space-y-2">
+                {searchResults.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => handleSelectFromSearch(item)}
+                    className="flex gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg cursor-pointer transition"
+                  >
+                    <img
+                      src={getImageUrl(item.poster_path, 'w92')}
+                      alt={item.title || item.name}
+                      className="w-12 h-18 object-cover rounded"
+                      onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
+                    />
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{item.title || item.name}</p>
+                      <p className="text-xs text-gray-400">{item.release_date || item.first_air_date}</p>
+                      <p className="text-xs text-gray-500">ID: {item.id}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t border-white/20 pt-4">
+              <label className="block text-sm font-medium mb-2">Or Enter TMDB ID Manually</label>
               <input
                 type="text"
                 value={tmdbId}
                 onChange={(e) => setTmdbId(e.target.value)}
                 placeholder="Enter TMDB ID (e.g., 550 for Fight Club)"
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 mb-3"
               />
+              <button
+                onClick={() => handleFetch()}
+                className="btn-primary w-full"
+                disabled={loading || !tmdbId}
+              >
+                {loading ? 'Fetching...' : 'Fetch from TMDB'}
+              </button>
             </div>
-
-            <button
-              onClick={handleFetch}
-              className="btn-primary w-full"
-              disabled={loading || !tmdbId}
-            >
-              {loading ? 'Fetching...' : 'Fetch from TMDB'}
-            </button>
           </div>
         </div>
 

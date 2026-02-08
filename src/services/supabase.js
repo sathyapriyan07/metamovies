@@ -34,11 +34,16 @@ export const getCurrentUser = async () => {
 
 // Movies
 export const getMovies = async (limit = 20, offset = 0) => {
-  const { data, error } = await supabase
+  const query = supabase
     .from('movies')
     .select('*')
-    .range(offset, offset + limit - 1)
     .order('created_at', { ascending: false });
+  
+  if (limit) {
+    query.range(offset, offset + limit - 1);
+  }
+  
+  const { data, error } = await query;
   return { data, error };
 };
 
@@ -77,11 +82,16 @@ export const getUpcomingMovies = async () => {
 
 // Series
 export const getSeries = async (limit = 20, offset = 0) => {
-  const { data, error } = await supabase
+  const query = supabase
     .from('series')
     .select('*')
-    .range(offset, offset + limit - 1)
     .order('created_at', { ascending: false });
+  
+  if (limit) {
+    query.range(offset, offset + limit - 1);
+  }
+  
+  const { data, error } = await query;
   return { data, error };
 };
 

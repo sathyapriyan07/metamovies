@@ -5,7 +5,9 @@ import { useNavigate } from 'react-router-dom';
 const ManageMovies = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState([]);
+  const [filteredMovies, setFilteredMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     loadMovies();
@@ -13,9 +15,22 @@ const ManageMovies = () => {
 
   const loadMovies = async () => {
     setLoading(true);
-    const { data } = await getMovies(100, 0);
+    const { data } = await getMovies(null, 0);
     setMovies(data || []);
+    setFilteredMovies(data || []);
     setLoading(false);
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredMovies(movies);
+    } else {
+      const filtered = movies.filter(movie => 
+        movie.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredMovies(filtered);
+    }
   };
 
   const handleToggleTrending = async (movie) => {
@@ -35,11 +50,21 @@ const ManageMovies = () => {
       <div className="container mx-auto px-4">
         <h1 className="text-4xl font-bold mb-8">Manage Movies</h1>
 
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search movies..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+          />
+        </div>
+
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : (
           <div className="grid gap-4">
-            {movies.map((movie) => (
+            {filteredMovies.map((movie) => (
               <div key={movie.id} className="glass-dark p-4 rounded-xl flex gap-4">
                 <img
                   src={movie.poster_url || 'https://via.placeholder.com/100x150'}
