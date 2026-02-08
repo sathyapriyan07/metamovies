@@ -276,3 +276,8 @@ ALTER TABLE series ADD COLUMN IF NOT EXISTS composer_name TEXT;
 ALTER TABLE series ADD COLUMN IF NOT EXISTS composer_links JSONB;
 
 -- Example composer_links structure: {"spotify": "url", "apple_music": "url", "youtube_music": "url"}
+
+-- Add music platform links for composers/music directors
+ALTER TABLE persons ADD COLUMN IF NOT EXISTS music_links JSONB;
+
+-- Example music_links structure: {"spotify": "url", "apple_music": "url", "youtube_music": "url"}

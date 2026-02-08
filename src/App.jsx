@@ -25,6 +25,8 @@ import ManageSeries from './pages/admin/ManageSeries';
 import ManageCollections from './pages/admin/ManageCollections';
 import UpdatePersons from './pages/admin/UpdatePersons';
 import ManageLinks from './pages/admin/ManageLinks';
+import ManagePersons from './pages/admin/ManagePersons';
+import ManageCrew from './pages/admin/ManageCrew';
 
 function App() {
   return (
@@ -106,6 +108,18 @@ function App() {
             <Route path="/admin/manage-links" element={
               <ProtectedRoute adminOnly>
                 <ManageLinks />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/manage-persons" element={
+              <ProtectedRoute adminOnly>
+                <ManagePersons />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/manage-crew" element={
+              <ProtectedRoute adminOnly>
+                <ManageCrew />
               </ProtectedRoute>
             } />
           </Routes>
