@@ -13,7 +13,7 @@ const PosterCard = ({ item, type = 'movie' }) => {
         <img
           src={item.poster_url || 'https://via.placeholder.com/300x450?text=No+Image'}
           alt={item.title || item.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain bg-black"
           loading="lazy"
         />
         {/* Hover overlay */}
