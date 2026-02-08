@@ -19,7 +19,7 @@ const PosterRow = ({ title, items, type = 'movie', loading = false }) => {
       <div className="px-4 md:px-8">
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           {items.map((item) => (
-            <div key={item.id} className="flex-shrink-0 w-[140px] md:w-[180px]">
+            <div key={item.id} className="flex-shrink-0 w-[120px] md:w-[160px]">
               <PosterCard item={item} type={type} />
             </div>
           ))}
