@@ -32,7 +32,7 @@ const Series = () => {
           <SkeletonRow count={10} />
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
               {series.map((item) => (
                 <PosterCard key={item.id} item={item} type="series" />
               ))}
