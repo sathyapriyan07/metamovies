@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 14px;
+  }
+  
   body {
     @apply bg-black text-white;
     font-family: 'Inter', sans-serif;
