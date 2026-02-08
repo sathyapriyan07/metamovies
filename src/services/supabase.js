@@ -34,16 +34,33 @@ export const getCurrentUser = async () => {
 
 // Movies
 export const getMovies = async (limit = 20, offset = 0) => {
-  const query = supabase
-    .from('movies')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
-  if (limit) {
-    query.range(offset, offset + limit - 1);
+  if (limit === null || limit === 0) {
+    let allMovies = [];
+    let from = 0;
+    const batchSize = 1000;
+    
+    while (true) {
+      const { data } = await supabase
+        .from('movies')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(from, from + batchSize - 1);
+      
+      if (!data || data.length === 0) break;
+      allMovies = [...allMovies, ...data];
+      if (data.length < batchSize) break;
+      from += batchSize;
+    }
+    
+    return { data: allMovies, error: null };
   }
   
-  const { data, error } = await query;
+  const { data, error } = await supabase
+    .from('movies')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+  
   return { data, error };
 };
 
@@ -82,16 +99,33 @@ export const getUpcomingMovies = async () => {
 
 // Series
 export const getSeries = async (limit = 20, offset = 0) => {
-  const query = supabase
-    .from('series')
-    .select('*')
-    .order('created_at', { ascending: false });
-  
-  if (limit) {
-    query.range(offset, offset + limit - 1);
+  if (limit === null || limit === 0) {
+    let allSeries = [];
+    let from = 0;
+    const batchSize = 1000;
+    
+    while (true) {
+      const { data } = await supabase
+        .from('series')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(from, from + batchSize - 1);
+      
+      if (!data || data.length === 0) break;
+      allSeries = [...allSeries, ...data];
+      if (data.length < batchSize) break;
+      from += batchSize;
+    }
+    
+    return { data: allSeries, error: null };
   }
   
-  const { data, error } = await query;
+  const { data, error } = await supabase
+    .from('series')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+  
   return { data, error };
 };
 
@@ -136,9 +170,9 @@ export const getPersonById = async (id) => {
 // Search
 export const searchAll = async (query) => {
   const [movies, series, persons] = await Promise.all([
-    supabase.from('movies').select('*').ilike('title', `%${query}%`).limit(10),
-    supabase.from('series').select('*').ilike('title', `%${query}%`).limit(10),
-    supabase.from('persons').select('*').ilike('name', `%${query}%`).limit(10)
+    supabase.from('movies').select('*').ilike('title', `%${query}%`).limit(100),
+    supabase.from('series').select('*').ilike('title', `%${query}%`).limit(100),
+    supabase.from('persons').select('*').ilike('name', `%${query}%`).limit(100)
   ]);
   return { movies: movies.data, series: series.data, persons: persons.data };
 };

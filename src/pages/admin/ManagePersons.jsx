@@ -21,9 +21,25 @@ const ManagePersons = () => {
 
   const loadPersons = async () => {
     setLoading(true);
-    const { data } = await supabase.from('persons').select('*').order('name');
-    setPersons(data || []);
-    setFilteredPersons(data || []);
+    let allPersons = [];
+    let from = 0;
+    const batchSize = 1000;
+    
+    while (true) {
+      const { data } = await supabase
+        .from('persons')
+        .select('*')
+        .order('name')
+        .range(from, from + batchSize - 1);
+      
+      if (!data || data.length === 0) break;
+      allPersons = [...allPersons, ...data];
+      if (data.length < batchSize) break;
+      from += batchSize;
+    }
+    
+    setPersons(allPersons);
+    setFilteredPersons(allPersons);
     setLoading(false);
   };
 
@@ -84,7 +100,7 @@ const ManagePersons = () => {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Persons List */}
           <div>
-            <h2 className="text-2xl font-bold mb-4">Select Person</h2>
+            <h2 className="text-2xl font-bold mb-4">Select Person ({filteredPersons.length} total)</h2>
             <input
               type="text"
               placeholder="Search persons..."

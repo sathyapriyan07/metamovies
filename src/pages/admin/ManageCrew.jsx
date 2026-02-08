@@ -31,8 +31,24 @@ const ManageCrew = () => {
   };
 
   const loadPersons = async () => {
-    const { data } = await supabase.from('persons').select('*').order('name');
-    setPersons(data || []);
+    let allPersons = [];
+    let from = 0;
+    const batchSize = 1000;
+    
+    while (true) {
+      const { data } = await supabase
+        .from('persons')
+        .select('*')
+        .order('name')
+        .range(from, from + batchSize - 1);
+      
+      if (!data || data.length === 0) break;
+      allPersons = [...allPersons, ...data];
+      if (data.length < batchSize) break;
+      from += batchSize;
+    }
+    
+    setPersons(allPersons);
   };
 
   const handleSearch = (query) => {

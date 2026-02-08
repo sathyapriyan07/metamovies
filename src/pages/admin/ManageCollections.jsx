@@ -47,8 +47,8 @@ const ManageCollections = () => {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     const { data } = searchType === 'movie' 
-      ? await getMovies(20, 0)
-      : await getSeries(20, 0);
+      ? await getMovies(null, 0)
+      : await getSeries(null, 0);
     const filtered = data?.filter(item => 
       item.title?.toLowerCase().includes(searchQuery.toLowerCase())
     ) || [];
