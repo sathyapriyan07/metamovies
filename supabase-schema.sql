@@ -211,11 +211,12 @@ CREATE POLICY "Users insert own data" ON users FOR INSERT
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, username, role)
+  INSERT INTO public.users (id, username, role, approved)
   VALUES (
     NEW.id,
     NEW.raw_user_meta_data->>'username',
-    COALESCE(NEW.raw_user_meta_data->>'role', 'user')
+    COALESCE(NEW.raw_user_meta_data->>'role', 'user'),
+    false
   );
   RETURN NEW;
 END;

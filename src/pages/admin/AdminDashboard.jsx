@@ -107,6 +107,10 @@ const AdminDashboard = () => {
             <h3 className="text-xl font-bold mb-2">🎬 Manage Hero Banner</h3>
             <p className="text-gray-400 text-sm">Control homepage hero section</p>
           </Link>
+          <Link to="/admin/manage-users" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
+            <h3 className="text-xl font-bold mb-2">👥 Manage Users</h3>
+            <p className="text-gray-400 text-sm">Approve and manage user accounts</p>
+          </Link>
         </div>
       </div>
     </div>

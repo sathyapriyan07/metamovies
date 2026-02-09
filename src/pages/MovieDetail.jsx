@@ -60,84 +60,101 @@ const MovieDetail = () => {
   if (!movie) return <div className="min-h-screen flex items-center justify-center">Movie not found</div>;
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Poster */}
-          <img
-            src={movie.poster_url || 'https://via.placeholder.com/300x450'}
-            alt={movie.title}
-            className="w-48 md:w-64 rounded-xl shadow-2xl"
-          />
+    <div className="min-h-screen bg-black">
+      {/* Hero Section */}
+      <div className="relative w-full h-[65vh] md:h-[80vh] overflow-hidden">
+        {/* Backdrop Image */}
+        <img
+          src={movie.backdrop_url || movie.poster_url || 'https://via.placeholder.com/1920x1080'}
+          alt={movie.title}
+          className="absolute inset-0 w-full h-full object-cover animate-[scale_0.3s_ease-out]" 
+          style={{ animation: 'fadeIn 0.3s ease-out' }}
+        />
 
-          {/* Info */}
-          <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{movie.title}</h1>
-            
-            <div className="flex flex-wrap gap-4 mb-4">
+        {/* Gradient Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
+
+        {/* Content */}
+        <div className="relative h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-end pb-12 md:pb-16">
+          <div className="max-w-3xl space-y-3 fade-in">
+            {/* Title */}
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+              {movie.title}
+            </h1>
+
+            {/* Rating & Metadata */}
+            <div className="flex items-center gap-3 text-sm md:text-base">
               {movie.rating && (
-                <span className="text-yellow-400 text-xl">⭐ {movie.rating.toFixed(1)}</span>
+                <span className="text-yellow-400 font-semibold">⭐ {movie.rating.toFixed(1)}</span>
               )}
-              <span className="text-gray-400">{movie.release_date?.split('-')[0]}</span>
-              <span className="text-gray-400">{movie.runtime} min</span>
-            </div>
-
-            {/* Genres */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {movie.genres?.map((genre, i) => (
-                <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-sm">{genre}</span>
-              ))}
+              {movie.release_date && (
+                <>
+                  <span className="text-gray-500">•</span>
+                  <span className="text-gray-300">{movie.release_date.split('-')[0]}</span>
+                </>
+              )}
+              {movie.runtime && (
+                <>
+                  <span className="text-gray-500">•</span>
+                  <span className="text-gray-300">{movie.runtime} min</span>
+                </>
+              )}
             </div>
 
             {/* Overview */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">Overview</h2>
-              <p className={`text-gray-300 ${!showFullOverview && 'line-clamp-3'}`}>
+            {movie.overview && (
+              <p className="text-gray-400 text-sm md:text-base line-clamp-3 leading-relaxed">
                 {movie.overview}
               </p>
-              {movie.overview?.length > 200 && (
-                <button
-                  onClick={() => setShowFullOverview(!showFullOverview)}
-                  className="text-red-500 mt-2"
-                >
-                  {showFullOverview ? 'Read Less' : 'Read More'}
-                </button>
-              )}
-            </div>
+            )}
 
-            {/* Buttons */}
-            <div className="flex flex-wrap gap-4 mb-8">
+            {/* Genres */}
+            {movie.genres && movie.genres.length > 0 && (
+              <div className="text-gray-300 text-sm md:text-base">
+                {movie.genres.join(' | ')}
+              </div>
+            )}
+
+            {/* Watchlist Button */}
+            <div className="pt-2">
               <button onClick={toggleWatchlist} className="btn-secondary">
                 {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
               </button>
             </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Tabs */}
-            <div className="border-b border-gray-700 mb-6">
-              <div className="flex gap-6">
-                <button
-                  onClick={() => setActiveTab('cast')}
-                  className={`pb-2 ${activeTab === 'cast' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
-                >
-                  Cast
-                </button>
-                <button
-                  onClick={() => setActiveTab('links')}
-                  className={`pb-2 ${activeTab === 'links' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
-                >
-                  Links
-                </button>
-                <button
-                  onClick={() => setActiveTab('crew')}
-                  className={`pb-2 ${activeTab === 'crew' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
-                >
-                  Crew
-                </button>
-              </div>
-            </div>
+      {/* Content Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
 
-            {/* Tab Content */}
-            {activeTab === 'cast' && (
+        {/* Tabs */}
+        <div className="border-b border-gray-700 mb-6">
+          <div className="flex gap-6">
+            <button
+              onClick={() => setActiveTab('cast')}
+              className={`pb-2 ${activeTab === 'cast' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
+            >
+              Cast
+            </button>
+            <button
+              onClick={() => setActiveTab('links')}
+              className={`pb-2 ${activeTab === 'links' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
+            >
+              Links
+            </button>
+            <button
+              onClick={() => setActiveTab('crew')}
+              className={`pb-2 ${activeTab === 'crew' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
+            >
+              Crew
+            </button>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'cast' && (
               <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 {movie.cast?.map((c) => (
                   <div
@@ -154,10 +171,10 @@ const MovieDetail = () => {
                     <p className="text-xs text-gray-400">{c.character}</p>
                   </div>
                 ))}
-              </div>
-            )}
+          </div>
+        )}
 
-            {activeTab === 'links' && (
+        {activeTab === 'links' && (
               <div className="space-y-8">
                 {/* Watch Now */}
                 {movie.watch_links && (movie.watch_links.netflix || movie.watch_links.prime || movie.watch_links.hotstar || movie.watch_links.zee5) && (
@@ -284,12 +301,10 @@ const MovieDetail = () => {
                     </div>
                   </div>
                 )}
+          </div>
+        )}
 
-
-              </div>
-            )}
-
-            {activeTab === 'crew' && (
+        {activeTab === 'crew' && (
               <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
                 {movie.crew?.map((c) => (
                   <div
@@ -306,10 +321,8 @@ const MovieDetail = () => {
                     <p className="text-xs text-gray-400">{c.job}</p>
                   </div>
                 ))}
-              </div>
-            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

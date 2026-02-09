@@ -28,6 +28,7 @@ import ManageLinks from './pages/admin/ManageLinks';
 import ManagePersons from './pages/admin/ManagePersons';
 import ManageCrew from './pages/admin/ManageCrew';
 import ManageHeroBanner from './pages/admin/ManageHeroBanner';
+import ManageUsers from './pages/admin/ManageUsers';
 
 function App() {
   return (
@@ -127,6 +128,12 @@ function App() {
             <Route path="/admin/manage-hero-banner" element={
               <ProtectedRoute adminOnly>
                 <ManageHeroBanner />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/manage-users" element={
+              <ProtectedRoute adminOnly>
+                <ManageUsers />
               </ProtectedRoute>
             } />
           </Routes>
