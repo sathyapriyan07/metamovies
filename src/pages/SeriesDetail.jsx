@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getSeriesById } from '../services/supabase';
+import { getSeriesById, updateSeries } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 import CastCard from '../components/CastCard';
+import DetailHero from '../components/DetailHero';
 
 const SeriesDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { addItem, removeItem, checkInWatchlist } = useWatchlist();
   const [series, setSeries] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,6 +17,8 @@ const SeriesDetail = () => {
   const [selectedSeason, setSelectedSeason] = useState(null);
   const [showFullOverview, setShowFullOverview] = useState(false);
   const [inWatchlist, setInWatchlist] = useState(false);
+  const [editingPoster, setEditingPoster] = useState(false);
+  const [posterUrl, setPosterUrl] = useState('');
 
   const getYouTubeThumbnail = (url) => {
     const videoId = url?.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/)?.[1];
@@ -65,66 +68,111 @@ const SeriesDetail = () => {
   if (!series) return <div className="min-h-screen flex items-center justify-center">Series not found</div>;
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Poster */}
-          <img
-            src={series.poster_url || 'https://via.placeholder.com/300x450'}
-            alt={series.title}
-            className="w-48 md:w-64 rounded-xl shadow-2xl"
-          />
+    <div className="min-h-screen bg-black">
+      {/* Hero Section */}
+      <DetailHero
+        backdrop={series.backdrop_url}
+        poster={series.poster_url}
+        title={series.title}
+      />
 
-          {/* Info */}
-          <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{series.title}</h1>
-            
-            <div className="flex flex-wrap gap-4 mb-4">
-              {series.rating && (
-                <span className="text-yellow-400 text-xl">⭐ {series.rating.toFixed(1)}</span>
-              )}
-              <span className="text-gray-400">{series.first_air_date?.split('-')[0]}</span>
-              <span className="text-gray-400">{series.seasons?.length} Seasons</span>
-            </div>
+      {/* Title & Metadata Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12 md:mt-16 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
+          {series.title}
+        </h1>
+        
+        {/* Metadata Row */}
+        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4">
+          {series.first_air_date && (
+            <span className="text-gray-400">{series.first_air_date.split('-')[0]}</span>
+          )}
+          {series.genres && series.genres.length > 0 && (
+            <>
+              <span className="text-gray-500">•</span>
+              <div className="flex gap-2">
+                {series.genres.slice(0, 3).map((genre, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(`/series?genre=${genre}`)}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    {genre}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {series.rating && (
+            <>
+              <span className="text-gray-500">•</span>
+              <span className="text-yellow-400 font-semibold">⭐ {series.rating.toFixed(1)}</span>
+            </>
+          )}
+          {series.seasons?.length > 0 && (
+            <>
+              <span className="text-gray-500">•</span>
+              <span className="text-gray-400">{series.seasons.length} Seasons</span>
+            </>
+          )}
+        </div>
 
-            {/* Genres */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {series.genres?.map((genre, i) => (
+        {/* Overview */}
+        {series.overview && (
+          <p className="text-gray-300 text-sm md:text-base max-w-4xl mx-auto mb-6">
+            {series.overview}
+          </p>
+        )}
+
+        {/* Buttons */}
+        <div className="flex gap-3 justify-center">
+          <button onClick={toggleWatchlist} className="btn-secondary">
+            {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
+          </button>
+          {user?.isAdmin && (
+            <button onClick={() => { setEditingPoster(true); setPosterUrl(series.poster_url || ''); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+              Edit Poster
+            </button>
+          )}
+        </div>
+
+        {/* Admin Poster Edit Modal */}
+        {editingPoster && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
+            <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-xl font-bold mb-4">Update Poster</h3>
+              <input
+                type="text"
+                value={posterUrl}
+                onChange={(e) => setPosterUrl(e.target.value)}
+                placeholder="Poster URL"
+                className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
+              />
+              <div className="flex gap-3">
                 <button
-                  key={i}
-                  onClick={() => navigate(`/series?genre=${genre}`)}
-                  className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm transition-colors"
+                  onClick={async () => {
+                    await updateSeries(series.id, { poster_url: posterUrl });
+                    setEditingPoster(false);
+                    loadSeries();
+                  }}
+                  className="flex-1 btn-primary"
                 >
-                  {genre}
+                  Save
                 </button>
-              ))}
-            </div>
-
-            {/* Overview */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">Overview</h2>
-              <p className={`text-gray-300 ${!showFullOverview && 'line-clamp-3'}`}>
-                {series.overview}
-              </p>
-              {series.overview?.length > 200 && (
-                <button
-                  onClick={() => setShowFullOverview(!showFullOverview)}
-                  className="text-red-500 mt-2"
-                >
-                  {showFullOverview ? 'Read Less' : 'Read More'}
+                <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
+                  Cancel
                 </button>
-              )}
+              </div>
             </div>
+          </div>
+        )}
+      </div>
 
-            {/* Buttons */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              <button onClick={toggleWatchlist} className="btn-secondary">
-                {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
-              </button>
-            </div>
+      {/* Content Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 mt-8">
 
-            {/* Seasons Dropdown */}}
-            {series.seasons && series.seasons.length > 0 && (
+        {/* Seasons Dropdown */}
+        {series.seasons && series.seasons.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-xl font-bold mb-3">Seasons</h3>
                 <select
@@ -162,10 +210,10 @@ const SeriesDetail = () => {
                     ))}
                   </div>
                 )}
-              </div>
-            )}
+          </div>
+        )}
 
-            {/* Tabs */}
+        {/* Tabs */}
             <div className="border-b border-gray-700 mb-6">
               <div className="flex gap-6">
                 <button
@@ -189,8 +237,8 @@ const SeriesDetail = () => {
               </div>
             </div>
 
-            {/* Tab Content */}
-            {activeTab === 'cast' && (
+        {/* Tab Content */}
+        {activeTab === 'cast' && (
               <div>
                 <h3 className="text-lg font-bold mb-3">Cast</h3>
                 <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
@@ -206,10 +254,10 @@ const SeriesDetail = () => {
                 {(!series.cast || series.cast.length === 0) && (
                   <p className="text-center text-gray-400 py-8">No cast information available</p>
                 )}
-              </div>
-            )}
+          </div>
+        )}
 
-            {activeTab === 'links' && (
+        {activeTab === 'links' && (
               <div className="space-y-8">
                 {/* Watch Now */}
                 {series.watch_links && (series.watch_links.netflix || series.watch_links.prime || series.watch_links.hotstar || series.watch_links.zee5) && (
@@ -338,10 +386,10 @@ const SeriesDetail = () => {
                 )}
 
 
-              </div>
-            )}
+          </div>
+        )
 
-            {activeTab === 'crew' && (
+        {activeTab === 'crew' && (
               <div>
                 <h3 className="text-lg font-bold mb-3">Crew</h3>
                 <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
@@ -357,10 +405,8 @@ const SeriesDetail = () => {
                 {(!series.crew || series.crew.length === 0) && (
                   <p className="text-center text-gray-400 py-8">No crew information available</p>
                 )}
-              </div>
-            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

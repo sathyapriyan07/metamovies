@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getMovieById } from '../services/supabase';
+import { getMovieById, updateMovie } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 import CastCard from '../components/CastCard';
+import DetailHero from '../components/DetailHero';
 
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { addItem, removeItem, checkInWatchlist } = useWatchlist();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('cast');
   const [showFullOverview, setShowFullOverview] = useState(false);
   const [inWatchlist, setInWatchlist] = useState(false);
+  const [editingPoster, setEditingPoster] = useState(false);
+  const [posterUrl, setPosterUrl] = useState('');
 
   const getYouTubeThumbnail = (url) => {
     const videoId = url?.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/)?.[1];
@@ -63,80 +66,106 @@ const MovieDetail = () => {
   return (
     <div className="min-h-screen bg-black">
       {/* Hero Section */}
-      <div className="relative w-full h-[65vh] md:h-[80vh] overflow-hidden">
-        {/* Backdrop Image */}
-        <img
-          src={movie.backdrop_url || movie.poster_url || 'https://via.placeholder.com/1920x1080'}
-          alt={movie.title}
-          className="absolute inset-0 w-full h-full object-cover" 
-          style={{ animation: 'fadeIn 0.3s ease-out' }}
-        />
+      <DetailHero
+        backdrop={movie.backdrop_url}
+        poster={movie.poster_url}
+        title={movie.title}
+      />
 
-        {/* Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-
-        {/* Content */}
-        <div className="relative h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-end pb-12 md:pb-16">
-          <div className="max-w-3xl space-y-3 fade-in">
-            {/* Title */}
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-              {movie.title}
-            </h1>
-
-            {/* Rating & Metadata */}
-            <div className="flex items-center gap-3 text-sm md:text-base">
-              {movie.rating && (
-                <span className="text-yellow-400 font-semibold">⭐ {movie.rating.toFixed(1)}</span>
-              )}
-              {movie.release_date && (
-                <>
-                  <span className="text-gray-500">•</span>
-                  <span className="text-gray-300">{movie.release_date.split('-')[0]}</span>
-                </>
-              )}
-              {movie.runtime && (
-                <>
-                  <span className="text-gray-500">•</span>
-                  <span className="text-gray-300">{movie.runtime} min</span>
-                </>
-              )}
-            </div>
-
-            {/* Overview */}
-            {movie.overview && (
-              <p className="text-gray-400 text-sm md:text-base line-clamp-3 leading-relaxed">
-                {movie.overview}
-              </p>
-            )}
-
-            {/* Genres */}
-            {movie.genres && movie.genres.length > 0 && (
-              <div className="flex gap-2 text-sm md:text-base">
-                {movie.genres.map((genre, i) => (
+      {/* Title & Metadata Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12 md:mt-16 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
+          {movie.title}
+        </h1>
+        
+        {/* Metadata Row */}
+        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4">
+          {movie.release_date && (
+            <span className="text-gray-400">{movie.release_date.split('-')[0]}</span>
+          )}
+          {movie.genres && movie.genres.length > 0 && (
+            <>
+              <span className="text-gray-500">•</span>
+              <div className="flex gap-2">
+                {movie.genres.slice(0, 3).map((genre, i) => (
                   <button
                     key={i}
                     onClick={() => navigate(`/movies?genre=${genre}`)}
-                    className="text-gray-300 hover:text-red-500 transition-colors"
+                    className="text-gray-400 hover:text-red-500 transition-colors"
                   >
-                    {genre}{i < movie.genres.length - 1 && ' |'}
+                    {genre}
                   </button>
                 ))}
               </div>
-            )}
+            </>
+          )}
+          {movie.rating && (
+            <>
+              <span className="text-gray-500">•</span>
+              <span className="text-yellow-400 font-semibold">⭐ {movie.rating.toFixed(1)}</span>
+            </>
+          )}
+          {movie.runtime && (
+            <>
+              <span className="text-gray-500">•</span>
+              <span className="text-gray-400">{movie.runtime} min</span>
+            </>
+          )}
+        </div>
 
-            {/* Watchlist Button */}
-            <div className="pt-2">
-              <button onClick={toggleWatchlist} className="btn-secondary">
-                {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
-              </button>
+        {/* Overview */}
+        {movie.overview && (
+          <p className="text-gray-300 text-sm md:text-base max-w-4xl mx-auto mb-6">
+            {movie.overview}
+          </p>
+        )}
+
+        {/* Buttons */}
+        <div className="flex gap-3 justify-center">
+          <button onClick={toggleWatchlist} className="btn-secondary">
+            {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
+          </button>
+          {user?.isAdmin && (
+            <button onClick={() => { setEditingPoster(true); setPosterUrl(movie.poster_url || ''); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+              Edit Poster
+            </button>
+          )}
+        </div>
+
+        {/* Admin Poster Edit Modal */}
+        {editingPoster && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
+            <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-xl font-bold mb-4">Update Poster</h3>
+              <input
+                type="text"
+                value={posterUrl}
+                onChange={(e) => setPosterUrl(e.target.value)}
+                placeholder="Poster URL"
+                className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    await updateMovie(movie.id, { poster_url: posterUrl });
+                    setEditingPoster(false);
+                    loadMovie();
+                  }}
+                  className="flex-1 btn-primary"
+                >
+                  Save
+                </button>
+                <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 mt-8">
 
         {/* Tabs */}
         <div className="border-b border-gray-700 mb-6">
