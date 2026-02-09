@@ -46,7 +46,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen pt-16 md:pt-16 pb-20 md:pb-8">
+    <div className="min-h-screen pb-20 md:pb-8">
       {/* Hero Banner */}
       <HeroBanner />
       

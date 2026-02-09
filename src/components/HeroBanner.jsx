@@ -95,7 +95,7 @@ const HeroBanner = () => {
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
       {/* Content Container */}
-      <div className="relative h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-center md:justify-end pb-16 md:pb-20">
+      <div className="relative h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-end pb-12 md:pb-16">
         {/* Text Content */}
         <div className="max-w-2xl fade-in">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
