@@ -70,7 +70,7 @@ const HeroBanner = () => {
 
   if (loading || banners.length === 0) {
     return (
-      <div className="w-full h-[60vh] md:h-[75vh] bg-gray-900 animate-pulse" />
+      <div className="w-full h-[50vh] md:h-[60vh] bg-gray-900 animate-pulse" />
     );
   }
 
@@ -78,7 +78,7 @@ const HeroBanner = () => {
 
   return (
     <div 
-      className="relative w-full h-[60vh] md:h-[75vh] overflow-hidden"
+      className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -94,32 +94,8 @@ const HeroBanner = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-      {/* Navigation Arrows */}
-      {banners.length > 1 && (
-        <>
-          <button
-            onClick={goToPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all z-10"
-            aria-label="Previous"
-          >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-            </svg>
-          </button>
-          <button
-            onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center transition-all z-10"
-            aria-label="Next"
-          >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" />
-            </svg>
-          </button>
-        </>
-      )}
-
       {/* Content Container */}
-      <div className="relative h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-center md:justify-end pb-16 md:pb-24">
+      <div className="relative h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-center md:justify-end pb-16 md:pb-20">
         {/* Text Content */}
         <div className="max-w-2xl fade-in">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
