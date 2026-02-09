@@ -66,7 +66,7 @@ const PersonDetail = () => {
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8 bg-black">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="grid md:grid-cols-[300px_1fr] gap-8">
+        <div className="grid md:grid-cols-[200px_1fr] gap-8">
           {/* Left Column - Profile Image & Info */}
           <div className="space-y-6">
             <img
