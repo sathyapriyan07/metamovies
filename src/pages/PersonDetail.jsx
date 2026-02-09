@@ -66,18 +66,22 @@ const PersonDetail = () => {
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8 bg-black">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="grid md:grid-cols-[200px_1fr] gap-8">
+        <div className="grid md:grid-cols-[250px_1fr] gap-8">
           {/* Left Column - Profile Image & Info */}
           <div className="space-y-6">
-            <img
-              src={person.profile_url || 'https://via.placeholder.com/400x600'}
-              alt={`${person.name} profile`}
-              className="w-full rounded-xl shadow-2xl md:sticky md:top-24"
-            />
+            {/* Centered Profile Image */}
+            <div className="flex justify-center">
+              <img
+                src={person.profile_url || 'https://via.placeholder.com/400x600'}
+                alt={`${person.name} profile`}
+                className="w-64 h-64 object-cover rounded-3xl shadow-2xl"
+              />
+            </div>
             
-            <PersonalInfoCard person={person} creditsCount={creditsCount} />
+            {/* Centered Name */}
+            <h1 className="text-3xl font-bold text-center">{person.name}</h1>
             
-            {/* Social Icons */}
+            {/* Centered Social Icons */}
             {person.social_links && (
               <div className="flex gap-4 justify-center">
                 {person.social_links.instagram && (
@@ -103,12 +107,12 @@ const PersonDetail = () => {
                 )}
               </div>
             )}
+            
+            <PersonalInfoCard person={person} creditsCount={creditsCount} />
           </div>
 
           {/* Right Column - Biography & Known For */}
           <div className="space-y-8">
-            {/* Name */}
-            <h1 className="text-4xl md:text-5xl font-bold">{person.name}</h1>
 
             {/* Biography */}
             {person.biography && (
