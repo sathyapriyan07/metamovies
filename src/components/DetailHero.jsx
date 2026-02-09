@@ -11,7 +11,7 @@ const DetailHero = ({ backdrop, poster, title, year, rating, genres, runtime, on
         />
         
         {/* Light Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#f5d9a6]/90 via-[#f5d9a6]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-100/80 via-amber-50/30 to-transparent" />
         
         {/* Floating Poster */}
         <div className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 z-20 animate-[fadeIn_0.3s_ease-out]">
