@@ -48,8 +48,10 @@ const Home = () => {
 
   return (
     <div className="min-h-screen pb-20 md:pb-8">
-      {/* Search Bar */}
-      <HomeSearchBar />
+      {/* Top Black Header with Search Bar */}
+      <div className="w-full bg-black pt-16 md:pt-20 pb-3 px-4">
+        <HomeSearchBar />
+      </div>
       
       {/* Hero Banner */}
       <HeroBanner />
