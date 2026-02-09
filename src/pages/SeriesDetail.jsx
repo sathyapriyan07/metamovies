@@ -66,6 +66,17 @@ const SeriesDetail = () => {
 
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="fixed top-20 md:top-24 left-4 md:left-8 z-50 glass glass-hover p-3 rounded-full shadow-lg"
+        aria-label="Go back"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Poster */}

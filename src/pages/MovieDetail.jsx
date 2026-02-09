@@ -62,6 +62,17 @@ const MovieDetail = () => {
 
   return (
     <div className="min-h-screen bg-black">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="fixed top-20 md:top-24 left-4 md:left-8 z-50 glass glass-hover p-3 rounded-full shadow-lg"
+        aria-label="Go back"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
       {/* Hero Section */}
       <div className="relative w-full h-[65vh] md:h-[80vh] overflow-hidden">
         {/* Backdrop Image */}
