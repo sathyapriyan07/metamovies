@@ -67,7 +67,7 @@ const MovieDetail = () => {
         <img
           src={movie.backdrop_url || movie.poster_url || 'https://via.placeholder.com/1920x1080'}
           alt={movie.title}
-          className="absolute inset-0 w-full h-full object-contain bg-black" 
+          className="absolute inset-0 w-full h-full object-cover animate-[scale_0.3s_ease-out]" 
           style={{ animation: 'fadeIn 0.3s ease-out' }}
         />
 
