@@ -387,7 +387,7 @@ const SeriesDetail = () => {
 
 
           </div>
-        )
+        )}
 
         {activeTab === 'crew' && (
               <div>
