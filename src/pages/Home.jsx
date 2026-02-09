@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getTrendingMovies, getTrendingSeries, getUpcomingMovies, getMovies, getCollections, getCollectionWithItems } from '../services/supabase';
 import PosterRow from '../components/PosterRow';
+import HeroBanner from '../components/HeroBanner';
 
 const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -46,6 +47,9 @@ const Home = () => {
 
   return (
     <div className="min-h-screen pt-16 md:pt-16 pb-20 md:pb-8">
+      {/* Hero Banner */}
+      <HeroBanner />
+      
       {/* Content Rows */}
       <div className="max-w-7xl mx-auto pt-8">
         <PosterRow title="Trending Movies" items={trendingMovies} type="movie" loading={loading} />

@@ -351,3 +351,17 @@ export const removeFromCollection = async (collectionItemId) => {
   const { error } = await supabase.from('collection_items').delete().eq('id', collectionItemId);
   return { error };
 };
+
+// Hero Banners
+export const getHeroBanners = async () => {
+  const { data, error } = await supabase
+    .from('hero_banners')
+    .select(`
+      *,
+      movie:movies(*),
+      series:series(*)
+    `)
+    .eq('is_active', true)
+    .order('display_order', { ascending: true });
+  return { data, error };
+};

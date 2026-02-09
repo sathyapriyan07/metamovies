@@ -27,6 +27,7 @@ import UpdatePersons from './pages/admin/UpdatePersons';
 import ManageLinks from './pages/admin/ManageLinks';
 import ManagePersons from './pages/admin/ManagePersons';
 import ManageCrew from './pages/admin/ManageCrew';
+import ManageHeroBanner from './pages/admin/ManageHeroBanner';
 
 function App() {
   return (
@@ -120,6 +121,12 @@ function App() {
             <Route path="/admin/manage-crew" element={
               <ProtectedRoute adminOnly>
                 <ManageCrew />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/manage-hero-banner" element={
+              <ProtectedRoute adminOnly>
+                <ManageHeroBanner />
               </ProtectedRoute>
             } />
           </Routes>

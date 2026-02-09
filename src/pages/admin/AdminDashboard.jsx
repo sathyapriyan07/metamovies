@@ -7,7 +7,8 @@ const AdminDashboard = () => {
     movies: 0,
     series: 0,
     persons: 0,
-    users: 0
+    users: 0,
+    banners: 0
   });
 
   useEffect(() => {
@@ -15,18 +16,20 @@ const AdminDashboard = () => {
   }, []);
 
   const loadStats = async () => {
-    const [movies, series, persons, users] = await Promise.all([
+    const [movies, series, persons, users, banners] = await Promise.all([
       supabase.from('movies').select('id', { count: 'exact', head: true }),
       supabase.from('series').select('id', { count: 'exact', head: true }),
       supabase.from('persons').select('id', { count: 'exact', head: true }),
-      supabase.from('users').select('id', { count: 'exact', head: true })
+      supabase.from('users').select('id', { count: 'exact', head: true }),
+      supabase.from('hero_banners').select('id', { count: 'exact', head: true })
     ]);
 
     setStats({
       movies: movies.count || 0,
       series: series.count || 0,
       persons: persons.count || 0,
-      users: users.count || 0
+      users: users.count || 0,
+      banners: banners.count || 0
     });
   };
 
@@ -49,8 +52,8 @@ const AdminDashboard = () => {
             <p className="text-3xl font-bold">{stats.persons}</p>
           </div>
           <div className="glass-dark p-6 rounded-xl">
-            <h3 className="text-gray-400 text-sm mb-2">Total Users</h3>
-            <p className="text-3xl font-bold">{stats.users}</p>
+            <h3 className="text-gray-400 text-sm mb-2">Hero Banners</h3>
+            <p className="text-3xl font-bold">{stats.banners}</p>
           </div>
         </div>
 
@@ -99,6 +102,10 @@ const AdminDashboard = () => {
           <Link to="/admin/manage-crew" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
             <h3 className="text-xl font-bold mb-2">🎭 Manage Crew</h3>
             <p className="text-gray-400 text-sm">Add directors, composers to crew</p>
+          </Link>
+          <Link to="/admin/manage-hero-banner" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
+            <h3 className="text-xl font-bold mb-2">🎬 Manage Hero Banner</h3>
+            <p className="text-gray-400 text-sm">Control homepage hero section</p>
           </Link>
         </div>
       </div>
