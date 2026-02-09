@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPersonById } from '../services/supabase';
+import PersonalInfoCard from '../components/PersonalInfoCard';
+import PosterCard from '../components/PosterCard';
 
 const PersonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('about');
+  const [showFullBio, setShowFullBio] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     loadPerson();
@@ -31,25 +34,52 @@ const PersonDetail = () => {
   if (!person) return <div className="min-h-screen flex items-center justify-center">Person not found</div>;
 
   const allWorks = [
-    ...(person.cast_roles?.map(c => ({ ...c.movie || c.series, type: c.movie ? 'movie' : 'series', role: c.character })) || []),
-    ...(person.crew_roles?.map(c => ({ ...c.movie || c.series, type: c.movie ? 'movie' : 'series', role: c.job })) || [])
-  ];
+    ...(person.cast_roles?.map(c => ({ ...c.movie || c.series, type: c.movie ? 'movie' : 'series', role: c.character, year: (c.movie || c.series)?.release_date?.split('-')[0] })) || []),
+    ...(person.crew_roles?.map(c => ({ ...c.movie || c.series, type: c.movie ? 'movie' : 'series', role: c.job, year: (c.movie || c.series)?.release_date?.split('-')[0] })) || [])
+  ].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 15);
+
+  const creditsCount = (person.cast_roles?.length || 0) + (person.crew_roles?.length || 0);
+
+  // Acting credits
+  const actingCredits = (person.cast_roles || []).map(c => ({
+    ...c.movie || c.series,
+    type: c.movie ? 'movie' : 'series',
+    role: c.character,
+    year: (c.movie || c.series)?.release_date?.split('-')[0]
+  })).sort((a, b) => (b.year || '0') - (a.year || '0'));
+
+  // Sound/Music credits
+  const soundJobs = ['Original Music Composer', 'Music Composer', 'Composer', 'Score', 'Soundtrack', 'Music'];
+  const soundCredits = (person.crew_roles || []).filter(c => 
+    soundJobs.some(job => c.job?.includes(job))
+  ).map(c => ({
+    ...c.movie || c.series,
+    type: c.movie ? 'movie' : 'series',
+    role: c.job,
+    year: (c.movie || c.series)?.release_date?.split('-')[0]
+  })).sort((a, b) => (b.year || '0') - (a.year || '0'));
+
+  // Determine visible tabs
+  const hasActing = actingCredits.length > 0;
+  const hasSound = soundCredits.length > 0;
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row gap-8">
-          {/* Profile Image */}
-          <div className="md:w-1/4">
+    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8 bg-black">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="grid md:grid-cols-[300px_1fr] gap-8">
+          {/* Left Column - Profile Image & Info */}
+          <div className="space-y-6">
             <img
               src={person.profile_url || 'https://via.placeholder.com/400x600'}
-              alt={person.name}
-              className="w-full rounded-xl shadow-2xl"
+              alt={`${person.name} profile`}
+              className="w-full rounded-xl shadow-2xl md:sticky md:top-24"
             />
+            
+            <PersonalInfoCard person={person} creditsCount={creditsCount} />
             
             {/* Social Icons */}
             {person.social_links && (
-              <div className="flex gap-4 mt-6 justify-center">
+              <div className="flex gap-4 justify-center">
                 {person.social_links.instagram && (
                   <a href={person.social_links.instagram} target="_blank" rel="noopener noreferrer" className="text-2xl hover:text-red-500 transition">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -75,102 +105,138 @@ const PersonDetail = () => {
             )}
           </div>
 
-          {/* Info */}
-          <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">{person.name}</h1>
+          {/* Right Column - Biography & Known For */}
+          <div className="space-y-8">
+            {/* Name */}
+            <h1 className="text-4xl md:text-5xl font-bold">{person.name}</h1>
 
-            {/* Music Platform Links */}
-            {person.music_links && (person.music_links.spotify || person.music_links.apple_music || person.music_links.youtube_music) && (
-              <div className="mb-6">
-                <h3 className="text-xl font-bold mb-3">Listen on Music Platforms</h3>
-                <div className="flex flex-wrap gap-3">
-                  {person.music_links.spotify && (
-                    <a href={person.music_links.spotify} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition">
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                      </svg>
-                      Spotify
-                    </a>
-                  )}
-                  {person.music_links.apple_music && (
-                    <a href={person.music_links.apple_music} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-pink-600 hover:bg-pink-700 rounded-lg transition">
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M23.997 6.124c0-.738-.065-1.47-.24-2.19-.317-1.31-1.062-2.31-2.18-3.043C21.003.517 20.373.285 19.7.164c-.517-.093-1.038-.135-1.564-.15-.04-.003-.083-.01-.124-.013H5.988c-.152.01-.303.017-.455.026C4.786.07 4.043.15 3.34.428 2.004.958 1.04 1.88.475 3.208c-.192.448-.292.925-.363 1.408-.056.392-.088.785-.1 1.18 0 .032-.007.062-.01.093v12.223c.01.14.017.283.027.424.05.815.154 1.624.497 2.373.65 1.42 1.738 2.353 3.234 2.801.42.127.856.187 1.293.228.555.053 1.11.06 1.667.06h11.03c.525 0 1.048-.034 1.57-.1.823-.106 1.597-.35 2.296-.81a5.28 5.28 0 0 0 1.88-2.207c.186-.42.293-.87.37-1.324.113-.675.138-1.358.137-2.04-.002-3.8 0-7.595-.003-11.393zm-6.423 3.99v5.712c0 .417-.058.827-.244 1.206-.29.59-.76 1.035-1.36 1.322-.63.302-1.29.405-1.97.332-.655-.07-1.227-.306-1.72-.706-.677-.55-1.03-1.264-1.1-2.107-.08-.98.27-1.85 1.03-2.52.48-.423 1.05-.685 1.68-.816.48-.1.97-.14 1.46-.16.48-.02.96 0 1.51 0v-4.74c0-.068-.007-.127-.048-.188-.05-.075-.11-.087-.19-.08-.48.05-.96.1-1.44.16-1.07.14-2.14.28-3.21.43-.27.04-.55.06-.82.1-.14.02-.27.06-.39.16-.07.06-.09.14-.09.22v8.1c0 .42-.06.83-.25 1.21-.29.59-.76 1.04-1.36 1.33-.63.3-1.29.4-1.97.33-.66-.07-1.23-.31-1.72-.71-.68-.55-1.03-1.27-1.1-2.11-.08-.98.27-1.85 1.03-2.52.48-.42 1.05-.68 1.68-.81.48-.1.97-.14 1.46-.16.48-.02.96 0 1.51 0V6.47c0-.21.03-.21.21-.18.48.06.95.12 1.43.18l2.39.31c.97.13 1.94.26 2.91.39.35.04.71.08 1.06.13.28.04.43.2.43.49v5.29z"/>
-                      </svg>
-                      Apple Music
-                    </a>
-                  )}
-                  {person.music_links.youtube_music && (
-                    <a href={person.music_links.youtube_music} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition">
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.104c-3.924 0-7.104-3.18-7.104-7.104S8.076 4.896 12 4.896s7.104 3.18 7.104 7.104-3.18 7.104-7.104 7.104zm0-13.332c-3.432 0-6.228 2.796-6.228 6.228S8.568 18.228 12 18.228s6.228-2.796 6.228-6.228S15.432 5.772 12 5.772zM9.684 15.54V8.46L15.816 12l-6.132 3.54z"/>
-                      </svg>
-                      YouTube Music
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Tabs */}
-            <div className="border-b border-gray-700 mb-6">
-              <div className="flex gap-6">
-                <button
-                  onClick={() => setActiveTab('about')}
-                  className={`pb-2 ${activeTab === 'about' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
-                >
-                  About
-                </button>
-                <button
-                  onClick={() => setActiveTab('filmography')}
-                  className={`pb-2 ${activeTab === 'filmography' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}
-                >
-                  Filmography
-                </button>
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            {activeTab === 'about' && (
-              <div className="space-y-4">
-                {person.birthday && (
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-400">Birthday</h3>
-                    <p>{person.birthday}</p>
-                  </div>
-                )}
-                {person.place_of_birth && (
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-400">Place of Birth</h3>
-                    <p>{person.place_of_birth}</p>
-                  </div>
-                )}
-                {person.biography && (
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-400">Biography</h3>
-                    <p className="text-gray-300 whitespace-pre-line">{person.biography}</p>
-                  </div>
+            {/* Biography */}
+            {person.biography && (
+              <div className="space-y-3">
+                <h2 className="text-2xl font-bold">Biography</h2>
+                <p className={`text-gray-300 leading-relaxed whitespace-pre-line ${!showFullBio && 'line-clamp-6'}`}>
+                  {person.biography}
+                </p>
+                {person.biography.length > 500 && (
+                  <button
+                    onClick={() => setShowFullBio(!showFullBio)}
+                    className="text-red-500 hover:underline font-semibold"
+                    aria-label={showFullBio ? 'Read Less' : 'Read More'}
+                  >
+                    {showFullBio ? 'Read Less' : 'Read More'}
+                  </button>
                 )}
               </div>
             )}
 
-            {activeTab === 'filmography' && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {/* Known For Row */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">Known For</h2>
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {allWorks.map((work, i) => (
                   <div
                     key={i}
                     onClick={() => navigate(`/${work.type}/${work.id}`)}
-                    className="cursor-pointer hover:scale-105 transition"
+                    className="flex-shrink-0 w-[110px] md:w-[140px] cursor-pointer hover:scale-105 transition-transform"
                   >
                     <img
-                      src={work.poster_url || 'https://via.placeholder.com/300x450'}
+                      src={work.poster_url || 'https://via.placeholder.com/140x210'}
                       alt={work.title}
-                      className="w-full h-64 object-cover rounded-lg mb-2"
+                      className="w-full aspect-[2/3] object-cover rounded-lg mb-2"
+                      loading="lazy"
                     />
-                    <p className="font-semibold text-sm">{work.title}</p>
-                    <p className="text-xs text-gray-400">{work.role}</p>
+                    <p className="font-semibold text-sm line-clamp-2">{work.title}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Department Tabs */}
+            {(hasActing || hasSound) && (
+              <div className="space-y-6">
+                {/* Tab Bar */}
+                <div className="glass rounded-lg p-1 flex gap-2 overflow-x-auto scrollbar-hide">
+                  <button
+                    onClick={() => setActiveTab('overview')}
+                    className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all duration-300 ${
+                      activeTab === 'overview' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'
+                    }`}
+                    aria-selected={activeTab === 'overview'}
+                  >
+                    Overview
+                  </button>
+                  {hasActing && (
+                    <button
+                      onClick={() => setActiveTab('acting')}
+                      className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all duration-300 ${
+                        activeTab === 'acting' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'
+                      }`}
+                      aria-selected={activeTab === 'acting'}
+                    >
+                      Acting
+                    </button>
+                  )}
+                  {hasSound && (
+                    <button
+                      onClick={() => setActiveTab('sound')}
+                      className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all duration-300 ${
+                        activeTab === 'sound' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'
+                      }`}
+                      aria-selected={activeTab === 'sound'}
+                    >
+                      Sound
+                    </button>
+                  )}
+                </div>
+
+                {/* Tab Content */}
+                <div className="glass rounded-xl p-4 md:p-6 max-h-[600px] overflow-y-auto">
+                  {activeTab === 'overview' && (
+                    <div className="text-center text-gray-400 py-8">
+                      Select a department tab to view credits
+                    </div>
+                  )}
+
+                  {activeTab === 'acting' && (
+                    <div className="space-y-1">
+                      {actingCredits.map((credit, i) => (
+                        <div
+                          key={i}
+                          onClick={() => navigate(`/${credit.type}/${credit.id}`)}
+                          className="py-3 px-2 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors"
+                        >
+                          <div className="flex items-start gap-4">
+                            <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || '—'}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-medium">{credit.title}</p>
+                              <p className="text-gray-400 text-sm">as {credit.role}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeTab === 'sound' && (
+                    <div className="space-y-1">
+                      {soundCredits.map((credit, i) => (
+                        <div
+                          key={i}
+                          onClick={() => navigate(`/${credit.type}/${credit.id}`)}
+                          className="py-3 px-2 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors"
+                        >
+                          <div className="flex items-start gap-4">
+                            <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || '—'}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-medium">{credit.title}</p>
+                              <p className="text-gray-400 text-sm">{credit.role}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

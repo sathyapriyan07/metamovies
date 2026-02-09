@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieById } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
+import CastCard from '../components/CastCard';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -111,8 +112,16 @@ const MovieDetail = () => {
 
             {/* Genres */}
             {movie.genres && movie.genres.length > 0 && (
-              <div className="text-gray-300 text-sm md:text-base">
-                {movie.genres.join(' | ')}
+              <div className="flex gap-2 text-sm md:text-base">
+                {movie.genres.map((genre, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(`/movies?genre=${genre}`)}
+                    className="text-gray-300 hover:text-red-500 transition-colors"
+                  >
+                    {genre}{i < movie.genres.length - 1 && ' |'}
+                  </button>
+                ))}
               </div>
             )}
 
@@ -155,22 +164,21 @@ const MovieDetail = () => {
 
         {/* Tab Content */}
         {activeTab === 'cast' && (
-              <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
-                {movie.cast?.map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => navigate(`/person/${c.person.id}`)}
-                    className="cursor-pointer hover:scale-105 transition"
-                  >
-                    <img
-                      src={c.person.profile_url || 'https://via.placeholder.com/200x300'}
-                      alt={c.person.name}
-                      className="w-full h-48 object-cover rounded-lg mb-2"
-                    />
-                    <p className="font-semibold text-sm">{c.person.name}</p>
-                    <p className="text-xs text-gray-400">{c.character}</p>
-                  </div>
-                ))}
+          <div>
+            <h3 className="text-lg font-bold mb-3">Cast</h3>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {movie.cast?.map((c) => (
+                <CastCard
+                  key={c.id}
+                  person={c.person}
+                  role={c.character}
+                  personId={c.person.id}
+                />
+              ))}
+            </div>
+            {(!movie.cast || movie.cast.length === 0) && (
+              <p className="text-center text-gray-400 py-8">No cast information available</p>
+            )}
           </div>
         )}
 
@@ -305,22 +313,21 @@ const MovieDetail = () => {
         )}
 
         {activeTab === 'crew' && (
-              <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
-                {movie.crew?.map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => navigate(`/person/${c.person.id}`)}
-                    className="cursor-pointer hover:scale-105 transition"
-                  >
-                    <img
-                      src={c.person.profile_url || 'https://via.placeholder.com/200x300'}
-                      alt={c.person.name}
-                      className="w-full h-48 object-cover rounded-lg mb-2"
-                    />
-                    <p className="font-semibold text-sm">{c.person.name}</p>
-                    <p className="text-xs text-gray-400">{c.job}</p>
-                  </div>
-                ))}
+          <div>
+            <h3 className="text-lg font-bold mb-3">Crew</h3>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {movie.crew?.map((c) => (
+                <CastCard
+                  key={c.id}
+                  person={c.person}
+                  role={c.job}
+                  personId={c.person.id}
+                />
+              ))}
+            </div>
+            {(!movie.crew || movie.crew.length === 0) && (
+              <p className="text-center text-gray-400 py-8">No crew information available</p>
+            )}
           </div>
         )}
       </div>

@@ -17,7 +17,7 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass hidden md:block border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 glass-dark hidden md:block border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="text-2xl font-bold text-red-600 tracking-tight">MetaMovies</Link>
         
@@ -78,7 +78,7 @@ const Navbar = () => {
               <div className="relative">
                 <button 
                   onClick={() => setShowMenu(!showMenu)} 
-                  className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center font-semibold transition-colors"
+                  className="w-10 h-10 rounded-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 flex items-center justify-center font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
                 >
                   {user.user_metadata?.username?.[0]?.toUpperCase() || 'U'}
                 </button>

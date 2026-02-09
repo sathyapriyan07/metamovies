@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getSeriesById } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
+import CastCard from '../components/CastCard';
 
 const SeriesDetail = () => {
   const { id } = useParams();
@@ -89,7 +90,13 @@ const SeriesDetail = () => {
             {/* Genres */}
             <div className="flex flex-wrap gap-2 mb-6">
               {series.genres?.map((genre, i) => (
-                <span key={i} className="px-3 py-1 bg-white/10 rounded-full text-sm">{genre}</span>
+                <button
+                  key={i}
+                  onClick={() => navigate(`/series?genre=${genre}`)}
+                  className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full text-sm transition-colors"
+                >
+                  {genre}
+                </button>
               ))}
             </div>
 
@@ -184,22 +191,21 @@ const SeriesDetail = () => {
 
             {/* Tab Content */}
             {activeTab === 'cast' && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {series.cast?.map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => navigate(`/person/${c.person.id}`)}
-                    className="cursor-pointer hover:scale-105 transition"
-                  >
-                    <img
-                      src={c.person.profile_url || 'https://via.placeholder.com/200x300'}
-                      alt={c.person.name}
-                      className="w-full h-48 object-cover rounded-lg mb-2"
+              <div>
+                <h3 className="text-lg font-bold mb-3">Cast</h3>
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                  {series.cast?.map((c) => (
+                    <CastCard
+                      key={c.id}
+                      person={c.person}
+                      role={c.character}
+                      personId={c.person.id}
                     />
-                    <p className="font-semibold text-sm">{c.person.name}</p>
-                    <p className="text-xs text-gray-400">{c.character}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                {(!series.cast || series.cast.length === 0) && (
+                  <p className="text-center text-gray-400 py-8">No cast information available</p>
+                )}
               </div>
             )}
 
@@ -336,22 +342,21 @@ const SeriesDetail = () => {
             )}
 
             {activeTab === 'crew' && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {series.crew?.map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => navigate(`/person/${c.person.id}`)}
-                    className="cursor-pointer hover:scale-105 transition"
-                  >
-                    <img
-                      src={c.person.profile_url || 'https://via.placeholder.com/200x300'}
-                      alt={c.person.name}
-                      className="w-full h-48 object-cover rounded-lg mb-2"
+              <div>
+                <h3 className="text-lg font-bold mb-3">Crew</h3>
+                <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                  {series.crew?.map((c) => (
+                    <CastCard
+                      key={c.id}
+                      person={c.person}
+                      role={c.job}
+                      personId={c.person.id}
                     />
-                    <p className="font-semibold text-sm">{c.person.name}</p>
-                    <p className="text-xs text-gray-400">{c.job}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                {(!series.crew || series.crew.length === 0) && (
+                  <p className="text-center text-gray-400 py-8">No crew information available</p>
+                )}
               </div>
             )}
           </div>
