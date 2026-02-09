@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPersonById } from '../services/supabase';
 import PersonalInfoCard from '../components/PersonalInfoCard';
@@ -11,6 +11,7 @@ const PersonDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showFullBio, setShowFullBio] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const knownForRef = useRef(null);
 
   useEffect(() => {
     loadPerson();
@@ -39,6 +40,16 @@ const PersonDetail = () => {
   ].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 15);
 
   const creditsCount = (person.cast_roles?.length || 0) + (person.crew_roles?.length || 0);
+
+  const scrollKnownFor = (direction) => {
+    if (knownForRef.current) {
+      const scrollAmount = 300;
+      knownForRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Acting credits
   const actingCredits = (person.cast_roles || []).map(c => ({
@@ -135,8 +146,30 @@ const PersonDetail = () => {
 
             {/* Known For Row */}
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold">Known For</h2>
-              <div className="flex gap-4 overflow-x-auto pb-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold">Known For</h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => scrollKnownFor('left')}
+                    className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition"
+                    aria-label="Scroll left"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => scrollKnownFor('right')}
+                    className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition"
+                    aria-label="Scroll right"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div ref={knownForRef} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {allWorks.map((work, i) => (
                   <div
                     key={i}
