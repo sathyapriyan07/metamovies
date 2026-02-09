@@ -65,15 +65,10 @@ const MovieDetail = () => {
 
   return (
     <div className="min-h-screen bg-black">
-      <DetailHero
-        backdrop={movie.backdrop_url}
-        poster={movie.poster_url}
-        title={movie.title}
-        year={movie.release_date?.split('-')[0]}
-      />
+      <DetailHero backdrop={movie.backdrop_url} poster={movie.poster_url} title={movie.title} />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-10 md:mt-14 text-center">
-        <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12 md:mt-16 text-center">
+        <h1 className="text-2xl md:text-5xl font-bold text-white mb-3 z-30">
           {movie.title} <span className="text-gray-400">{movie.release_date && `(${movie.release_date.split('-')[0]})`}</span>
         </h1>
         
@@ -102,17 +97,17 @@ const MovieDetail = () => {
         </div>
 
         {movie.overview && (
-          <p className="text-gray-300 text-sm md:text-base max-w-4xl mx-auto mb-6">
+          <p className="text-gray-400 text-sm md:text-base max-w-4xl mx-auto mb-6 line-clamp-4">
             {movie.overview}
           </p>
         )}
 
         <div className="flex gap-3 justify-center mb-8">
-          <button onClick={toggleWatchlist} className="btn-secondary">
+          <button onClick={toggleWatchlist} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
             {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
           </button>
           {user?.isAdmin && (
-            <button onClick={() => { setEditingPoster(true); setPosterUrl(movie.poster_url || ''); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+            <button onClick={() => { setEditingPoster(true); setPosterUrl(movie.poster_url || ''); }} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
               Edit Poster
             </button>
           )}
@@ -120,7 +115,7 @@ const MovieDetail = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-        <div className="border-b border-gray-700 mb-6">
+        <div className="border-b border-white/10 mb-6">
           <div className="flex gap-6">
             <button onClick={() => setActiveTab('cast')} className={`pb-2 ${activeTab === 'cast' ? 'border-b-2 border-red-600 text-red-600' : 'text-gray-400'}`}>
               Cast
