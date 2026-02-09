@@ -375,34 +375,3 @@ const SeriesDetail = () => {
 };
 
 export default SeriesDetail;
-
-      {/* Admin Poster Edit Modal */}
-      {editingPoster && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
-          <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-4">Update Poster</h3>
-            <input
-              type="text"
-              value={posterUrl}
-              onChange={(e) => setPosterUrl(e.target.value)}
-              placeholder="Poster URL"
-              className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={async () => {
-                  await updateSeries(series.id, { poster_url: posterUrl });
-                  setEditingPoster(false);
-                  loadSeries();
-                }}
-                className="flex-1 btn-primary"
-              >
-                Save
-              </button>
-              <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}

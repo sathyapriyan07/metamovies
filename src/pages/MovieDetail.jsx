@@ -126,8 +126,36 @@ const MovieDetail = () => {
           </div>
         </div>
 
-      {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+        {editingPoster && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
+            <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-xl font-bold mb-4">Update Poster</h3>
+              <input
+                type="text"
+                value={posterUrl}
+                onChange={(e) => setPosterUrl(e.target.value)}
+                placeholder="Poster URL"
+                className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    await updateMovie(movie.id, { poster_url: posterUrl });
+                    setEditingPoster(false);
+                    loadMovie();
+                  }}
+                  className="flex-1 btn-primary"
+                >
+                  Save
+                </button>
+                <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="border-b border-gray-700 mb-6">
           <div className="flex gap-6">
@@ -321,37 +349,6 @@ const MovieDetail = () => {
           </div>
         )}
       </div>
-
-      {/* Admin Poster Edit Modal */}
-      {editingPoster && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
-          <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-4">Update Poster</h3>
-            <input
-              type="text"
-              value={posterUrl}
-              onChange={(e) => setPosterUrl(e.target.value)}
-              placeholder="Poster URL"
-              className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
-            />
-            <div className="flex gap-3">
-              <button
-                onClick={async () => {
-                  await updateMovie(movie.id, { poster_url: posterUrl });
-                  setEditingPoster(false);
-                  loadMovie();
-                }}
-                className="flex-1 btn-primary"
-              >
-                Save
-              </button>
-              <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
