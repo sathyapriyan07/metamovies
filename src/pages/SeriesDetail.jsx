@@ -77,7 +77,7 @@ const SeriesDetail = () => {
       />
 
       {/* Title & Metadata Section */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12 md:mt-16 text-center">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8 md:mt-12 text-center">
         <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
           {series.title}
         </h1>
