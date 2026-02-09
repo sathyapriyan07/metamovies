@@ -6,7 +6,7 @@ const KnownForCard = ({ work }) => {
   return (
     <div
       onClick={() => navigate(`/${work.type}/${work.id}`)}
-      className="flex-shrink-0 w-[110px] md:w-[150px] cursor-pointer group"
+      className="cursor-pointer group"
     >
       <div className="glass rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
         <img
@@ -16,7 +16,7 @@ const KnownForCard = ({ work }) => {
           loading="lazy"
         />
       </div>
-      <p className="font-semibold text-sm mt-2 line-clamp-2">{work.title}</p>
+      <p className="font-semibold text-xs md:text-sm mt-2 line-clamp-2">{work.title}</p>
     </div>
   );
 };
