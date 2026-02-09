@@ -70,22 +70,15 @@ const MovieDetail = () => {
         backdrop={movie.backdrop_url}
         poster={movie.poster_url}
         title={movie.title}
+        year={movie.release_date?.split('-')[0]}
       />
 
-      {/* Title & Metadata Section */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8 md:mt-12 text-center">
-        <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
-          {movie.title}
-        </h1>
-        
-        {/* Metadata Row */}
-        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4">
-          {movie.release_date && (
-            <span className="text-gray-400">{movie.release_date.split('-')[0]}</span>
-          )}
-          {movie.genres && movie.genres.length > 0 && (
-            <>
-              <span className="text-gray-500">•</span>
+      {/* Metadata & Content Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+        {/* Metadata */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4 flex-wrap">
+            {movie.genres && movie.genres.length > 0 && (
               <div className="flex gap-2">
                 {movie.genres.slice(0, 3).map((genre, i) => (
                   <button
@@ -97,42 +90,39 @@ const MovieDetail = () => {
                   </button>
                 ))}
               </div>
-            </>
-          )}
-          {movie.rating && (
-            <>
-              <span className="text-gray-500">•</span>
-              <span className="text-yellow-400 font-semibold">⭐ {movie.rating.toFixed(1)}</span>
-            </>
-          )}
-          {movie.runtime && (
-            <>
-              <span className="text-gray-500">•</span>
-              <span className="text-gray-400">{movie.runtime} min</span>
-            </>
-          )}
-        </div>
+            )}
+            {movie.rating && (
+              <>
+                <span className="text-gray-500">•</span>
+                <span className="text-yellow-400 font-semibold">⭐ {movie.rating.toFixed(1)}</span>
+              </>
+            )}
+            {movie.runtime && (
+              <>
+                <span className="text-gray-500">•</span>
+                <span className="text-gray-400">{movie.runtime} min</span>
+              </>
+            )}
+          </div>
 
-        {/* Overview */}
-        {movie.overview && (
-          <p className="text-gray-300 text-sm md:text-base max-w-4xl mx-auto mb-6">
-            {movie.overview}
-          </p>
-        )}
+          {movie.overview && (
+            <p className="text-gray-300 text-sm md:text-base max-w-4xl mx-auto mb-6">
+              {movie.overview}
+            </p>
+          )}
 
-        {/* Buttons */}
-        <div className="flex gap-3 justify-center">
-          <button onClick={toggleWatchlist} className="btn-secondary">
-            {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
-          </button>
-          {user?.isAdmin && (
-            <button onClick={() => { setEditingPoster(true); setPosterUrl(movie.poster_url || ''); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
-              Edit Poster
+          <div className="flex gap-3 justify-center">
+            <button onClick={toggleWatchlist} className="btn-secondary">
+              {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
             </button>
-          )}
+            {user?.isAdmin && (
+              <button onClick={() => { setEditingPoster(true); setPosterUrl(movie.poster_url || ''); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+                Edit Poster
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Admin Poster Edit Modal */}
         {editingPoster && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
             <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
@@ -162,10 +152,6 @@ const MovieDetail = () => {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 mt-8">
 
         {/* Tabs */}
         <div className="border-b border-gray-700 mb-6">

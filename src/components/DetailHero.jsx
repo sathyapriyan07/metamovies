@@ -1,26 +1,35 @@
 const DetailHero = ({ backdrop, poster, title, year, rating, genres, runtime, onGenreClick }) => {
   return (
-    <div className="relative w-full min-h-[48vh] md:min-h-[60vh] overflow-visible">
-      {/* Backdrop */}
-      <div className="absolute inset-0 overflow-hidden">
+    <>
+      {/* Hero Backdrop Section */}
+      <div className="relative w-full h-[40vh] md:h-[55vh] overflow-hidden rounded-b-3xl">
+        {/* Backdrop */}
         <img
           src={backdrop || poster || 'https://via.placeholder.com/1920x1080'}
           alt={title}
           className="w-full h-full object-cover animate-[fadeIn_0.3s_ease-out]"
         />
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+        
+        {/* Light Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#f5d9a6]/90 via-[#f5d9a6]/40 to-transparent" />
+        
+        {/* Floating Poster */}
+        <div className="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 z-20 animate-[fadeIn_0.3s_ease-out]">
+          <img
+            src={poster || 'https://via.placeholder.com/300x450'}
+            alt={`${title} poster`}
+            className="w-[110px] md:w-[180px] aspect-[2/3] object-cover rounded-2xl shadow-2xl border border-black/10 hover:scale-105 transition-transform duration-200"
+          />
+        </div>
       </div>
-      
-      {/* Floating Poster */}
-      <div className="absolute left-4 md:left-8 bottom-[-20px] md:bottom-[-40px] z-20">
-        <img
-          src={poster || 'https://via.placeholder.com/300x450'}
-          alt={title}
-          className="w-[120px] md:w-[180px] h-auto aspect-[2/3] object-contain rounded-xl shadow-2xl border border-white/10 hover:scale-105 transition-transform duration-200"
-        />
+
+      {/* Beige Title Strip */}
+      <div className="bg-[#e8cc8f] py-6 px-4 text-center">
+        <h1 className="text-3xl md:text-5xl font-semibold text-black">
+          {title} <span className="text-black/70">{year && `(${year})`}</span>
+        </h1>
       </div>
-    </div>
+    </>
   );
 };
 
