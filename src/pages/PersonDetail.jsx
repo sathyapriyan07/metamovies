@@ -65,17 +65,6 @@ const PersonDetail = () => {
 
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8 bg-black">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="fixed top-20 md:top-24 left-4 md:left-8 z-50 glass glass-hover p-3 rounded-full shadow-lg"
-        aria-label="Go back"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="grid md:grid-cols-[250px_1fr] gap-8">
           {/* Left Column - Profile Image & Info */}
@@ -147,7 +136,7 @@ const PersonDetail = () => {
             {/* Known For Row */}
             <div className="space-y-4">
               <h2 className="text-2xl font-bold">Known For</h2>
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              <div className="flex gap-4 overflow-x-auto pb-4">
                 {allWorks.map((work, i) => (
                   <div
                     key={i}

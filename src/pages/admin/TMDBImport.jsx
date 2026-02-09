@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getMovieDetails, getSeriesDetails, getSeasonDetails, getImageUrl, getPersonDetails, searchMovies, searchSeries } from '../../services/tmdb';
+import { getMovieDetails, getSeriesDetails, getSeasonDetails, getImageUrl, getPersonDetails, searchMovies, searchSeries, searchPerson } from '../../services/tmdb';
 import { createMovie, createSeries, createCast, createCrew, createSeason, createEpisode, createPerson } from '../../services/supabase';
 import { supabase } from '../../services/supabase';
 
@@ -28,7 +28,9 @@ const TMDBImport = () => {
     try {
       const results = type === 'movie' 
         ? await searchMovies(searchQuery)
-        : await searchSeries(searchQuery);
+        : type === 'series'
+        ? await searchSeries(searchQuery)
+        : await searchPerson(searchQuery);
       setSearchResults(results.slice(0, 10));
     } catch (err) {
       setError('Search failed. Please try again.');
@@ -55,7 +57,9 @@ const TMDBImport = () => {
     try {
       const data = type === 'movie' 
         ? await getMovieDetails(fetchId)
-        : await getSeriesDetails(fetchId);
+        : type === 'series'
+        ? await getSeriesDetails(fetchId)
+        : await getPersonDetails(fetchId);
       
       setPreview(data);
     } catch (err) {
@@ -72,7 +76,26 @@ const TMDBImport = () => {
     setError('');
     
     try {
-      if (type === 'movie') {
+      if (type === 'person') {
+        const personData = {
+          tmdb_id: preview.id,
+          name: preview.name,
+          profile_url: getImageUrl(preview.profile_path),
+          biography: preview.biography,
+          birthday: preview.birthday,
+          place_of_birth: preview.place_of_birth,
+          social_links: {
+            instagram: preview.external_ids?.instagram_id ? `https://instagram.com/${preview.external_ids.instagram_id}` : null,
+            twitter: preview.external_ids?.twitter_id ? `https://twitter.com/${preview.external_ids.twitter_id}` : null,
+            facebook: preview.external_ids?.facebook_id ? `https://facebook.com/${preview.external_ids.facebook_id}` : null
+          }
+        };
+        
+        const { error: personError } = await createPerson(personData);
+        if (personError) throw personError;
+        
+        setSuccess('Person imported successfully!');
+      } else if (type === 'movie') {
         // Import movie
         const movieData = {
           tmdb_id: preview.id,
@@ -337,6 +360,24 @@ const TMDBImport = () => {
       setBulkProgress({ current: i + 1, total: ids.length, status: `Importing ${type} ${id}...` });
       
       try {
+        if (type === 'person') {
+          const data = await getPersonDetails(id);
+          const personData = {
+            tmdb_id: data.id,
+            name: data.name,
+            profile_url: getImageUrl(data.profile_path),
+            biography: data.biography,
+            birthday: data.birthday,
+            place_of_birth: data.place_of_birth,
+            social_links: {
+              instagram: data.external_ids?.instagram_id ? `https://instagram.com/${data.external_ids.instagram_id}` : null,
+              twitter: data.external_ids?.twitter_id ? `https://twitter.com/${data.external_ids.twitter_id}` : null,
+              facebook: data.external_ids?.facebook_id ? `https://facebook.com/${data.external_ids.facebook_id}` : null
+            }
+          };
+          const { error: personError } = await createPerson(personData);
+          if (personError) throw personError;
+        } else {
         const data = type === 'movie' 
           ? await getMovieDetails(id)
           : await getSeriesDetails(id);
@@ -553,6 +594,7 @@ const TMDBImport = () => {
             }
           }
         }
+        }
         
         successCount++;
       } catch (err) {
@@ -573,7 +615,9 @@ const TMDBImport = () => {
     try {
       const results = type === 'movie' 
         ? await searchMovies(bulkSearchQuery)
-        : await searchSeries(bulkSearchQuery);
+        : type === 'series'
+        ? await searchSeries(bulkSearchQuery)
+        : await searchPerson(bulkSearchQuery);
       setBulkSearchResults(results.slice(0, 20));
     } catch (err) {
       setError('Search failed. Please try again.');
@@ -646,6 +690,7 @@ const TMDBImport = () => {
               >
                 <option value="movie" className="bg-black">Movies</option>
                 <option value="series" className="bg-black">TV Series</option>
+                <option value="person" className="bg-black">Persons</option>
               </select>
             </div>
 
@@ -702,14 +747,14 @@ const TMDBImport = () => {
                           className="mt-1"
                         />
                         <img
-                          src={getImageUrl(item.poster_path, 'w92')}
+                          src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
                           alt={item.title || item.name}
                           className="w-12 h-18 object-cover rounded"
                           onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
                         />
                         <div className="flex-1">
                           <p className="font-semibold text-sm">{item.title || item.name}</p>
-                          <p className="text-xs text-gray-400">{item.release_date || item.first_air_date}</p>
+                          <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
                           <p className="text-xs text-gray-500">ID: {item.id}</p>
                         </div>
                       </div>
@@ -767,6 +812,7 @@ const TMDBImport = () => {
               >
                 <option value="movie" className="bg-black">Movie</option>
                 <option value="series" className="bg-black">TV Series</option>
+                <option value="person" className="bg-black">Person</option>
               </select>
             </div>
 
@@ -800,14 +846,14 @@ const TMDBImport = () => {
                     className="flex gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg cursor-pointer transition"
                   >
                     <img
-                      src={getImageUrl(item.poster_path, 'w92')}
+                      src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
                       alt={item.title || item.name}
                       className="w-12 h-18 object-cover rounded"
                       onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
                     />
                     <div className="flex-1">
                       <p className="font-semibold text-sm">{item.title || item.name}</p>
-                      <p className="text-xs text-gray-400">{item.release_date || item.first_air_date}</p>
+                      <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
                       <p className="text-xs text-gray-500">ID: {item.id}</p>
                     </div>
                   </div>
@@ -841,16 +887,16 @@ const TMDBImport = () => {
             
             <div className="flex gap-6 mb-6">
               <img
-                src={getImageUrl(preview.poster_path, 'w300')}
+                src={type === 'person' ? getImageUrl(preview.profile_path, 'w300') : getImageUrl(preview.poster_path, 'w300')}
                 alt={preview.title || preview.name}
                 className="w-32 rounded-lg"
               />
               <div className="flex-1">
                 <h3 className="text-xl font-bold mb-2">{preview.title || preview.name}</h3>
                 <p className="text-gray-400 text-sm mb-2">
-                  {preview.release_date || preview.first_air_date}
+                  {type === 'person' ? preview.known_for_department : (preview.release_date || preview.first_air_date)}
                 </p>
-                <p className="text-sm line-clamp-3">{preview.overview}</p>
+                <p className="text-sm line-clamp-3">{type === 'person' ? preview.biography : preview.overview}</p>
               </div>
             </div>
 

@@ -57,6 +57,13 @@ export const searchSeries = async (query) => {
   return data.results;
 };
 
+export const searchPerson = async (query) => {
+  const { data } = await tmdbApi.get('/search/person', {
+    params: { query }
+  });
+  return data.results;
+};
+
 export const getTrendingMovies = async () => {
   const { data } = await tmdbApi.get('/trending/movie/week');
   return data.results;
