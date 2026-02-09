@@ -71,7 +71,7 @@ const SeriesDetail = () => {
     <div className="min-h-screen bg-black">
       <DetailHero backdrop={series.backdrop_url} poster={series.poster_url} title={series.title} />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12 md:mt-16 text-center">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-14 md:mt-20 text-center">
         <h1 className="text-2xl md:text-5xl font-bold text-white mb-3 z-30">
           {series.title} <span className="text-gray-400">{series.first_air_date && `(${series.first_air_date.split('-')[0]})`}</span>
         </h1>

@@ -67,7 +67,7 @@ const MovieDetail = () => {
     <div className="min-h-screen bg-black">
       <DetailHero backdrop={movie.backdrop_url} poster={movie.poster_url} title={movie.title} />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12 md:mt-16 text-center">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-14 md:mt-20 text-center">
         <h1 className="text-2xl md:text-5xl font-bold text-white mb-3 z-30">
           {movie.title} <span className="text-gray-400">{movie.release_date && `(${movie.release_date.split('-')[0]})`}</span>
         </h1>
