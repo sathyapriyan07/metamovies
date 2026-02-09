@@ -37,7 +37,7 @@ const PersonDetail = () => {
   const allWorks = [
     ...(person.cast_roles?.map(c => ({ ...c.movie || c.series, type: c.movie ? 'movie' : 'series', role: c.character, year: (c.movie || c.series)?.release_date?.split('-')[0] })) || []),
     ...(person.crew_roles?.map(c => ({ ...c.movie || c.series, type: c.movie ? 'movie' : 'series', role: c.job, year: (c.movie || c.series)?.release_date?.split('-')[0] })) || [])
-  ].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 15);
+  ].sort((a, b) => (b.rating || 0) - (a.rating || 0));
 
   const creditsCount = (person.cast_roles?.length || 0) + (person.crew_roles?.length || 0);
 
