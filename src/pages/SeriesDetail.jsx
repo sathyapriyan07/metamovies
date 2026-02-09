@@ -77,85 +77,61 @@ const SeriesDetail = () => {
         year={series.first_air_date?.split('-')[0]}
       />
 
-      {/* Metadata & Content Section */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        {/* Metadata */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4 flex-wrap">
-            {series.genres && series.genres.length > 0 && (
-              <div className="flex gap-2">
-                {series.genres.slice(0, 3).map((genre, i) => (
-                  <button
-                    key={i}
-                    onClick={() => navigate(`/series?genre=${genre}`)}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    {genre}
-                  </button>
-                ))}
-              </div>
-            )}
-            {series.rating && (
-              <>
-                <span className="text-gray-500">•</span>
-                <span className="text-yellow-400 font-semibold">⭐ {series.rating.toFixed(1)}</span>
-              </>
-            )}
-            {series.seasons?.length > 0 && (
-              <>
-                <span className="text-gray-500">•</span>
-                <span className="text-gray-400">{series.seasons.length} Seasons</span>
-              </>
-            )}
-          </div>
-
-          {series.overview && (
-            <p className="text-gray-300 text-sm md:text-base max-w-4xl mx-auto mb-6">
-              {series.overview}
-            </p>
+      {/* Title & Metadata Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-10 md:mt-14 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 z-30">
+          {series.title} <span className="text-gray-400">{series.first_air_date && `(${series.first_air_date.split('-')[0]})`}</span>
+        </h1>
+        
+        {/* Metadata Row */}
+        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4 flex-wrap">
+          {series.genres && series.genres.length > 0 && (
+            <div className="flex gap-2">
+              {series.genres.slice(0, 3).map((genre, i) => (
+                <button
+                  key={i}
+                  onClick={() => navigate(`/series?genre=${genre}`)}
+                  className="text-gray-300 hover:text-red-500 transition-colors"
+                >
+                  {genre}
+                </button>
+              ))}
+            </div>
           )}
-
-          <div className="flex gap-3 justify-center">
-            <button onClick={toggleWatchlist} className="btn-secondary">
-              {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
-            </button>
-            {user?.isAdmin && (
-              <button onClick={() => { setEditingPoster(true); setPosterUrl(series.poster_url || ''); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
-                Edit Poster
-              </button>
-            )}
-          </div>
+          {series.rating && (
+            <>
+              <span className="text-gray-500">•</span>
+              <span className="text-yellow-400 font-semibold">⭐ {series.rating.toFixed(1)}</span>
+            </>
+          )}
+          {series.seasons?.length > 0 && (
+            <>
+              <span className="text-gray-500">•</span>
+              <span className="text-gray-300">{series.seasons.length} Seasons</span>
+            </>
+          )}
         </div>
 
-        {editingPoster && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
-            <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-xl font-bold mb-4">Update Poster</h3>
-              <input
-                type="text"
-                value={posterUrl}
-                onChange={(e) => setPosterUrl(e.target.value)}
-                placeholder="Poster URL"
-                className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={async () => {
-                    await updateSeries(series.id, { poster_url: posterUrl });
-                    setEditingPoster(false);
-                    loadSeries();
-                  }}
-                  className="flex-1 btn-primary"
-                >
-                  Save
-                </button>
-                <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
+        {series.overview && (
+          <p className="text-gray-300 text-sm md:text-base max-w-4xl mx-auto mb-6">
+            {series.overview}
+          </p>
         )}
+
+        <div className="flex gap-3 justify-center mb-8">
+          <button onClick={toggleWatchlist} className="btn-secondary">
+            {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
+          </button>
+          {user?.isAdmin && (
+            <button onClick={() => { setEditingPoster(true); setPosterUrl(series.poster_url || ''); }} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition">
+              Edit Poster
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
 
         {/* Seasons Dropdown */}
         {series.seasons && series.seasons.length > 0 && (
@@ -399,3 +375,34 @@ const SeriesDetail = () => {
 };
 
 export default SeriesDetail;
+
+      {/* Admin Poster Edit Modal */}
+      {editingPoster && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
+          <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4">Update Poster</h3>
+            <input
+              type="text"
+              value={posterUrl}
+              onChange={(e) => setPosterUrl(e.target.value)}
+              placeholder="Poster URL"
+              className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={async () => {
+                  await updateSeries(series.id, { poster_url: posterUrl });
+                  setEditingPoster(false);
+                  loadSeries();
+                }}
+                className="flex-1 btn-primary"
+              >
+                Save
+              </button>
+              <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}

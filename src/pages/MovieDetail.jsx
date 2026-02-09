@@ -73,18 +73,21 @@ const MovieDetail = () => {
         year={movie.release_date?.split('-')[0]}
       />
 
-      {/* Metadata & Content Section */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-        {/* Metadata */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4 flex-wrap">
+      {/* Title & Metadata Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-10 md:mt-14 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 z-30">
+          {movie.title} <span className="text-gray-400">{movie.release_date && `(${movie.release_date.split('-')[0]})`}</span>
+        </h1>
+        
+        {/* Metadata Row */}
+        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4 flex-wrap">
             {movie.genres && movie.genres.length > 0 && (
               <div className="flex gap-2">
                 {movie.genres.slice(0, 3).map((genre, i) => (
                   <button
                     key={i}
                     onClick={() => navigate(`/movies?genre=${genre}`)}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    className="text-gray-300 hover:text-red-500 transition-colors"
                   >
                     {genre}
                   </button>
@@ -100,7 +103,7 @@ const MovieDetail = () => {
             {movie.runtime && (
               <>
                 <span className="text-gray-500">•</span>
-                <span className="text-gray-400">{movie.runtime} min</span>
+                <span className="text-gray-300">{movie.runtime} min</span>
               </>
             )}
           </div>
@@ -111,7 +114,7 @@ const MovieDetail = () => {
             </p>
           )}
 
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 justify-center mb-8">
             <button onClick={toggleWatchlist} className="btn-secondary">
               {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
             </button>
@@ -123,36 +126,8 @@ const MovieDetail = () => {
           </div>
         </div>
 
-        {editingPoster && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
-            <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-xl font-bold mb-4">Update Poster</h3>
-              <input
-                type="text"
-                value={posterUrl}
-                onChange={(e) => setPosterUrl(e.target.value)}
-                placeholder="Poster URL"
-                className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
-              />
-              <div className="flex gap-3">
-                <button
-                  onClick={async () => {
-                    await updateMovie(movie.id, { poster_url: posterUrl });
-                    setEditingPoster(false);
-                    loadMovie();
-                  }}
-                  className="flex-1 btn-primary"
-                >
-                  Save
-                </button>
-                <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
+      {/* Content Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         {/* Tabs */}
         <div className="border-b border-gray-700 mb-6">
           <div className="flex gap-6">
@@ -346,6 +321,37 @@ const MovieDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Admin Poster Edit Modal */}
+      {editingPoster && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
+          <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4">Update Poster</h3>
+            <input
+              type="text"
+              value={posterUrl}
+              onChange={(e) => setPosterUrl(e.target.value)}
+              placeholder="Poster URL"
+              className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={async () => {
+                  await updateMovie(movie.id, { poster_url: posterUrl });
+                  setEditingPoster(false);
+                  loadMovie();
+                }}
+                className="flex-1 btn-primary"
+              >
+                Save
+              </button>
+              <button onClick={() => setEditingPoster(false)} className="flex-1 btn-secondary">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
