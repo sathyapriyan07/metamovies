@@ -19,6 +19,8 @@ const SeriesDetail = () => {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [editingPoster, setEditingPoster] = useState(false);
   const [posterUrl, setPosterUrl] = useState('');
+  const [backdropUrl, setBackdropUrl] = useState('');
+  const [editingBackdrop, setEditingBackdrop] = useState(false);
 
   const getYouTubeThumbnail = (url) => {
     const videoId = url?.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/)?.[1];
@@ -115,10 +117,15 @@ const SeriesDetail = () => {
           <button onClick={toggleWatchlist} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
             {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
           </button>
-          {user?.isAdmin && (
-            <button onClick={() => { setEditingPoster(true); setPosterUrl(series.poster_url || ''); }} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
-              Edit Poster
-            </button>
+          {isAdmin && (
+            <>
+              <button onClick={() => { setEditingPoster(true); setPosterUrl(series.poster_url || ''); }} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
+                Edit Poster
+              </button>
+              <button onClick={() => { setEditingBackdrop(true); setBackdropUrl(series.backdrop_url || ''); }} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
+                Edit Backdrop
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -363,6 +370,52 @@ const SeriesDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Poster Modal */}
+      {editingPoster && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingPoster(false)}>
+          <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4">Update Poster</h3>
+            {posterUrl && (
+              <div className="mb-4 flex justify-center">
+                <img src={posterUrl} alt="Preview" className="w-32 h-48 object-cover rounded-lg" onError={(e) => e.target.style.display = 'none'} />
+              </div>
+            )}
+            <input type="url" value={posterUrl} onChange={(e) => setPosterUrl(e.target.value)} placeholder="Poster URL" className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4 text-white" />
+            <div className="flex gap-3">
+              <button onClick={async () => { await updateSeries(series.id, { poster_url: posterUrl }); setEditingPoster(false); loadSeries(); }} className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg">
+                Save
+              </button>
+              <button onClick={() => setEditingPoster(false)} className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Backdrop Modal */}
+      {editingBackdrop && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingBackdrop(false)}>
+          <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4">Update Backdrop</h3>
+            {backdropUrl && (
+              <div className="mb-4">
+                <img src={backdropUrl} alt="Preview" className="w-full h-32 object-cover rounded-lg" onError={(e) => e.target.style.display = 'none'} />
+              </div>
+            )}
+            <input type="url" value={backdropUrl} onChange={(e) => setBackdropUrl(e.target.value)} placeholder="Backdrop URL" className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4 text-white" />
+            <div className="flex gap-3">
+              <button onClick={async () => { await updateSeries(series.id, { backdrop_url: backdropUrl }); setEditingBackdrop(false); loadSeries(); }} className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg">
+                Save
+              </button>
+              <button onClick={() => setEditingBackdrop(false)} className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
