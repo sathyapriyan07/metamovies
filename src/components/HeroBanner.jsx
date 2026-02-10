@@ -135,7 +135,7 @@ const HeroBanner = () => {
           {/* CTA Button */}
           <button
             onClick={handleViewClick}
-            className="px-8 py-3 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2"
+            className="px-8 py-3 bg-white hover:bg-gray-100 text-black rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center gap-2"
             aria-label="View Details"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
