@@ -97,6 +97,26 @@
     background: rgba(59, 167, 255, 0.12);
   }
 
+  .platform-btn {
+    @apply inline-flex flex-col items-center justify-center h-[46px] px-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur transition-all duration-200;
+  }
+
+  .platform-btn:hover {
+    box-shadow: 0 0 12px rgba(0, 180, 255, 0.35);
+    transform: scale(1.02);
+  }
+
+  .platform-logo {
+    height: 24px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .platform-label {
+    @apply hidden md:block text-[10px] font-medium text-gray-300 mt-1;
+    letter-spacing: 0.04em;
+  }
+
   .btn-secondary {
     @apply px-5 py-2 rounded-full font-semibold border border-white/15 bg-white/10 text-white transition-all duration-300;
   }

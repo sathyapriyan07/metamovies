@@ -100,6 +100,193 @@ export const getUpcomingMovies = async () => {
   return { data, error };
 };
 
+// Music (tracks)
+export const getMusic = async (limit = 20, offset = 0) => {
+  if (limit === null || limit === 0) {
+    let allMusic = [];
+    let from = 0;
+    const batchSize = 1000;
+
+    while (true) {
+      const { data } = await supabase
+        .from('tracks')
+        .select('*, album:albums(*, artist:artists(*))')
+        .order('created_at', { ascending: false })
+        .range(from, from + batchSize - 1);
+
+      if (!data || data.length === 0) break;
+      allMusic = [...allMusic, ...data];
+      if (data.length < batchSize) break;
+      from += batchSize;
+    }
+
+    return { data: allMusic, error: null };
+  }
+
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*, album:albums(*, artist:artists(*))')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  return { data, error };
+};
+
+export const getMusicById = async (id) => {
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*, album:albums(*, artist:artists(*))')
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
+export const getArtistById = async (id) => {
+  const { data, error } = await supabase
+    .from('artists')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
+export const getArtists = async () => {
+  const { data, error } = await supabase
+    .from('artists')
+    .select('*')
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const getAlbumsByArtist = async (artistId) => {
+  const { data, error } = await supabase
+    .from('albums')
+    .select('*')
+    .eq('artist_id', artistId)
+    .order('release_year', { ascending: false });
+  return { data, error };
+};
+
+export const getTracksByArtist = async (artistId) => {
+  const { data: albums } = await supabase
+    .from('albums')
+    .select('id')
+    .eq('artist_id', artistId);
+  const albumIds = (albums || []).map((a) => a.id);
+  if (albumIds.length === 0) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*')
+    .in('album_id', albumIds);
+  return { data, error };
+};
+
+export const getAlbumById = async (id) => {
+  const { data, error } = await supabase
+    .from('albums')
+    .select('*, artist:artists(*)')
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
+export const getTracksByAlbum = async (albumId) => {
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*')
+    .eq('album_id', albumId)
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const getAlbums = async () => {
+  const { data, error } = await supabase
+    .from('albums')
+    .select('*, artist:artists(*)')
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const getTracks = async () => {
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*, album:albums(*, artist:artists(*))')
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const upsertArtist = async (payload) => {
+  const { data, error } = await supabase
+    .from('artists')
+    .upsert(payload)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateArtist = async (id, payload) => {
+  const { data, error } = await supabase
+    .from('artists')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteArtist = async (id) => {
+  const { error } = await supabase.from('artists').delete().eq('id', id);
+  return { error };
+};
+
+export const upsertAlbum = async (payload) => {
+  const { data, error } = await supabase
+    .from('albums')
+    .upsert(payload)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateAlbum = async (id, payload) => {
+  const { data, error } = await supabase
+    .from('albums')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteAlbum = async (id) => {
+  const { error } = await supabase.from('albums').delete().eq('id', id);
+  return { error };
+};
+
+export const upsertTrack = async (payload) => {
+  const { data, error } = await supabase
+    .from('tracks')
+    .upsert(payload)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const updateTrack = async (id, payload) => {
+  const { data, error } = await supabase
+    .from('tracks')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteTrack = async (id) => {
+  const { error } = await supabase.from('tracks').delete().eq('id', id);
+  return { error };
+};
+
 // Persons
 export const getPersonById = async (id) => {
   const { data, error } = await supabase
@@ -129,13 +316,23 @@ export const getWatchlist = async (userId) => {
     .from('watchlist')
     .select(`
       *,
-      movie:movies(*)
+      movie:movies(*),
+      music:tracks(*, album:albums(*, artist:artists(*)))
     `)
     .eq('user_id', userId);
   return { data, error };
 };
 
 export const addToWatchlist = async (userId, itemId, itemType) => {
+  if (itemType === 'music') {
+    const { data, error } = await supabase
+      .from('watchlist')
+      .insert({
+        user_id: userId,
+        music_id: itemId,
+      });
+    return { data, error };
+  }
   const { data, error } = await supabase
     .from('watchlist')
     .insert({
@@ -153,7 +350,8 @@ export const removeFromWatchlist = async (userId, itemId, itemType) => {
   
   if (itemType === 'movie') {
     query.eq('movie_id', itemId);
-  } else {
+  } else if (itemType === 'music') {
+    query.eq('music_id', itemId);
   }
   
   const { error } = await query;
@@ -168,6 +366,8 @@ export const isInWatchlist = async (userId, itemId, itemType) => {
   
   if (itemType === 'movie') {
     query.eq('movie_id', itemId);
+  } else if (itemType === 'music') {
+    query.eq('music_id', itemId);
   }
   
   const { data } = await query.single();
@@ -187,6 +387,108 @@ export const updateMovie = async (id, movieData) => {
 
 export const deleteMovie = async (id) => {
   const { error } = await supabase.from('movies').delete().eq('id', id);
+  return { error };
+};
+
+export const createMusic = async (musicData) => {
+  const artistName = (musicData.artist || '').trim();
+  const albumTitle = (musicData.album || '').trim();
+
+  let artistId = null;
+  if (artistName) {
+    const { data: existing } = await supabase
+      .from('artists')
+      .select('*')
+      .eq('name', artistName)
+      .single();
+    if (existing?.id) {
+      artistId = existing.id;
+    } else {
+      const { data: created } = await supabase
+        .from('artists')
+        .insert({
+          name: artistName,
+          profile_image_url: musicData.artist_image_url || null,
+          banner_image_url: musicData.artist_banner_url || null,
+          bio: musicData.artist_bio || null,
+          tags: musicData.artist_tags || null,
+          social_links: musicData.artist_social_links || null,
+          import_source: musicData.import_source || null,
+          is_imported: !!musicData.is_imported,
+          last_synced_at: musicData.last_synced_at || null
+        })
+        .select()
+        .single();
+      artistId = created?.id || null;
+    }
+  }
+
+  let albumId = null;
+  if (albumTitle && artistId) {
+    const { data: existingAlbum } = await supabase
+      .from('albums')
+      .select('*')
+      .eq('title', albumTitle)
+      .eq('artist_id', artistId)
+      .single();
+    if (existingAlbum?.id) {
+      albumId = existingAlbum.id;
+    } else {
+      const { data: createdAlbum } = await supabase
+        .from('albums')
+        .insert({
+          title: albumTitle,
+          artist_id: artistId,
+          cover_image_url: musicData.cover_image_url || null,
+          release_year: musicData.release_year || null,
+          total_duration_seconds: musicData.total_duration_seconds || null,
+          spotify_url: musicData.spotify_url || null,
+          apple_music_url: musicData.apple_music_url || null,
+          youtube_music_url: musicData.youtube_music_url || null,
+          amazon_music_url: musicData.amazon_music_url || null,
+          import_source: musicData.import_source || null,
+          is_imported: !!musicData.is_imported,
+          last_synced_at: musicData.last_synced_at || null
+        })
+        .select()
+        .single();
+      albumId = createdAlbum?.id || null;
+    }
+  }
+
+  const { data, error } = await supabase.from('tracks').insert({
+    album_id: albumId,
+    title: musicData.title,
+    duration_seconds: musicData.duration_seconds || null,
+    preview_url: musicData.preview_url || null,
+    artwork_url: musicData.artwork_url || null,
+    spotify_url: musicData.spotify_url || null,
+    apple_music_url: musicData.apple_music_url || null,
+    youtube_music_url: musicData.youtube_music_url || null,
+    amazon_music_url: musicData.amazon_music_url || null,
+    import_source: musicData.import_source || null,
+    is_imported: !!musicData.is_imported,
+    last_synced_at: musicData.last_synced_at || null
+  }).select().single();
+  return { data, error };
+};
+
+export const updateMusic = async (id, musicData) => {
+  const { data, error } = await supabase.from('tracks').update({
+    title: musicData.title,
+    duration_seconds: musicData.duration_seconds || null,
+    preview_url: musicData.preview_url || null,
+    artwork_url: musicData.artwork_url || null,
+    spotify_url: musicData.spotify_url || null,
+    apple_music_url: musicData.apple_music_url || null,
+    youtube_music_url: musicData.youtube_music_url || null,
+    amazon_music_url: musicData.amazon_music_url || null
+  }).eq('id', id).select().single();
+  return { data, error };
+};
+
+export const deleteMusic = async (id) => {
+  const { error } = await supabase.from('tracks').delete().eq('id', id);
   return { error };
 };
 

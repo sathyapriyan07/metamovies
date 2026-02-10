@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { getMovieDetails, getImageUrl, getPersonDetails, searchMovies, searchPerson } from '../../services/tmdb';
-import { createMovie, createPerson } from '../../services/supabase';
+import { createMovie, createPerson, createCast, createCrew, supabase } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const TMDBImport = () => {
@@ -18,6 +18,31 @@ const TMDBImport = () => {
   const [bulkSearchQuery, setBulkSearchQuery] = useState('');
   const [bulkSearchResults, setBulkSearchResults] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+
+  const crewJobs = new Set([
+    'Director',
+    'Writer',
+    'Screenplay',
+    'Producer',
+    'Executive Producer',
+    'Original Music Composer',
+    'Music Composer',
+    'Composer'
+  ]);
+
+  const mapWithConcurrency = async (items, limit, fn) => {
+    const results = [];
+    let index = 0;
+    const workers = new Array(limit).fill(null).map(async () => {
+      while (index < items.length) {
+        const current = index;
+        index += 1;
+        results[current] = await fn(items[current]);
+      }
+    });
+    await Promise.all(workers);
+    return results;
+  };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -103,7 +128,73 @@ const TMDBImport = () => {
             return trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
           })()
         };
-        await createMovie(moviePayload);
+        const { data: movie } = await createMovie(moviePayload);
+        const credits = preview.credits || { cast: [], crew: [] };
+        console.log('TMDB credits fetched:', {
+          cast: credits.cast?.length || 0,
+          crew: credits.crew?.length || 0
+        });
+
+        if (movie?.id) {
+          await supabase.from('cast').delete().eq('movie_id', movie.id);
+          await supabase.from('crew').delete().eq('movie_id', movie.id);
+
+          const cast = (credits.cast || []).slice(0, 20);
+          const crew = (credits.crew || []).filter((c) => crewJobs.has(c.job)).slice(0, 20);
+          const personIds = Array.from(new Set([
+            ...cast.map((c) => c.id),
+            ...crew.map((c) => c.id)
+          ]));
+
+          const personCache = new Map();
+          await mapWithConcurrency(personIds, 5, async (personId) => {
+            if (personCache.has(personId)) return personCache.get(personId);
+            const details = await getPersonDetails(personId);
+            const payload = {
+              tmdb_id: details.id,
+              name: details.name,
+              biography: details.biography || null,
+              birthday: details.birthday || null,
+              place_of_birth: details.place_of_birth || null,
+              profile_url: getImageUrl(details.profile_path, 'w500'),
+              social_links: {
+                instagram: details.external_ids?.instagram_id ? `https://www.instagram.com/${details.external_ids.instagram_id}` : null,
+                twitter: details.external_ids?.twitter_id ? `https://x.com/${details.external_ids.twitter_id}` : null,
+                facebook: details.external_ids?.facebook_id ? `https://www.facebook.com/${details.external_ids.facebook_id}` : null,
+                imdb: details.external_ids?.imdb_id ? `https://www.imdb.com/name/${details.external_ids.imdb_id}` : null
+              }
+            };
+            const { data } = await supabase
+              .from('persons')
+              .upsert(payload, { onConflict: 'tmdb_id' })
+              .select()
+              .single();
+            personCache.set(personId, data);
+            return data;
+          });
+
+          console.log('Persons upserted:', personCache.size);
+
+          await Promise.all(cast.map(async (member) => {
+            const person = personCache.get(member.id);
+            if (!person?.id) return;
+            await createCast({
+              movie_id: movie.id,
+              person_id: person.id,
+              character: member.character || null
+            });
+          }));
+
+          await Promise.all(crew.map(async (member) => {
+            const person = personCache.get(member.id);
+            if (!person?.id) return;
+            await createCrew({
+              movie_id: movie.id,
+              person_id: person.id,
+              job: member.job || null
+            });
+          }));
+        }
         setSuccess('Movie imported successfully.');
       } else {
         const personPayload = {
@@ -172,7 +263,74 @@ const TMDBImport = () => {
               return trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
             })()
           };
-          await createMovie(moviePayload);
+          const { data: movie } = await createMovie(moviePayload);
+
+          const credits = data.credits || { cast: [], crew: [] };
+          console.log('TMDB credits fetched:', {
+            cast: credits.cast?.length || 0,
+            crew: credits.crew?.length || 0
+          });
+
+          if (movie?.id) {
+            await supabase.from('cast').delete().eq('movie_id', movie.id);
+            await supabase.from('crew').delete().eq('movie_id', movie.id);
+
+            const cast = (credits.cast || []).slice(0, 20);
+            const crew = (credits.crew || []).filter((c) => crewJobs.has(c.job)).slice(0, 20);
+            const personIds = Array.from(new Set([
+              ...cast.map((c) => c.id),
+              ...crew.map((c) => c.id)
+            ]));
+
+            const personCache = new Map();
+            await mapWithConcurrency(personIds, 5, async (personId) => {
+              if (personCache.has(personId)) return personCache.get(personId);
+              const details = await getPersonDetails(personId);
+              const payload = {
+                tmdb_id: details.id,
+                name: details.name,
+                biography: details.biography || null,
+                birthday: details.birthday || null,
+                place_of_birth: details.place_of_birth || null,
+                profile_url: getImageUrl(details.profile_path, 'w500'),
+                social_links: {
+                  instagram: details.external_ids?.instagram_id ? `https://www.instagram.com/${details.external_ids.instagram_id}` : null,
+                  twitter: details.external_ids?.twitter_id ? `https://x.com/${details.external_ids.twitter_id}` : null,
+                  facebook: details.external_ids?.facebook_id ? `https://www.facebook.com/${details.external_ids.facebook_id}` : null,
+                  imdb: details.external_ids?.imdb_id ? `https://www.imdb.com/name/${details.external_ids.imdb_id}` : null
+                }
+              };
+              const { data: person } = await supabase
+                .from('persons')
+                .upsert(payload, { onConflict: 'tmdb_id' })
+                .select()
+                .single();
+              personCache.set(personId, person);
+              return person;
+            });
+
+            console.log('Persons upserted:', personCache.size);
+
+            await Promise.all(cast.map(async (member) => {
+              const person = personCache.get(member.id);
+              if (!person?.id) return;
+              await createCast({
+                movie_id: movie.id,
+                person_id: person.id,
+                character: member.character || null
+              });
+            }));
+
+            await Promise.all(crew.map(async (member) => {
+              const person = personCache.get(member.id);
+              if (!person?.id) return;
+              await createCrew({
+                movie_id: movie.id,
+                person_id: person.id,
+                job: member.job || null
+              });
+            }));
+          }
         } else {
           const personPayload = {
             tmdb_id: data.id,

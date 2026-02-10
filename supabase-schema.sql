@@ -34,6 +34,73 @@ CREATE TABLE movies (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+
+-- Music table
+CREATE TABLE music (
+  id BIGSERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  artist TEXT,
+  album TEXT,
+  duration_seconds INTEGER,
+  release_year INTEGER,
+  poster_url TEXT,
+  spotify_url TEXT,
+  apple_music_url TEXT,
+  youtube_music_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Artists table
+CREATE TABLE artists (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  profile_image_url TEXT,
+  banner_image_url TEXT,
+  bio TEXT,
+  tags TEXT[],
+  social_links JSONB,
+  import_source TEXT,
+  is_imported BOOLEAN DEFAULT false,
+  last_synced_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Albums table
+CREATE TABLE albums (
+  id BIGSERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  artist_id BIGINT REFERENCES artists(id) ON DELETE CASCADE,
+  cover_image_url TEXT,
+  release_year INTEGER,
+  total_duration_seconds INTEGER,
+  spotify_url TEXT,
+  apple_music_url TEXT,
+  youtube_music_url TEXT,
+  amazon_music_url TEXT,
+  import_source TEXT,
+  is_imported BOOLEAN DEFAULT false,
+  last_synced_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Tracks table
+CREATE TABLE tracks (
+  id BIGSERIAL PRIMARY KEY,
+  album_id BIGINT REFERENCES albums(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  duration_seconds INTEGER,
+  preview_url TEXT,
+  artwork_url TEXT,
+  spotify_url TEXT,
+  apple_music_url TEXT,
+  youtube_music_url TEXT,
+  amazon_music_url TEXT,
+  import_source TEXT,
+  is_imported BOOLEAN DEFAULT false,
+  last_synced_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Persons table (actors, directors, crew)
 CREATE TABLE persons (
   id BIGSERIAL PRIMARY KEY,
@@ -79,13 +146,20 @@ CREATE TABLE watchlist (
   id BIGSERIAL PRIMARY KEY,
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   movie_id BIGINT REFERENCES movies(id) ON DELETE CASCADE,
+  music_id BIGINT REFERENCES tracks(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(user_id, movie_id)
+  UNIQUE(user_id, movie_id),
+  UNIQUE(user_id, music_id),
+  CHECK ((movie_id IS NOT NULL AND music_id IS NULL) OR (movie_id IS NULL AND music_id IS NOT NULL))
 );
 
 -- Create indexes for better performance
 CREATE INDEX idx_movies_trending ON movies(trending);
 CREATE INDEX idx_movies_release_date ON movies(release_date);
+CREATE INDEX idx_music_release_year ON music(release_year);
+CREATE INDEX idx_artists_name ON artists(name);
+CREATE INDEX idx_albums_artist ON albums(artist_id);
+CREATE INDEX idx_tracks_album ON tracks(album_id);
 CREATE INDEX idx_cast_movie ON "cast"(movie_id);
 CREATE INDEX idx_cast_person ON "cast"(person_id);
 CREATE INDEX idx_crew_movie ON crew(movie_id);
@@ -97,6 +171,10 @@ CREATE INDEX idx_watchlist_user ON watchlist(user_id);
 -- Enable RLS
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE movies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE music ENABLE ROW LEVEL SECURITY;
+ALTER TABLE artists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE albums ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tracks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE persons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "cast" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE crew ENABLE ROW LEVEL SECURITY;
@@ -105,6 +183,10 @@ ALTER TABLE watchlist ENABLE ROW LEVEL SECURITY;
 
 -- Public read access for content
 CREATE POLICY "Public read movies" ON movies FOR SELECT USING (true);
+CREATE POLICY "Public read music" ON music FOR SELECT USING (true);
+CREATE POLICY "Public read artists" ON artists FOR SELECT USING (true);
+CREATE POLICY "Public read albums" ON albums FOR SELECT USING (true);
+CREATE POLICY "Public read tracks" ON tracks FOR SELECT USING (true);
 CREATE POLICY "Public read persons" ON persons FOR SELECT USING (true);
 CREATE POLICY "Public read cast" ON "cast" FOR SELECT USING (true);
 CREATE POLICY "Public read crew" ON crew FOR SELECT USING (true);
@@ -116,6 +198,31 @@ CREATE POLICY "Admin insert movies" ON movies FOR INSERT
 CREATE POLICY "Admin update movies" ON movies FOR UPDATE 
   USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
 CREATE POLICY "Admin delete movies" ON movies FOR DELETE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+
+CREATE POLICY "Admin insert music" ON music FOR INSERT 
+  WITH CHECK ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin update music" ON music FOR UPDATE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin delete music" ON music FOR DELETE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin insert artists" ON artists FOR INSERT 
+  WITH CHECK ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin update artists" ON artists FOR UPDATE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin delete artists" ON artists FOR DELETE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin insert albums" ON albums FOR INSERT 
+  WITH CHECK ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin update albums" ON albums FOR UPDATE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin delete albums" ON albums FOR DELETE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin insert tracks" ON tracks FOR INSERT 
+  WITH CHECK ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin update tracks" ON tracks FOR UPDATE 
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin delete tracks" ON tracks FOR DELETE 
   USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
 CREATE POLICY "Admin manage persons" ON persons FOR ALL 
   USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');

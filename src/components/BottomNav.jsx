@@ -37,6 +37,13 @@ const BottomNav = () => {
             </svg>
           )}
           {navItem(
+            '/music',
+            'Music',
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 4v12.2a2.5 2.5 0 1 0 1.5 2.3V8l8-2v6.2a2.5 2.5 0 1 0 1.5 2.3V3.5L9 4z" />
+            </svg>
+          )}
+          {navItem(
             '/search',
             'Search',
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 import CastCard from '../components/CastCard';
 import DetailHero from '../components/DetailHero';
+import MusicPlatforms from '../components/MusicPlatforms';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -288,23 +289,11 @@ const MovieDetail = () => {
             {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music) && (
               <div>
                 <h3 className="text-xl font-semibold mb-3">Listen to Soundtrack</h3>
-                <div className="flex flex-wrap gap-3">
-                  {movie.music_links.spotify && (
-                    <a href={movie.music_links.spotify} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                      Spotify
-                    </a>
-                  )}
-                  {movie.music_links.apple_music && (
-                    <a href={movie.music_links.apple_music} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                      Apple Music
-                    </a>
-                  )}
-                  {movie.music_links.youtube_music && (
-                    <a href={movie.music_links.youtube_music} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                      YouTube Music
-                    </a>
-                  )}
-                </div>
+                <MusicPlatforms
+                  spotifyUrl={movie.music_links.spotify}
+                  appleMusicUrl={movie.music_links.apple_music}
+                  youtubeMusicUrl={movie.music_links.youtube_music}
+                />
               </div>
             )}
           </div>
