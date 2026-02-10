@@ -4,21 +4,15 @@
 CREATE TABLE IF NOT EXISTS hero_banners (
   id BIGSERIAL PRIMARY KEY,
   movie_id BIGINT REFERENCES movies(id) ON DELETE CASCADE,
-  series_id BIGINT REFERENCES series(id) ON DELETE CASCADE,
   display_order INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  CONSTRAINT hero_banner_content_check CHECK (
-    (movie_id IS NOT NULL AND series_id IS NULL) OR 
-    (movie_id IS NULL AND series_id IS NOT NULL)
-  )
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create index for faster queries
 CREATE INDEX IF NOT EXISTS idx_hero_banners_active ON hero_banners(is_active, display_order);
 CREATE INDEX IF NOT EXISTS idx_hero_banners_movie ON hero_banners(movie_id);
-CREATE INDEX IF NOT EXISTS idx_hero_banners_series ON hero_banners(series_id);
 
 -- Enable Row Level Security
 ALTER TABLE hero_banners ENABLE ROW LEVEL SECURITY;

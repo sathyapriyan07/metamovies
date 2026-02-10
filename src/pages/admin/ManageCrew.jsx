@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getMovies, getSeries, createCrew, supabase } from '../../services/supabase';
+import { getMovies, createCrew, supabase } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const ManageCrew = () => {
@@ -24,7 +24,7 @@ const ManageCrew = () => {
 
   const loadItems = async () => {
     setLoading(true);
-    const { data } = type === 'movie' ? await getMovies(null, 0) : await getSeries(null, 0);
+    const { data } = await getMovies(null, 0);
     setItems(data || []);
     setFilteredItems(data || []);
     setSearchQuery('');
@@ -69,7 +69,7 @@ const ManageCrew = () => {
     const { data } = await supabase
       .from('crew')
       .select('*, person:persons(*)')
-      .eq(type === 'movie' ? 'movie_id' : 'series_id', item.id);
+      .eq('movie_id', item.id);
     setCrew(data || []);
   };
 
@@ -81,8 +81,7 @@ const ManageCrew = () => {
       person_id: parseInt(formData.person_id),
       job: formData.job,
       movie_id: type === 'movie' ? selectedItem.id : null,
-      series_id: type === 'series' ? selectedItem.id : null
-    };
+          };
 
     await createCrew(crewData);
     alert('Crew member added successfully!');
@@ -111,14 +110,13 @@ const ManageCrew = () => {
             className="px-4 py-2 bg-white/10 rounded-lg border border-white/20"
           >
             <option value="movie" className="bg-black">Movies</option>
-            <option value="series" className="bg-black">Series</option>
-          </select>
+                      </select>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Items List */}
           <div>
-            <h2 className="text-2xl font-bold mb-4">Select {type === 'movie' ? 'Movie' : 'Series'}</h2>
+            <h2 className="text-2xl font-bold mb-4">Select {'Movie'}</h2>
             <input
               type="text"
               placeholder="Search..."

@@ -6,9 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
 import Movies from './pages/Movies';
-import Series from './pages/Series';
 import MovieDetail from './pages/MovieDetail';
-import SeriesDetail from './pages/SeriesDetail';
 import PersonDetail from './pages/PersonDetail';
 import Search from './pages/Search';
 import Watchlist from './pages/Watchlist';
@@ -19,10 +17,8 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TMDBImport from './pages/admin/TMDBImport';
 import AddMovie from './pages/admin/AddMovie';
-import AddSeries from './pages/admin/AddSeries';
 import AddPerson from './pages/admin/AddPerson';
 import ManageMovies from './pages/admin/ManageMovies';
-import ManageSeries from './pages/admin/ManageSeries';
 import ManageCollections from './pages/admin/ManageCollections';
 import UpdatePersons from './pages/admin/UpdatePersons';
 import ManageLinks from './pages/admin/ManageLinks';
@@ -41,9 +37,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/movies" element={<Movies />} />
-            <Route path="/series" element={<Series />} />
             <Route path="/movie/:id" element={<MovieDetail />} />
-            <Route path="/series/:id" element={<SeriesDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/search" element={<Search />} />
             <Route path="/login" element={<Login />} />
@@ -95,15 +89,6 @@ function App() {
             />
 
             <Route
-              path="/admin/add-series"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <AddSeries />
-                </ProtectedRoute>
-              )}
-            />
-
-            <Route
               path="/admin/add-person"
               element={(
                 <ProtectedRoute adminOnly>
@@ -117,15 +102,6 @@ function App() {
               element={(
                 <ProtectedRoute adminOnly>
                   <ManageMovies />
-                </ProtectedRoute>
-              )}
-            />
-
-            <Route
-              path="/admin/manage-series"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageSeries />
                 </ProtectedRoute>
               )}
             />

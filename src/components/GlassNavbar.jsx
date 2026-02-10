@@ -31,11 +31,7 @@ const GlassNavbar = () => {
             </Link>
             <Link to="/movies" className={`transition-colors ${isActive('/movies') ? 'text-white' : 'hover:text-white'}`}>
               Movies
-            </Link>
-            <Link to="/series" className={`transition-colors ${isActive('/series') ? 'text-white' : 'hover:text-white'}`}>
-              Series
-            </Link>
-            {user && (
+            </Link>            {user && (
               <Link to="/watchlist" className={`transition-colors ${isActive('/watchlist') ? 'text-white' : 'hover:text-white'}`}>
                 Watchlist
               </Link>
@@ -55,7 +51,7 @@ const GlassNavbar = () => {
               <input
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="Search movies, shows, people"
+                placeholder="Search movies and people"
                 className="w-full pl-11 pr-4 py-2 glass-input text-sm"
                 aria-label="Search"
               />

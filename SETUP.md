@@ -92,7 +92,6 @@ Open http://localhost:5173
 - 278 - The Shawshank Redemption
 - 680 - Pulp Fiction
 
-### TV Series
 - 1396 - Breaking Bad
 - 1399 - Game of Thrones
 - 60735 - The Flash
@@ -103,7 +102,7 @@ Open http://localhost:5173
 
 ### "Failed to fetch from TMDB"
 - Check your TMDB API key is correct
-- Make sure you're using the movie/series ID, not the URL
+- Make sure you're using the movie ID, not the URL
 - Try a different ID to verify API is working
 
 ### "Failed to import"
@@ -123,7 +122,6 @@ Open http://localhost:5173
 
 ## Next Steps
 
-1. Import more movies and series
 2. Customize the UI colors in `tailwind.config.js`
 3. Add more features in admin panel
 4. Deploy to production (Vercel/Netlify)

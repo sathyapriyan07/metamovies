@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { getMovieDetails, getSeriesDetails, getSeasonDetails, getImageUrl, getPersonDetails, searchMovies, searchSeries, searchPerson } from '../../services/tmdb';
-import { createMovie, createSeries, createCast, createCrew, createSeason, createEpisode, createPerson } from '../../services/supabase';
-import { supabase } from '../../services/supabase';
+import { getMovieDetails, getImageUrl, getPersonDetails, searchMovies, searchPerson } from '../../services/tmdb';
+import { createMovie, createPerson } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const TMDBImport = () => {
@@ -22,608 +21,187 @@ const TMDBImport = () => {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
-      const results = type === 'movie' 
-        ? await searchMovies(searchQuery)
-        : type === 'series'
-        ? await searchSeries(searchQuery)
-        : await searchPerson(searchQuery);
-      setSearchResults(results.slice(0, 10));
+      const results = type === 'movie' ? await searchMovies(searchQuery) : await searchPerson(searchQuery);
+      setSearchResults(results.slice(0, 20));
     } catch (err) {
       setError('Search failed. Please try again.');
     }
-    
     setLoading(false);
-  };
-
-  const handleSelectFromSearch = (item) => {
-    setTmdbId(item.id.toString());
-    setSearchResults([]);
-    setSearchQuery('');
-    handleFetch(item.id);
-  };
-
-  const handleFetch = async (id = null) => {
-    const fetchId = id || tmdbId;
-    if (!fetchId) return;
-    
-    setLoading(true);
-    setError('');
-    setSuccess('');
-    
-    try {
-      const data = type === 'movie' 
-        ? await getMovieDetails(fetchId)
-        : type === 'series'
-        ? await getSeriesDetails(fetchId)
-        : await getPersonDetails(fetchId);
-      
-      setPreview(data);
-    } catch (err) {
-      setError('Failed to fetch from TMDB. Check the ID and try again.');
-    }
-    
-    setLoading(false);
-  };
-
-  const handleImport = async () => {
-    if (!preview) return;
-    
-    setLoading(true);
-    setError('');
-    
-    try {
-      if (type === 'person') {
-        const personData = {
-          tmdb_id: preview.id,
-          name: preview.name,
-          profile_url: getImageUrl(preview.profile_path),
-          biography: preview.biography,
-          birthday: preview.birthday,
-          place_of_birth: preview.place_of_birth,
-          social_links: {
-            instagram: preview.external_ids?.instagram_id ? `https://instagram.com/${preview.external_ids.instagram_id}` : null,
-            twitter: preview.external_ids?.twitter_id ? `https://twitter.com/${preview.external_ids.twitter_id}` : null,
-            facebook: preview.external_ids?.facebook_id ? `https://facebook.com/${preview.external_ids.facebook_id}` : null
-          }
-        };
-        
-        const { error: personError } = await createPerson(personData);
-        if (personError) throw personError;
-        
-        setSuccess('Person imported successfully!');
-      } else if (type === 'movie') {
-        // Import movie
-        const movieData = {
-          tmdb_id: preview.id,
-          title: preview.title,
-          overview: preview.overview,
-          release_date: preview.release_date,
-          runtime: preview.runtime,
-          rating: preview.vote_average,
-          poster_url: getImageUrl(preview.poster_path),
-          backdrop_url: getImageUrl(preview.backdrop_path),
-          genres: preview.genres.map(g => g.name),
-          trailer_url: preview.videos?.results?.[0] ? `https://youtube.com/watch?v=${preview.videos.results[0].key}` : null,
-          trending: false
-        };
-        
-        const { data: movie, error: movieError } = await createMovie(movieData);
-        if (movieError) throw movieError;
-        
-        // Import cast
-        for (const cast of preview.credits.cast.slice(0, 10)) {
-          // Check if person already exists
-          const { data: existingPerson } = await supabase
-            .from('persons')
-            .select('id')
-            .eq('tmdb_id', cast.id)
-            .single();
-          
-          let personId = existingPerson?.id;
-          
-          if (!personId) {
-            // Fetch full person details from TMDB
-            const personDetails = await getPersonDetails(cast.id);
-            
-            const personData = {
-              tmdb_id: cast.id,
-              name: cast.name,
-              profile_url: getImageUrl(cast.profile_path),
-              biography: personDetails.biography,
-              birthday: personDetails.birthday,
-              place_of_birth: personDetails.place_of_birth,
-              social_links: {
-                instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-              }
-            };
-            const { data: person } = await createPerson(personData);
-            personId = person?.id;
-          }
-          
-          if (personId) {
-            await createCast({
-              movie_id: movie.id,
-              person_id: personId,
-              character: cast.character
-            });
-          }
-        }
-        
-        // Import crew
-        for (const crew of preview.credits.crew.slice(0, 5)) {
-          // Check if person already exists
-          const { data: existingPerson } = await supabase
-            .from('persons')
-            .select('id')
-            .eq('tmdb_id', crew.id)
-            .single();
-          
-          let personId = existingPerson?.id;
-          
-          if (!personId) {
-            // Fetch full person details from TMDB
-            const personDetails = await getPersonDetails(crew.id);
-            
-            const personData = {
-              tmdb_id: crew.id,
-              name: crew.name,
-              profile_url: getImageUrl(crew.profile_path),
-              biography: personDetails.biography,
-              birthday: personDetails.birthday,
-              place_of_birth: personDetails.place_of_birth,
-              social_links: {
-                instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-              }
-            };
-            const { data: person } = await createPerson(personData);
-            personId = person?.id;
-          }
-          
-          if (personId) {
-            await createCrew({
-              movie_id: movie.id,
-              person_id: personId,
-              job: crew.job
-            });
-          }
-        }
-        
-        setSuccess('Movie imported successfully!');
-      } else {
-        // Import series
-        const seriesData = {
-          tmdb_id: preview.id,
-          title: preview.name,
-          overview: preview.overview,
-          first_air_date: preview.first_air_date,
-          rating: preview.vote_average,
-          poster_url: getImageUrl(preview.poster_path),
-          backdrop_url: getImageUrl(preview.backdrop_path),
-          genres: preview.genres.map(g => g.name),
-          trailer_url: preview.videos?.results?.[0] ? `https://youtube.com/watch?v=${preview.videos.results[0].key}` : null,
-          trending: false
-        };
-        
-        const { data: series, error: seriesError } = await createSeries(seriesData);
-        if (seriesError) throw seriesError;
-        
-        // Import cast
-        for (const cast of preview.credits.cast.slice(0, 10)) {
-          // Check if person already exists
-          const { data: existingPerson } = await supabase
-            .from('persons')
-            .select('id')
-            .eq('tmdb_id', cast.id)
-            .single();
-          
-          let personId = existingPerson?.id;
-          
-          if (!personId) {
-            // Fetch full person details from TMDB
-            const personDetails = await getPersonDetails(cast.id);
-            
-            const personData = {
-              tmdb_id: cast.id,
-              name: cast.name,
-              profile_url: getImageUrl(cast.profile_path),
-              biography: personDetails.biography,
-              birthday: personDetails.birthday,
-              place_of_birth: personDetails.place_of_birth,
-              social_links: {
-                instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-              }
-            };
-            const { data: person } = await createPerson(personData);
-            personId = person?.id;
-          }
-          
-          if (personId) {
-            await createCast({
-              series_id: series.id,
-              person_id: personId,
-              character: cast.character
-            });
-          }
-        }
-        
-        // Import crew
-        for (const crew of preview.credits.crew.slice(0, 5)) {
-          // Check if person already exists
-          const { data: existingPerson } = await supabase
-            .from('persons')
-            .select('id')
-            .eq('tmdb_id', crew.id)
-            .single();
-          
-          let personId = existingPerson?.id;
-          
-          if (!personId) {
-            // Fetch full person details from TMDB
-            const personDetails = await getPersonDetails(crew.id);
-            
-            const personData = {
-              tmdb_id: crew.id,
-              name: crew.name,
-              profile_url: getImageUrl(crew.profile_path),
-              biography: personDetails.biography,
-              birthday: personDetails.birthday,
-              place_of_birth: personDetails.place_of_birth,
-              social_links: {
-                instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-              }
-            };
-            const { data: person } = await createPerson(personData);
-            personId = person?.id;
-          }
-          
-          if (personId) {
-            await createCrew({
-              series_id: series.id,
-              person_id: personId,
-              job: crew.job
-            });
-          }
-        }
-        
-        // Import seasons (first 3 seasons only for demo)
-        for (const season of preview.seasons.slice(0, 3)) {
-          if (season.season_number === 0) continue; // Skip specials
-          
-          const seasonData = {
-            series_id: series.id,
-            season_number: season.season_number,
-            name: season.name,
-            overview: season.overview,
-            poster_url: getImageUrl(season.poster_path),
-            air_date: season.air_date
-          };
-          const { data: createdSeason } = await createSeason(seasonData);
-          
-          // Fetch and import episodes for this season
-          if (createdSeason) {
-            const seasonDetails = await getSeasonDetails(preview.id, season.season_number);
-            for (const episode of seasonDetails.episodes) {
-              const episodeData = {
-                season_id: createdSeason.id,
-                episode_number: episode.episode_number,
-                title: episode.name,
-                overview: episode.overview,
-                still_url: getImageUrl(episode.still_path),
-                air_date: episode.air_date,
-                runtime: episode.runtime
-              };
-              await createEpisode(episodeData);
-            }
-          }
-        }
-        
-        setSuccess('Series imported successfully!');
-      }
-      
-      setPreview(null);
-      setTmdbId('');
-    } catch (err) {
-      setError('Failed to import. Please try again.');
-    }
-    
-    setLoading(false);
-  };
-
-  const handleBulkImport = async () => {
-    if (!bulkIds.trim()) return;
-    
-    const ids = bulkIds.split(',').map(id => id.trim()).filter(id => id);
-    if (ids.length === 0) return;
-    
-    setBulkLoading(true);
-    setError('');
-    setSuccess('');
-    setBulkProgress({ current: 0, total: ids.length, status: '' });
-    
-    let successCount = 0;
-    let failCount = 0;
-    
-    for (let i = 0; i < ids.length; i++) {
-      const id = ids[i];
-      setBulkProgress({ current: i + 1, total: ids.length, status: `Importing ${type} ${id}...` });
-      
-      try {
-        if (type === 'person') {
-          const data = await getPersonDetails(id);
-          const personData = {
-            tmdb_id: data.id,
-            name: data.name,
-            profile_url: getImageUrl(data.profile_path),
-            biography: data.biography,
-            birthday: data.birthday,
-            place_of_birth: data.place_of_birth,
-            social_links: {
-              instagram: data.external_ids?.instagram_id ? `https://instagram.com/${data.external_ids.instagram_id}` : null,
-              twitter: data.external_ids?.twitter_id ? `https://twitter.com/${data.external_ids.twitter_id}` : null,
-              facebook: data.external_ids?.facebook_id ? `https://facebook.com/${data.external_ids.facebook_id}` : null
-            }
-          };
-          const { error: personError } = await createPerson(personData);
-          if (personError) throw personError;
-        } else {
-        const data = type === 'movie' 
-          ? await getMovieDetails(id)
-          : await getSeriesDetails(id);
-        
-        if (type === 'movie') {
-          const movieData = {
-            tmdb_id: data.id,
-            title: data.title,
-            overview: data.overview,
-            release_date: data.release_date,
-            runtime: data.runtime,
-            rating: data.vote_average,
-            poster_url: getImageUrl(data.poster_path),
-            backdrop_url: getImageUrl(data.backdrop_path),
-            genres: data.genres.map(g => g.name),
-            trailer_url: data.videos?.results?.[0] ? `https://youtube.com/watch?v=${data.videos.results[0].key}` : null,
-            trending: false
-          };
-          
-          const { data: movie, error: movieError } = await createMovie(movieData);
-          if (movieError) throw movieError;
-          
-          for (const cast of data.credits.cast.slice(0, 10)) {
-            const { data: existingPerson } = await supabase
-              .from('persons')
-              .select('id')
-              .eq('tmdb_id', cast.id)
-              .single();
-            
-            let personId = existingPerson?.id;
-            
-            if (!personId) {
-              const personDetails = await getPersonDetails(cast.id);
-              const personData = {
-                tmdb_id: cast.id,
-                name: cast.name,
-                profile_url: getImageUrl(cast.profile_path),
-                biography: personDetails.biography,
-                birthday: personDetails.birthday,
-                place_of_birth: personDetails.place_of_birth,
-                social_links: {
-                  instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                  twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                  facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-                }
-              };
-              const { data: person } = await createPerson(personData);
-              personId = person?.id;
-            }
-            
-            if (personId) {
-              await createCast({
-                movie_id: movie.id,
-                person_id: personId,
-                character: cast.character
-              });
-            }
-          }
-          
-          for (const crew of data.credits.crew.slice(0, 5)) {
-            const { data: existingPerson } = await supabase
-              .from('persons')
-              .select('id')
-              .eq('tmdb_id', crew.id)
-              .single();
-            
-            let personId = existingPerson?.id;
-            
-            if (!personId) {
-              const personDetails = await getPersonDetails(crew.id);
-              const personData = {
-                tmdb_id: crew.id,
-                name: crew.name,
-                profile_url: getImageUrl(crew.profile_path),
-                biography: personDetails.biography,
-                birthday: personDetails.birthday,
-                place_of_birth: personDetails.place_of_birth,
-                social_links: {
-                  instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                  twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                  facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-                }
-              };
-              const { data: person } = await createPerson(personData);
-              personId = person?.id;
-            }
-            
-            if (personId) {
-              await createCrew({
-                movie_id: movie.id,
-                person_id: personId,
-                job: crew.job
-              });
-            }
-          }
-        } else {
-          const seriesData = {
-            tmdb_id: data.id,
-            title: data.name,
-            overview: data.overview,
-            first_air_date: data.first_air_date,
-            rating: data.vote_average,
-            poster_url: getImageUrl(data.poster_path),
-            backdrop_url: getImageUrl(data.backdrop_path),
-            genres: data.genres.map(g => g.name),
-            trailer_url: data.videos?.results?.[0] ? `https://youtube.com/watch?v=${data.videos.results[0].key}` : null,
-            trending: false
-          };
-          
-          const { data: series, error: seriesError } = await createSeries(seriesData);
-          if (seriesError) throw seriesError;
-          
-          for (const cast of data.credits.cast.slice(0, 10)) {
-            const { data: existingPerson } = await supabase
-              .from('persons')
-              .select('id')
-              .eq('tmdb_id', cast.id)
-              .single();
-            
-            let personId = existingPerson?.id;
-            
-            if (!personId) {
-              const personDetails = await getPersonDetails(cast.id);
-              const personData = {
-                tmdb_id: cast.id,
-                name: cast.name,
-                profile_url: getImageUrl(cast.profile_path),
-                biography: personDetails.biography,
-                birthday: personDetails.birthday,
-                place_of_birth: personDetails.place_of_birth,
-                social_links: {
-                  instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                  twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                  facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-                }
-              };
-              const { data: person } = await createPerson(personData);
-              personId = person?.id;
-            }
-            
-            if (personId) {
-              await createCast({
-                series_id: series.id,
-                person_id: personId,
-                character: cast.character
-              });
-            }
-          }
-          
-          for (const crew of data.credits.crew.slice(0, 5)) {
-            const { data: existingPerson } = await supabase
-              .from('persons')
-              .select('id')
-              .eq('tmdb_id', crew.id)
-              .single();
-            
-            let personId = existingPerson?.id;
-            
-            if (!personId) {
-              const personDetails = await getPersonDetails(crew.id);
-              const personData = {
-                tmdb_id: crew.id,
-                name: crew.name,
-                profile_url: getImageUrl(crew.profile_path),
-                biography: personDetails.biography,
-                birthday: personDetails.birthday,
-                place_of_birth: personDetails.place_of_birth,
-                social_links: {
-                  instagram: personDetails.external_ids?.instagram_id ? `https://instagram.com/${personDetails.external_ids.instagram_id}` : null,
-                  twitter: personDetails.external_ids?.twitter_id ? `https://twitter.com/${personDetails.external_ids.twitter_id}` : null,
-                  facebook: personDetails.external_ids?.facebook_id ? `https://facebook.com/${personDetails.external_ids.facebook_id}` : null
-                }
-              };
-              const { data: person } = await createPerson(personData);
-              personId = person?.id;
-            }
-            
-            if (personId) {
-              await createCrew({
-                series_id: series.id,
-                person_id: personId,
-                job: crew.job
-              });
-            }
-          }
-          
-          for (const season of data.seasons.slice(0, 3)) {
-            if (season.season_number === 0) continue;
-            
-            const seasonData = {
-              series_id: series.id,
-              season_number: season.season_number,
-              name: season.name,
-              overview: season.overview,
-              poster_url: getImageUrl(season.poster_path),
-              air_date: season.air_date
-            };
-            const { data: createdSeason } = await createSeason(seasonData);
-            
-            if (createdSeason) {
-              const seasonDetails = await getSeasonDetails(data.id, season.season_number);
-              for (const episode of seasonDetails.episodes) {
-                const episodeData = {
-                  season_id: createdSeason.id,
-                  episode_number: episode.episode_number,
-                  title: episode.name,
-                  overview: episode.overview,
-                  still_url: getImageUrl(episode.still_path),
-                  air_date: episode.air_date,
-                  runtime: episode.runtime
-                };
-                await createEpisode(episodeData);
-              }
-            }
-          }
-        }
-        }
-        
-        successCount++;
-      } catch (err) {
-        failCount++;
-      }
-    }
-    
-    setBulkProgress({ current: ids.length, total: ids.length, status: 'Complete' });
-    setSuccess(`Bulk import complete! Success: ${successCount}, Failed: ${failCount}`);
-    setBulkIds('');
-    setBulkLoading(false);
   };
 
   const handleBulkSearch = async () => {
     if (!bulkSearchQuery.trim()) return;
-    
+
     setLoading(true);
+    setError('');
+
     try {
-      const results = type === 'movie' 
-        ? await searchMovies(bulkSearchQuery)
-        : type === 'series'
-        ? await searchSeries(bulkSearchQuery)
-        : await searchPerson(bulkSearchQuery);
+      const results = type === 'movie' ? await searchMovies(bulkSearchQuery) : await searchPerson(bulkSearchQuery);
       setBulkSearchResults(results.slice(0, 20));
     } catch (err) {
       setError('Search failed. Please try again.');
     }
     setLoading(false);
+  };
+
+  const handleFetch = async () => {
+    if (!tmdbId) return;
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const data = type === 'movie' ? await getMovieDetails(tmdbId) : await getPersonDetails(tmdbId);
+      setPreview(data);
+    } catch (err) {
+      setError('Failed to fetch from TMDB. Check the ID and try again.');
+    }
+    setLoading(false);
+  };
+
+  const handleSelectFromSearch = async (item) => {
+    setTmdbId(String(item.id));
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      const data = type === 'movie' ? await getMovieDetails(item.id) : await getPersonDetails(item.id);
+      setPreview(data);
+    } catch (err) {
+      setError('Failed to fetch details. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  const handleImport = async () => {
+    if (!preview) return;
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      if (type === 'movie') {
+        const moviePayload = {
+          tmdb_id: preview.id,
+          title: preview.title,
+          overview: preview.overview || null,
+          release_date: preview.release_date || null,
+          runtime: preview.runtime || null,
+          rating: typeof preview.vote_average === 'number' ? Number(preview.vote_average.toFixed(1)) : null,
+          poster_url: getImageUrl(preview.poster_path, 'w500'),
+          backdrop_url: getImageUrl(preview.backdrop_path, 'original'),
+          genres: preview.genres?.map((g) => g.name) || [],
+          trailer_url: (() => {
+            const trailer = preview.videos?.results?.find(
+              (v) => v.site === 'YouTube' && v.type === 'Trailer'
+            );
+            return trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+          })()
+        };
+        await createMovie(moviePayload);
+        setSuccess('Movie imported successfully.');
+      } else {
+        const personPayload = {
+          tmdb_id: preview.id,
+          name: preview.name,
+          biography: preview.biography || null,
+          birthday: preview.birthday || null,
+          place_of_birth: preview.place_of_birth || null,
+          profile_url: getImageUrl(preview.profile_path, 'w500'),
+          social_links: {
+            instagram: preview.external_ids?.instagram_id ? `https://www.instagram.com/${preview.external_ids.instagram_id}` : null,
+            twitter: preview.external_ids?.twitter_id ? `https://x.com/${preview.external_ids.twitter_id}` : null,
+            facebook: preview.external_ids?.facebook_id ? `https://www.facebook.com/${preview.external_ids.facebook_id}` : null
+          }
+        };
+        await createPerson(personPayload);
+        setSuccess('Person imported successfully.');
+      }
+      setPreview(null);
+      setTmdbId('');
+      setSearchQuery('');
+      setSearchResults([]);
+    } catch (err) {
+      setError('Import failed. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  const handleBulkImport = async () => {
+    if (!bulkIds.trim()) return;
+    const ids = bulkIds
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    if (ids.length === 0) return;
+
+    setBulkLoading(true);
+    setError('');
+    setSuccess('');
+    setBulkProgress({ current: 0, total: ids.length, status: 'Starting import...' });
+
+    try {
+      let current = 0;
+      for (const id of ids) {
+        current += 1;
+        setBulkProgress({ current, total: ids.length, status: `Importing ${id}...` });
+
+        const data = type === 'movie' ? await getMovieDetails(id) : await getPersonDetails(id);
+
+        if (type === 'movie') {
+          const moviePayload = {
+            tmdb_id: data.id,
+            title: data.title,
+            overview: data.overview || null,
+            release_date: data.release_date || null,
+            runtime: data.runtime || null,
+            rating: typeof data.vote_average === 'number' ? Number(data.vote_average.toFixed(1)) : null,
+            poster_url: getImageUrl(data.poster_path, 'w500'),
+            backdrop_url: getImageUrl(data.backdrop_path, 'original'),
+            genres: data.genres?.map((g) => g.name) || [],
+            trailer_url: (() => {
+              const trailer = data.videos?.results?.find(
+                (v) => v.site === 'YouTube' && v.type === 'Trailer'
+              );
+              return trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+            })()
+          };
+          await createMovie(moviePayload);
+        } else {
+          const personPayload = {
+            tmdb_id: data.id,
+            name: data.name,
+            biography: data.biography || null,
+            birthday: data.birthday || null,
+            place_of_birth: data.place_of_birth || null,
+            profile_url: getImageUrl(data.profile_path, 'w500'),
+            social_links: {
+              instagram: data.external_ids?.instagram_id ? `https://www.instagram.com/${data.external_ids.instagram_id}` : null,
+              twitter: data.external_ids?.twitter_id ? `https://x.com/${data.external_ids.twitter_id}` : null,
+              facebook: data.external_ids?.facebook_id ? `https://www.facebook.com/${data.external_ids.facebook_id}` : null
+            }
+          };
+          await createPerson(personPayload);
+        }
+      }
+
+      setSuccess(`Imported ${ids.length} item(s) successfully.`);
+      setBulkIds('');
+      setBulkSearchResults([]);
+      setSelectedItems([]);
+      setBulkSearchQuery('');
+    } catch (err) {
+      setError('Bulk import failed. Please try again.');
+    }
+
+    setBulkLoading(false);
+    setBulkProgress({ current: 0, total: 0, status: '' });
   };
 
   const toggleSelectItem = (item) => {
@@ -645,7 +223,7 @@ const TMDBImport = () => {
   };
 
   return (
-    <AdminLayout title="TMDB Import" subtitle="Import movies, series, and people from TMDB.">
+    <AdminLayout title="TMDB Import" subtitle="Import movies and people from TMDB.">
       <div className="glass-card rounded-2xl p-6">
 
         <div className="flex gap-4 mb-6">
@@ -677,7 +255,7 @@ const TMDBImport = () => {
 
         <div id="bulk-import" className="glass-dark p-6 rounded-xl mb-8">
           <h2 className="text-2xl font-bold mb-4">Bulk Import</h2>
-          <p className="text-gray-400 text-sm mb-4">Import multiple {type === 'movie' ? 'movies' : 'series'} at once using comma-separated TMDB IDs</p>
+          <p className="text-gray-400 text-sm mb-4">Import multiple movies at once using comma-separated TMDB IDs</p>
           
           <div className="space-y-4">
             <div>
@@ -689,8 +267,7 @@ const TMDBImport = () => {
                 disabled={bulkLoading}
               >
                 <option value="movie" className="bg-black">Movies</option>
-                <option value="series" className="bg-black">TV Series</option>
-                <option value="person" className="bg-black">Persons</option>
+                                <option value="person" className="bg-black">Persons</option>
               </select>
             </div>
 
@@ -811,8 +388,7 @@ const TMDBImport = () => {
                 className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
               >
                 <option value="movie" className="bg-black">Movie</option>
-                <option value="series" className="bg-black">TV Series</option>
-                <option value="person" className="bg-black">Person</option>
+                                <option value="person" className="bg-black">Person</option>
               </select>
             </div>
 
@@ -824,7 +400,7 @@ const TMDBImport = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="Search for movies or series..."
+                  placeholder="Search for movies..."
                   className="flex-1 px-4 py-3 bg-white/10 rounded-lg border border-white/20"
                 />
                 <button

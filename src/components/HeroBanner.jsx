@@ -25,10 +25,9 @@ const HeroBanner = () => {
   const loadFeaturedContent = async () => {
     const { data } = await getHeroBanners();
 
-    const allContent = (data || [])
-      .map((banner) => ({
-        ...(banner.movie || banner.series),
-        type: banner.movie ? 'movie' : 'series'
+    const allContent = (data || [])      .map((banner) => ({
+        ...(banner.movie || {}),
+        type: 'movie'
       }))
       .filter((item) => item.backdrop_url);
 
@@ -102,14 +101,53 @@ const HeroBanner = () => {
             {featured.release_date && <span>{featured.release_date.split('-')[0]}</span>}
             {featured.genres && featured.genres.length > 0 && (
               <>
-                <span className="text-gray-500">•</span>
+                <span className="meta-separator"></span>
                 <span>{featured.genres.slice(0, 2).join(' / ')}</span>
               </>
             )}
-            {featured.rating && (
+            {(typeof featured.rating === 'number' ||
+              typeof featured.imdb_rating === 'number' ||
+              typeof featured.rotten_rating === 'number') && (
               <>
-                <span className="text-gray-500">•</span>
-                <span className="text-sky-200">? {featured.rating.toFixed(1)}</span>
+                <span className="meta-separator"></span>
+                <span className="inline-flex items-center gap-2 text-sky-200 flex-wrap">
+                  {typeof featured.rating === 'number' && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/3840px-Tmdb.new.logo.svg.png"
+                        alt="TMDB"
+                        className="h-4 w-auto"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      {featured.rating.toFixed(1)}
+                    </span>
+                  )}
+                  {typeof featured.imdb_rating === 'number' && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/960px-IMDB_Logo_2016.svg.png"
+                        alt="IMDb"
+                        className="h-4 w-auto"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      {featured.imdb_rating.toFixed(1)}
+                    </span>
+                  )}
+                  {typeof featured.rotten_rating === 'number' && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Rotten_Tomatoes.svg/3840px-Rotten_Tomatoes.svg.png"
+                        alt="Rotten Tomatoes"
+                        className="h-4 w-auto"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      {Math.round(featured.rotten_rating)}%
+                    </span>
+                  )}
+                </span>
               </>
             )}
           </div>
@@ -124,10 +162,10 @@ const HeroBanner = () => {
             <button onClick={handleViewClick} className="btn-primary">
               Watch Now
             </button>
-            {featured.type === 'movie' && featured.is_now_showing && featured.booking_url && (
+            {featured.is_now_showing && featured.booking_url && (
               <button
                 onClick={() => window.open(featured.booking_url, '_blank', 'noopener,noreferrer')}
-                className="btn-ticket flex items-center gap-2"
+                className="btn-ticket inline-flex items-center gap-2 whitespace-nowrap"
               >
                 <img
                   src="https://upload.wikimedia.org/wikipedia/commons/7/75/Bookmyshow-logoid.png"
@@ -163,6 +201,10 @@ const HeroBanner = () => {
 };
 
 export default HeroBanner;
+
+
+
+
 
 
 

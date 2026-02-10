@@ -12,7 +12,7 @@ Run the SQL migration in your Supabase SQL Editor:
 ```
 
 This creates:
-- `hero_banners` table with movie/series references
+- `hero_banners` table with movie references
 - Indexes for performance
 - Row Level Security policies
 - Auto-update timestamp trigger
@@ -24,7 +24,7 @@ This creates:
 - **ManageHeroBanner.jsx** - Admin panel for banner management
 
 #### Admin Controls
-- ✅ Add movies/series to hero banner
+- ✅ Add movies to hero banner
 - ✅ Set display order (1, 2, 3...)
 - ✅ Toggle active/inactive status
 - ✅ Delete banners
@@ -37,7 +37,7 @@ This creates:
 1. Login as admin user
 2. Navigate to `/admin`
 3. Click "🎬 Manage Hero Banner"
-4. Search and add movies/series
+4. Search and add movies
 5. Reorder and toggle active status
 
 ### 4. How It Works
@@ -50,7 +50,7 @@ This creates:
 - Auto-filters items with backdrop images
 
 **Admin Management:**
-- Search movies/series by title
+- Search movies by title
 - Add to hero banner with auto-incrementing order
 - Toggle active/inactive without deleting
 - Reorder by changing display_order number
@@ -62,7 +62,6 @@ This creates:
 hero_banners
 ├── id (UUID, Primary Key)
 ├── movie_id (UUID, FK to movies)
-├── series_id (UUID, FK to series)
 ├── display_order (INTEGER)
 ├── is_active (BOOLEAN)
 ├── created_at (TIMESTAMP)
@@ -70,8 +69,7 @@ hero_banners
 ```
 
 **Constraints:**
-- Either movie_id OR series_id must be set (not both)
-- Cascade delete when movie/series is deleted
+- Cascade delete when movie is deleted
 
 ### 6. Security
 - RLS enabled
@@ -90,7 +88,7 @@ hero_banners
 
 **No banners showing?**
 - Check if any banners are marked as active
-- Verify movies/series have backdrop_url
+- Verify movies have backdrop_url
 - Check browser console for errors
 
 **Can't add banners?**

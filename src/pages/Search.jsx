@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { searchAll, getTrendingMovies, getTrendingSeries, getMovies, getSeries } from '../services/supabase';
+import { searchAll, getTrendingMovies, getMovies } from '../services/supabase';
 import PosterCard from '../components/PosterCard';
 import CarouselRow from '../components/CarouselRow';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -7,13 +7,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const Search = () => {
   const location = useLocation();
   const [query, setQuery] = useState(location.state?.q || '');
-  const [results, setResults] = useState({ movies: [], series: [], persons: [] });
+  const [results, setResults] = useState({ movies: [], persons: [] });
   const [loading, setLoading] = useState(false);
   const [trendingMovies, setTrendingMovies] = useState([]);
-  const [trendingSeries, setTrendingSeries] = useState([]);
-  const [popularMovies, setPopularMovies] = useState([]);
-  const [popularSeries, setPopularSeries] = useState([]);
-  const [homeLoading, setHomeLoading] = useState(true);
+    const [popularMovies, setPopularMovies] = useState([]);
+    const [homeLoading, setHomeLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,22 +26,18 @@ const Search = () => {
 
   const loadHomeContent = async () => {
     setHomeLoading(true);
-    const [trending, series, movies, allSeries] = await Promise.all([
+    const [trending, movies] = await Promise.all([
       getTrendingMovies(),
-      getTrendingSeries(),
       getMovies(20, 0),
-      getSeries(20, 0)
     ]);
     setTrendingMovies(trending.data || []);
-    setTrendingSeries(series.data || []);
     setPopularMovies(movies.data || []);
-    setPopularSeries(allSeries.data || []);
     setHomeLoading(false);
   };
 
   const handleSearch = async (searchQuery) => {
     if (!searchQuery.trim()) {
-      setResults({ movies: [], series: [], persons: [] });
+      setResults({ movies: [], persons: [] });
       return;
     }
 
@@ -72,12 +66,7 @@ const Search = () => {
         title: item.title,
         type: 'movie'
       })),
-      ...results.series.slice(0, 4).map((item) => ({
-        id: item.id,
-        title: item.title,
-        type: 'series'
-      })),
-      ...results.persons.slice(0, 4).map((item) => ({
+            ...results.persons.slice(0, 4).map((item) => ({
         id: item.id,
         title: item.name,
         type: 'person'
@@ -98,7 +87,7 @@ const Search = () => {
               type="text"
               value={query}
               onChange={handleInputChange}
-              placeholder="Search movies, shows, people"
+              placeholder="Search movies and people"
               className="w-full pl-12 pr-6 py-3 glass-input"
             />
           </div>
@@ -122,8 +111,6 @@ const Search = () => {
           <div>
             <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={homeLoading} />
             <CarouselRow title="Popular Movies" items={popularMovies} type="movie" loading={homeLoading} />
-            <CarouselRow title="Popular Series" items={popularSeries} type="series" loading={homeLoading} />
-            <CarouselRow title="Trending Series" items={trendingSeries} type="series" loading={homeLoading} />
           </div>
         ) : (
           <div>
@@ -144,16 +131,7 @@ const Search = () => {
                   </div>
                 )}
 
-                {results.series.length > 0 && (
-                  <div className="mb-12">
-                    <h2 className="section-title">Series</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                      {results.series.map((item) => (
-                        <PosterCard key={item.id} item={item} type="series" />
-                      ))}
-                    </div>
-                  </div>
-                )}
+                
 
                 {results.persons.length > 0 && (
                   <div className="mb-12">
@@ -178,7 +156,7 @@ const Search = () => {
                   </div>
                 )}
 
-                {results.movies.length === 0 && results.series.length === 0 && results.persons.length === 0 && (
+                {results.movies.length === 0 && results.persons.length === 0 && (
                   <div className="text-center text-gray-400 py-16 glass-card rounded-2xl">
                     <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

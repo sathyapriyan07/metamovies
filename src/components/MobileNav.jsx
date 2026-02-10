@@ -19,13 +19,7 @@ const MobileNav = () => {
           isActive('/movies') ? 'text-red-500' : 'text-gray-400'
         }`}>
           Movies
-        </Link>
-        <Link to="/series" className={`transition-colors font-medium ${
-          isActive('/series') ? 'text-red-500' : 'text-gray-400'
-        }`}>
-          Series
-        </Link>
-        <Link to="/search" className={`transition-colors font-medium ${
+        </Link>        <Link to="/search" className={`transition-colors font-medium ${
           isActive('/search') ? 'text-red-500' : 'text-gray-400'
         }`}>
           Search

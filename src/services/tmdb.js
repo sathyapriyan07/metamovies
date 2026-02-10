@@ -17,18 +17,6 @@ export const getMovieDetails = async (tmdbId) => {
   return data;
 };
 
-export const getSeriesDetails = async (tmdbId) => {
-  const { data } = await tmdbApi.get(`/tv/${tmdbId}`, {
-    params: { append_to_response: 'credits,videos,external_ids' }
-  });
-  return data;
-};
-
-export const getSeasonDetails = async (seriesId, seasonNumber) => {
-  const { data } = await tmdbApi.get(`/tv/${seriesId}/season/${seasonNumber}`);
-  return data;
-};
-
 export const getPersonDetails = async (tmdbId) => {
   const { data } = await tmdbApi.get(`/person/${tmdbId}`, {
     params: { append_to_response: 'combined_credits,external_ids' }
@@ -50,13 +38,6 @@ export const searchMovies = async (query) => {
   return data.results;
 };
 
-export const searchSeries = async (query) => {
-  const { data } = await tmdbApi.get('/search/tv', {
-    params: { query }
-  });
-  return data.results;
-};
-
 export const searchPerson = async (query) => {
   const { data } = await tmdbApi.get('/search/person', {
     params: { query }
@@ -66,11 +47,6 @@ export const searchPerson = async (query) => {
 
 export const getTrendingMovies = async () => {
   const { data } = await tmdbApi.get('/trending/movie/week');
-  return data.results;
-};
-
-export const getTrendingSeries = async () => {
-  const { data } = await tmdbApi.get('/trending/tv/week');
   return data.results;
 };
 

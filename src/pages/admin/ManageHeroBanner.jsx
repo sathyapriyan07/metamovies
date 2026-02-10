@@ -5,9 +5,7 @@ import AdminLayout from '../../components/AdminLayout';
 const ManageHeroBanner = () => {
   const [banners, setBanners] = useState([]);
   const [movies, setMovies] = useState([]);
-  const [series, setSeries] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchType, setSearchType] = useState('movie');
   const [searchResults, setSearchResults] = useState([]);
   const [editingBanner, setEditingBanner] = useState(null);
 
@@ -21,36 +19,32 @@ const ManageHeroBanner = () => {
       .from('hero_banners')
       .select(`
         *,
-        movie:movies(*),
-        series:series(*)
+        movie:movies(*)
       `)
       .order('display_order', { ascending: true });
     setBanners(data || []);
   };
 
   const loadContent = async () => {
-    const [moviesData, seriesData] = await Promise.all([
-      supabase.from('movies').select('*').order('created_at', { ascending: false }),
-      supabase.from('series').select('*').order('created_at', { ascending: false })
+    const [moviesData] = await Promise.all([
+      supabase.from('movies').select('*').order('created_at', { ascending: false })
     ]);
     setMovies(moviesData.data || []);
-    setSeries(seriesData.data || []);
   };
 
   const handleSearch = () => {
-    const content = searchType === 'movie' ? movies : series;
+    const content = movies;
     const filtered = content.filter(item =>
       item.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setSearchResults(filtered);
   };
 
-  const handleAddBanner = async (itemId, itemType) => {
+  const handleAddBanner = async (itemId) => {
     const maxOrder = banners.length > 0 ? Math.max(...banners.map(b => b.display_order || 0)) : 0;
     await supabase.from('hero_banners').insert({
-      movie_id: itemType === 'movie' ? itemId : null,
-      series_id: itemType === 'series' ? itemId : null,
-      display_order: maxOrder + 1,
+      movie_id: itemId,
+            display_order: maxOrder + 1,
       is_active: true
     });
     loadBanners();
@@ -91,15 +85,7 @@ const ManageHeroBanner = () => {
             <h2 className="text-2xl font-bold mb-4">Add New Banner</h2>
             <div className="glass-dark p-6 rounded-xl">
               <div className="flex gap-2 mb-4">
-                <select
-                  value={searchType}
-                  onChange={(e) => setSearchType(e.target.value)}
-                  className="px-4 py-2 bg-white/10 rounded-lg border border-white/20"
-                >
-                  <option value="movie" className="bg-black">Movie</option>
-                  <option value="series" className="bg-black">Series</option>
-                </select>
-                <input
+                                <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -142,7 +128,7 @@ const ManageHeroBanner = () => {
             <h2 className="text-2xl font-bold mb-4">Current Banners ({banners.length})</h2>
             <div className="space-y-3">
               {banners.map((banner) => {
-                const content = banner.movie || banner.series;
+                const content = banner.movie;
                 return (
                   <div key={banner.id} className="glass-dark p-4 rounded-xl">
                     <div className="flex gap-3 mb-3">
@@ -154,7 +140,7 @@ const ManageHeroBanner = () => {
                       <div className="flex-1">
                         <p className="font-bold">{content?.title}</p>
                         <p className="text-sm text-gray-400">
-                          {banner.movie ? 'Movie' : 'Series'}
+                          Movie
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
                           {content?.release_date?.split('-')[0]} • ⭐ {content?.rating?.toFixed(1)}

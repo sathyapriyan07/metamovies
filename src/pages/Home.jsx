@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  getTrendingMovies,
-  getTrendingSeries,
-  getUpcomingMovies,
+  getTrendingMovies,  getUpcomingMovies,
   getMovies,
   getCollections,
   getCollectionWithItems
@@ -11,9 +9,7 @@ import CarouselRow from '../components/CarouselRow';
 import HeroBanner from '../components/HeroBanner';
 
 const Home = () => {
-  const [trendingMovies, setTrendingMovies] = useState([]);
-  const [trendingSeries, setTrendingSeries] = useState([]);
-  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [trendingMovies, setTrendingMovies] = useState([]);  const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [allMovies, setAllMovies] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,16 +20,14 @@ const Home = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [trending, series, upcoming, movies, cols] = await Promise.all([
+    const [trending, upcoming, movies, cols] = await Promise.all([
       getTrendingMovies(),
-      getTrendingSeries(),
       getUpcomingMovies(),
       getMovies(40, 0),
       getCollections()
     ]);
 
     setTrendingMovies(trending.data || []);
-    setTrendingSeries(series.data || []);
     setUpcomingMovies(upcoming.data || []);
     setAllMovies(movies.data || []);
 
@@ -44,8 +38,8 @@ const Home = () => {
           ...col,
           items:
             data?.collection_items?.map((item) => ({
-              ...(item.movie || item.series),
-              type: item.movie ? 'movie' : 'series'
+              ...(item.movie || {}),
+              type: 'movie'
             })) || []
         };
       })
@@ -61,7 +55,6 @@ const Home = () => {
 
       <div className="max-w-7xl mx-auto pt-10">
         <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
-        <CarouselRow title="Trending Series" items={trendingSeries} type="series" loading={loading} />
         <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
         {collections.map((collection) => (
           <CarouselRow

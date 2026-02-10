@@ -53,6 +53,16 @@ const MovieDetail = () => {
       setInWatchlist(true);
     }
   };
+  const formatRuntime = (runtimeMinutes) => {
+    if (!runtimeMinutes || runtimeMinutes <= 0) return null;
+    const hours = Math.floor(runtimeMinutes / 60);
+    const minutes = runtimeMinutes % 60;
+    if (hours > 0 && minutes > 0) return `Runtime: ${hours}hr ${minutes}min`;
+    if (hours > 0) return `Runtime: ${hours}hr`;
+    return `Runtime: ${minutes}min`;
+  };
+
+
 
   if (loading) {
     return (
@@ -128,10 +138,10 @@ const MovieDetail = () => {
               )}
             </div>
           )}
-          {movie.runtime && (
+          {movie.runtime > 0 && (
             <>
-              <span className="text-gray-500">•</span>
-              <span className="text-gray-300">{movie.runtime} min</span>
+              <span className="meta-separator">â€¢</span>
+              <span className="text-sm md:text-base font-medium text-gray-300/90 mx-2">{formatRuntime(movie.runtime)}</span>
             </>
           )}
         </div>
@@ -154,7 +164,7 @@ const MovieDetail = () => {
           {movie.is_now_showing && movie.booking_url && (
             <button
               onClick={() => window.open(movie.booking_url, '_blank', 'noopener,noreferrer')}
-              className="btn-ticket flex items-center gap-2"
+              className="btn-ticket inline-flex items-center gap-2 whitespace-nowrap"
             >
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/7/75/Bookmyshow-logoid.png"
@@ -162,7 +172,7 @@ const MovieDetail = () => {
                 className="ticket-logo"
                 loading="lazy"
                 decoding="async"
-              />\n</button>
+              /></button>
           )}
           {isAdmin && (
             <>
@@ -363,6 +373,20 @@ const MovieDetail = () => {
 };
 
 export default MovieDetail;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

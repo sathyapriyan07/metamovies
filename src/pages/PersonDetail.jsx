@@ -19,19 +19,19 @@ const PersonDetail = () => {
   const allWorks = useMemo(() => {
     if (!person) return [];
     return [
-      ...(person.cast_roles?.map((c) => ({
-        ...(c.movie || c.series),
-        type: c.movie ? 'movie' : 'series',
+      ...(person.cast_roles?.filter((c) => c.movie)?.map((c) => ({
+        ...(c.movie || {}),
+        type: 'movie',
         role: c.character,
-        year: (c.movie || c.series)?.release_date?.split('-')[0],
-        rating: (c.movie || c.series)?.rating || 0
+        year: c.movie?.release_date?.split('-')[0],
+        rating: c.movie?.rating || 0
       })) || []),
-      ...(person.crew_roles?.map((c) => ({
-        ...(c.movie || c.series),
-        type: c.movie ? 'movie' : 'series',
+      ...(person.crew_roles?.filter((c) => c.movie)?.map((c) => ({
+        ...(c.movie || {}),
+        type: 'movie',
         role: c.job,
-        year: (c.movie || c.series)?.release_date?.split('-')[0],
-        rating: (c.movie || c.series)?.rating || 0
+        year: c.movie?.release_date?.split('-')[0],
+        rating: c.movie?.rating || 0
       })) || [])
     ].sort((a, b) => (b.rating || 0) - (a.rating || 0));
   }, [person]);
@@ -56,33 +56,33 @@ const PersonDetail = () => {
 
   const creditsCount = (person.cast_roles?.length || 0) + (person.crew_roles?.length || 0);
 
-  const actingCredits = (person.cast_roles || [])
+  const actingCredits = (person.cast_roles || []).filter((c) => c.movie)
     .map((c) => ({
-      ...(c.movie || c.series),
-      type: c.movie ? 'movie' : 'series',
+      ...(c.movie || {}),
+      type: 'movie',
       role: c.character,
-      year: (c.movie || c.series)?.release_date?.split('-')[0]
+      year: c.movie?.release_date?.split('-')[0]
     }))
     .sort((a, b) => (b.year || '0') - (a.year || '0'));
 
   const soundJobs = ['Original Music Composer', 'Music Composer', 'Composer', 'Score', 'Soundtrack', 'Music'];
-  const soundCredits = (person.crew_roles || [])
+  const soundCredits = (person.crew_roles || []).filter((c) => c.movie)
     .filter((c) => soundJobs.some((job) => c.job?.includes(job)))
     .map((c) => ({
-      ...(c.movie || c.series),
-      type: c.movie ? 'movie' : 'series',
+      ...(c.movie || {}),
+      type: 'movie',
       role: c.job,
-      year: (c.movie || c.series)?.release_date?.split('-')[0]
+      year: c.movie?.release_date?.split('-')[0]
     }))
     .sort((a, b) => (b.year || '0') - (a.year || '0'));
 
-  const directorCredits = (person.crew_roles || [])
+  const directorCredits = (person.crew_roles || []).filter((c) => c.movie)
     .filter((c) => c.job?.includes('Director'))
     .map((c) => ({
-      ...(c.movie || c.series),
-      type: c.movie ? 'movie' : 'series',
+      ...(c.movie || {}),
+      type: 'movie',
       role: c.job,
-      year: (c.movie || c.series)?.release_date?.split('-')[0]
+      year: c.movie?.release_date?.split('-')[0]
     }))
     .sort((a, b) => (b.year || '0') - (a.year || '0'));
 
@@ -234,7 +234,7 @@ const PersonDetail = () => {
                         className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition"
                       >
                         <div className="flex items-start gap-4">
-                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || '—'}</span>
+                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || ''}</span>
                           <div>
                             <p className="text-white font-medium">{credit.title}</p>
                             <p className="text-gray-400 text-sm">as {credit.role}</p>
@@ -254,7 +254,7 @@ const PersonDetail = () => {
                         className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition"
                       >
                         <div className="flex items-start gap-4">
-                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || '—'}</span>
+                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || ''}</span>
                           <div>
                             <p className="text-white font-medium">{credit.title}</p>
                             <p className="text-gray-400 text-sm">{credit.role}</p>
@@ -274,7 +274,7 @@ const PersonDetail = () => {
                         className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition"
                       >
                         <div className="flex items-start gap-4">
-                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || '—'}</span>
+                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || ''}</span>
                           <div>
                             <p className="text-white font-medium">{credit.title}</p>
                             <p className="text-gray-400 text-sm">as {credit.role}</p>

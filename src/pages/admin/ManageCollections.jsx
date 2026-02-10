@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getCollections, createCollection, deleteCollection, getCollectionWithItems, addToCollection, removeFromCollection, getMovies, getSeries } from '../../services/supabase';
+import { getCollections, createCollection, deleteCollection, getCollectionWithItems, addToCollection, removeFromCollection, getMovies } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const ManageCollections = () => {
@@ -9,7 +9,6 @@ const ManageCollections = () => {
   const [collectionItems, setCollectionItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [searchType, setSearchType] = useState('movie');
 
   useEffect(() => {
     loadCollections();
@@ -47,9 +46,7 @@ const ManageCollections = () => {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
-    const { data } = searchType === 'movie' 
-      ? await getMovies(null, 0)
-      : await getSeries(null, 0);
+    const { data } = await getMovies(null, 0);
     const filtered = data?.filter(item => 
       item.title?.toLowerCase().includes(searchQuery.toLowerCase())
     ) || [];
@@ -58,7 +55,7 @@ const ManageCollections = () => {
 
   const handleAddToCollection = async (itemId) => {
     if (!selectedCollection) return;
-    await addToCollection(selectedCollection.id, itemId, searchType);
+    await addToCollection(selectedCollection.id, itemId, 'movie');
     handleSelectCollection(selectedCollection);
     setSearchResults([]);
     setSearchQuery('');
@@ -123,14 +120,6 @@ const ManageCollections = () => {
                 <div className="mb-6 glass-dark p-4 rounded-lg">
                   <h3 className="font-bold mb-3">Add Items</h3>
                   <div className="flex gap-2 mb-3">
-                    <select
-                      value={searchType}
-                      onChange={(e) => setSearchType(e.target.value)}
-                      className="px-4 py-2 bg-white/10 rounded-lg border border-white/20"
-                    >
-                      <option value="movie" className="bg-black">Movie</option>
-                      <option value="series" className="bg-black">Series</option>
-                    </select>
                     <input
                       type="text"
                       value={searchQuery}
@@ -161,7 +150,7 @@ const ManageCollections = () => {
                 {/* Current Items */}
                 <div className="space-y-2">
                   {collectionItems.map((item) => {
-                    const content = item.movie || item.series;
+                    const content = item.movie;
                     return (
                       <div key={item.id} className="glass-dark p-3 rounded-lg flex gap-3">
                         <img
@@ -171,7 +160,7 @@ const ManageCollections = () => {
                         />
                         <div className="flex-1">
                           <p className="font-semibold text-sm">{content.title}</p>
-                          <p className="text-xs text-gray-400">{item.movie ? 'Movie' : 'Series'}</p>
+                          <p className="text-xs text-gray-400">Movie</p>
                         </div>
                         <button
                           onClick={() => handleRemoveFromCollection(item.id)}

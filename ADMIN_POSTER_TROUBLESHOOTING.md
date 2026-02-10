@@ -45,7 +45,7 @@ You should see `role: admin` in the results.
 
 ## Step 4: Check Browser Console
 
-Open browser DevTools (F12) and check the console on a movie/series detail page.
+Open browser DevTools (F12) and check the console on a movie detail page.
 
 You should see:
 ```
@@ -103,7 +103,7 @@ WHERE id = (SELECT id FROM auth.users WHERE email = 'your-email@example.com');
    isAdmin: user?.user_metadata?.role === 'admin' || user?.raw_user_meta_data?.role === 'admin'
    ```
 3. **Check console logs** - Look for the debug output
-4. **Verify RLS policies** - Ensure admin can update movies/series tables
+4. **Verify RLS policies** - Ensure admin can update movies tables
 
 ---
 

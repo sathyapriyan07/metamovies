@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getMovies, getSeries, updateMovie, updateSeries } from '../../services/supabase';
+import { getMovies, updateMovie } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const ManageLinks = () => {
-  const [type, setType] = useState('movie');
-  const [items, setItems] = useState([]);
+    const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -27,11 +26,11 @@ const ManageLinks = () => {
 
   useEffect(() => {
     loadItems();
-  }, [type]);
+  }, []);
 
   const loadItems = async () => {
     setLoading(true);
-    const { data } = type === 'movie' ? await getMovies(null, 0) : await getSeries(null, 0);
+    const { data } = await getMovies(null, 0);
     setItems(data || []);
     setFilteredItems(data || []);
     setSearchQuery('');
@@ -95,11 +94,7 @@ const ManageLinks = () => {
       }
     };
 
-    if (type === 'movie') {
-      await updateMovie(selectedItem.id, updateData);
-    } else {
-      await updateSeries(selectedItem.id, updateData);
-    }
+    await updateMovie(selectedItem.id, updateData);
 
     alert('Links updated successfully!');
     loadItems();
@@ -110,21 +105,10 @@ const ManageLinks = () => {
     <AdminLayout title="Manage Links" subtitle="Configure trailers and music links.">
       <div className="glass-card rounded-2xl p-6">
 
-        <div className="mb-6">
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="px-4 py-2 bg-white/10 rounded-lg border border-white/20"
-          >
-            <option value="movie" className="bg-black">Movies</option>
-            <option value="series" className="bg-black">Series</option>
-          </select>
-        </div>
-
         <div className="grid md:grid-cols-2 gap-8">
           {/* Items List */}
           <div>
-            <h2 className="text-2xl font-bold mb-4">Select {type === 'movie' ? 'Movie' : 'Series'}</h2>
+            <h2 className="text-2xl font-bold mb-4">Select Movie</h2>
             <input
               type="text"
               placeholder="Search..."
@@ -324,7 +308,7 @@ const ManageLinks = () => {
               </div>
             ) : (
               <div className="glass-dark p-6 rounded-xl text-center text-gray-400">
-                Select a {type} to edit links
+                Select a movie to edit links
               </div>
             )}
           </div>

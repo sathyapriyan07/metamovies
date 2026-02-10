@@ -9,7 +9,7 @@ const HomeSearchBar = () => {
       className="max-w-2xl mx-auto bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-all duration-200 focus-within:ring-1 focus-within:ring-red-600"
       role="button"
       tabIndex={0}
-      aria-label="Search Movies and Series"
+      aria-label="Search Movies and People"
       onKeyDown={(e) => e.key === 'Enter' && navigate('/search')}
     >
       <svg 
@@ -20,7 +20,7 @@ const HomeSearchBar = () => {
       >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
-      <span className="text-gray-400 text-sm md:text-base">Movies, shows and more</span>
+      <span className="text-gray-400 text-sm md:text-base">Movies and more</span>
     </div>
   );
 };

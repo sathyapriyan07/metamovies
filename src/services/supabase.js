@@ -100,70 +100,14 @@ export const getUpcomingMovies = async () => {
   return { data, error };
 };
 
-// Series
-export const getSeries = async (limit = 20, offset = 0) => {
-  if (limit === null || limit === 0) {
-    let allSeries = [];
-    let from = 0;
-    const batchSize = 1000;
-    
-    while (true) {
-      const { data } = await supabase
-        .from('series')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .range(from, from + batchSize - 1);
-      
-      if (!data || data.length === 0) break;
-      allSeries = [...allSeries, ...data];
-      if (data.length < batchSize) break;
-      from += batchSize;
-    }
-    
-    return { data: allSeries, error: null };
-  }
-  
-  const { data, error } = await supabase
-    .from('series')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
-  
-  return { data, error };
-};
-
-export const getSeriesById = async (id) => {
-  const { data, error } = await supabase
-    .from('series')
-    .select(`
-      *,
-      seasons(*, episodes(*)),
-      cast:"cast"(*, person:persons(*)),
-      crew:crew(*, person:persons(*)),
-      external_links(*)
-    `)
-    .eq('id', id)
-    .single();
-  return { data, error };
-};
-
-export const getTrendingSeries = async () => {
-  const { data, error } = await supabase
-    .from('series')
-    .select('*')
-    .eq('trending', true)
-    .limit(20);
-  return { data, error };
-};
-
 // Persons
 export const getPersonById = async (id) => {
   const { data, error } = await supabase
     .from('persons')
     .select(`
       *,
-      cast_roles:"cast"(*, movie:movies(*), series:series(*)),
-      crew_roles:crew(*, movie:movies(*), series:series(*))
+      cast_roles:"cast"(*, movie:movies(*)),
+      crew_roles:crew(*, movie:movies(*))
     `)
     .eq('id', id)
     .single();
@@ -172,12 +116,11 @@ export const getPersonById = async (id) => {
 
 // Search
 export const searchAll = async (query) => {
-  const [movies, series, persons] = await Promise.all([
+  const [movies, persons] = await Promise.all([
     supabase.from('movies').select('*').ilike('title', `%${query}%`).limit(100),
-    supabase.from('series').select('*').ilike('title', `%${query}%`).limit(100),
     supabase.from('persons').select('*').ilike('name', `%${query}%`).limit(100)
   ]);
-  return { movies: movies.data, series: series.data, persons: persons.data };
+  return { movies: movies.data, persons: persons.data };
 };
 
 // Watchlist
@@ -186,8 +129,7 @@ export const getWatchlist = async (userId) => {
     .from('watchlist')
     .select(`
       *,
-      movie:movies(*),
-      series:series(*)
+      movie:movies(*)
     `)
     .eq('user_id', userId);
   return { data, error };
@@ -198,8 +140,7 @@ export const addToWatchlist = async (userId, itemId, itemType) => {
     .from('watchlist')
     .insert({
       user_id: userId,
-      movie_id: itemType === 'movie' ? itemId : null,
-      series_id: itemType === 'series' ? itemId : null
+      movie_id: itemId,
     });
   return { data, error };
 };
@@ -213,7 +154,6 @@ export const removeFromWatchlist = async (userId, itemId, itemType) => {
   if (itemType === 'movie') {
     query.eq('movie_id', itemId);
   } else {
-    query.eq('series_id', itemId);
   }
   
   const { error } = await query;
@@ -228,8 +168,6 @@ export const isInWatchlist = async (userId, itemId, itemType) => {
   
   if (itemType === 'movie') {
     query.eq('movie_id', itemId);
-  } else {
-    query.eq('series_id', itemId);
   }
   
   const { data } = await query.single();
@@ -252,33 +190,8 @@ export const deleteMovie = async (id) => {
   return { error };
 };
 
-export const createSeries = async (seriesData) => {
-  const { data, error } = await supabase.from('series').insert(seriesData).select().single();
-  return { data, error };
-};
-
-export const updateSeries = async (id, seriesData) => {
-  const { data, error } = await supabase.from('series').update(seriesData).eq('id', id).select().single();
-  return { data, error };
-};
-
-export const deleteSeries = async (id) => {
-  const { error } = await supabase.from('series').delete().eq('id', id);
-  return { error };
-};
-
 export const createPerson = async (personData) => {
   const { data, error } = await supabase.from('persons').insert(personData).select().single();
-  return { data, error };
-};
-
-export const createSeason = async (seasonData) => {
-  const { data, error } = await supabase.from('seasons').insert(seasonData).select().single();
-  return { data, error };
-};
-
-export const createEpisode = async (episodeData) => {
-  const { data, error } = await supabase.from('episodes').insert(episodeData).select().single();
   return { data, error };
 };
 
@@ -322,9 +235,8 @@ export const getCollectionWithItems = async (id) => {
       *,
       collection_items(
         *,
-        movie:movies(*),
-        series:series(*)
-      )
+        movie:movies(*)
+        )
     `)
     .eq('id', id)
     .single();
@@ -341,11 +253,10 @@ export const deleteCollection = async (id) => {
   return { error };
 };
 
-export const addToCollection = async (collectionId, itemId, itemType) => {
+export const addToCollection = async (collectionId, itemId) => {
   const { data, error } = await supabase.from('collection_items').insert({
     collection_id: collectionId,
-    movie_id: itemType === 'movie' ? itemId : null,
-    series_id: itemType === 'series' ? itemId : null
+    movie_id: itemId,
   });
   return { data, error };
 };
@@ -361,8 +272,7 @@ export const getHeroBanners = async () => {
     .from('hero_banners')
     .select(`
       *,
-      movie:movies(*),
-      series:series(*)
+      movie:movies(*)
     `)
     .eq('is_active', true)
     .order('display_order', { ascending: true });

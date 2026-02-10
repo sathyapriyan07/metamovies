@@ -1,10 +1,7 @@
 MetaMovies
-🎬 A production-ready, full-stack Movies & TV Series database web application with a cinematic dark glassmorphism UI inspired by Netflix and IMDb.
 
 ✨ Features
-Browse & Discover - Trending movies, TV series, upcoming releases, and custom collections
 
-Search - Find movies, series, and cast/crew members
 
 Detailed Pages - Complete information with cast, crew, trailers, seasons, and episodes
 
@@ -40,7 +37,6 @@ One-click TMDB import with auto-populated cast/crew
 
 Custom home page collections
 
-Episode-wise series information
 
 User authentication with role-based access
 
