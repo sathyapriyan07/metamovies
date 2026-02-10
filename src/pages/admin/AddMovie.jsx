@@ -12,6 +12,9 @@ const AddMovie = () => {
     release_date: '',
     runtime: '',
     rating: '',
+    is_now_showing: false,
+    booking_url: '',
+    booking_label: '',
     imdb_rating: '',
     rotten_rating: '',
     genres: '',
@@ -39,10 +42,26 @@ const AddMovie = () => {
         backdropUrl = data;
       }
 
+      if (formData.is_now_showing && formData.booking_url) {
+        try {
+          new URL(formData.booking_url);
+        } catch {
+          alert('Please enter a valid booking URL.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      const cleanedBookingLabel = (formData.booking_label || '').replace(/[\r\n]+/g, ' ').trim();
+
       const movieData = {
         ...formData,
         runtime: parseInt(formData.runtime),
         rating: parseFloat(formData.rating),
+        is_now_showing: !!formData.is_now_showing,
+        booking_url: formData.is_now_showing ? (formData.booking_url || null) : null,
+        booking_label: formData.is_now_showing ? (cleanedBookingLabel || 'Book Tickets') : null,
+        booking_last_updated: formData.is_now_showing && formData.booking_url ? new Date().toISOString() : null,
         imdb_rating: formData.imdb_rating ? parseFloat(formData.imdb_rating) : null,
         rotten_rating: formData.rotten_rating ? parseInt(formData.rotten_rating, 10) : null,
         genres: formData.genres.split(',').map((g) => g.trim()),
@@ -180,6 +199,43 @@ const AddMovie = () => {
             onChange={(e) => setFormData({ ...formData, trailer_url: e.target.value })}
             className="w-full px-4 py-3 glass-input"
           />
+        </div>
+
+        <div className="glass-card/0">
+          <label className="flex items-center gap-2 text-sm font-medium mb-3">
+            <input
+              type="checkbox"
+              checked={formData.is_now_showing}
+              onChange={(e) => setFormData({ ...formData, is_now_showing: e.target.checked })}
+              className="w-4 h-4"
+            />
+            Currently Streaming / In Theatres
+          </label>
+
+          {formData.is_now_showing && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Booking URL</label>
+                <input
+                  type="url"
+                  value={formData.booking_url}
+                  onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full px-4 py-3 glass-input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Button Label (optional)</label>
+                <input
+                  type="text"
+                  value={formData.booking_label}
+                  onChange={(e) => setFormData({ ...formData, booking_label: e.target.value })}
+                  placeholder="Book Tickets"
+                  className="w-full px-4 py-3 glass-input"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <div>

@@ -55,17 +55,6 @@ const Home = () => {
     setLoading(false);
   };
 
-  const topRated = useMemo(() => {
-    return [...allMovies]
-      .filter((movie) => typeof movie.rating === 'number')
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, 20);
-  }, [allMovies]);
-
-  const streamingNow = useMemo(() => {
-    return [...allMovies].slice(0, 20);
-  }, [allMovies]);
-
   return (
     <div className="min-h-screen pb-24 md:pb-12">
       <HeroBanner />
@@ -74,9 +63,6 @@ const Home = () => {
         <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
         <CarouselRow title="Trending Series" items={trendingSeries} type="series" loading={loading} />
         <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
-        <CarouselRow title="Top Rated" items={topRated} type="movie" loading={loading} />
-        <CarouselRow title="Streaming Now" items={streamingNow} type="movie" loading={loading} />
-
         {collections.map((collection) => (
           <CarouselRow
             key={collection.id}
@@ -92,3 +78,4 @@ const Home = () => {
 };
 
 export default Home;
+

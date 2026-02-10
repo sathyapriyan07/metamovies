@@ -95,6 +95,47 @@ const SeriesDetail = () => {
               ))}
             </div>
           )}
+
+          {((typeof series.rating === 'number') || (typeof series.imdb_rating === 'number') || (typeof series.rotten_rating === 'number')) && (
+            <div className="flex flex-wrap items-center gap-3">
+              {typeof series.rating === 'number' && (
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-200 hover:shadow-[0_0_18px_rgba(16,185,129,0.25)] transition">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/3840px-Tmdb.new.logo.svg.png"
+                    alt="TMDB"
+                    className="h-6 w-auto"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  {series.rating.toFixed(1)}
+                </span>
+              )}
+              {typeof series.imdb_rating === 'number' && (
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-200 hover:shadow-[0_0_18px_rgba(245,197,24,0.25)] transition">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/960px-IMDB_Logo_2016.svg.png"
+                    alt="IMDb"
+                    className="h-[22px] w-auto"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  {series.imdb_rating.toFixed(1)}
+                </span>
+              )}
+              {typeof series.rotten_rating === 'number' && (
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-200 hover:shadow-[0_0_18px_rgba(229,9,20,0.25)] transition">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Rotten_Tomatoes.svg/3840px-Rotten_Tomatoes.svg.png"
+                    alt="Rotten Tomatoes"
+                    className="h-5 w-5"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  {Math.round(series.rotten_rating)}%
+                </span>
+              )}
+            </div>
+          )}
           {series.seasons?.length > 0 && (
             <>
               <span className="text-gray-500">•</span>
@@ -102,47 +143,6 @@ const SeriesDetail = () => {
             </>
           )}
         </div>
-
-        {((typeof series.rating === 'number') || (typeof series.imdb_rating === 'number') || (typeof series.rotten_rating === 'number')) && (
-          <div className="flex flex-wrap justify-center gap-3 mb-6">
-            {typeof series.rating === 'number' && (
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-medium bg-black/60 backdrop-blur border border-white/10 hover:shadow-[0_0_18px_rgba(16,185,129,0.25)] transition">
-                <img
-                  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'><path fill='%2310b981' d='M12 2l2.9 6.1L22 9l-5 4.7L18.2 21 12 17.8 5.8 21 7 13.7 2 9l7.1-0.9z'/></svg>"
-                  alt="TMDB"
-                  className="w-4 h-4"
-                  loading="lazy"
-                  decoding="async"
-                />
-                {series.rating.toFixed(1)}
-              </span>
-            )}
-            {typeof series.imdb_rating === 'number' && (
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-medium bg-black/60 backdrop-blur border border-white/10 hover:shadow-[0_0_18px_rgba(245,197,24,0.25)] transition">
-                <img
-                  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='16' viewBox='0 0 24 16'><rect width='24' height='16' rx='3' fill='%23f5c518'/><text x='12' y='11' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='9' font-weight='700' fill='%23000000'>IMDb</text></svg>"
-                  alt="IMDb"
-                  className="w-6 h-4"
-                  loading="lazy"
-                  decoding="async"
-                />
-                {series.imdb_rating.toFixed(1)}
-              </span>
-            )}
-            {typeof series.rotten_rating === 'number' && (
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-medium bg-black/60 backdrop-blur border border-white/10 hover:shadow-[0_0_18px_rgba(229,9,20,0.25)] transition">
-                <img
-                  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2c3 2.5 6 5.5 6 9a6 6 0 1 1-12 0c0-3.5 3-6.5 6-9z'/><circle cx='9' cy='11' r='1.2' fill='%23ffffff'/><circle cx='15' cy='11' r='1.2' fill='%23ffffff'/></svg>"
-                  alt="Rotten Tomatoes"
-                  className="w-4 h-4"
-                  loading="lazy"
-                  decoding="async"
-                />
-                {Math.round(series.rotten_rating)}%
-              </span>
-            )}
-          </div>
-        )}
 
         {series.overview && (
           <p className="text-gray-300 text-sm md:text-base max-w-3xl mx-auto mb-6">
@@ -152,7 +152,7 @@ const SeriesDetail = () => {
 
         <div className="flex flex-wrap gap-3 justify-center mb-8">
           <button onClick={toggleWatchlist} className="btn-ghost">
-            {inWatchlist ? '? In Watchlist' : '+ Add to Watchlist'}
+            {inWatchlist ? 'In Watchlist' : '+ Add to Watchlist'}
           </button>
           {series.trailer_url && (
             <a href={series.trailer_url} target="_blank" rel="noopener noreferrer" className="btn-primary">
@@ -258,23 +258,23 @@ const SeriesDetail = () => {
                 <h3 className="text-xl font-semibold mb-3">Watch Now</h3>
                 <div className="flex flex-wrap gap-3">
                   {series.watch_links.netflix && (
-                    <a href={series.watch_links.netflix} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                      Netflix
+                    <a href={series.watch_links.netflix} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#E50914] hover:bg-[#f6121d] text-white transition font-semibold">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png" alt="Netflix" className="h-8 w-auto" loading="lazy" decoding="async" />
                     </a>
                   )}
                   {series.watch_links.prime && (
-                    <a href={series.watch_links.prime} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                      Prime Video
+                    <a href={series.watch_links.prime} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#1B4DB1] hover:bg-[#225dd6] text-white transition font-semibold">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_Prime_Video_logo.svg/960px-Amazon_Prime_Video_logo.svg.png" alt="Prime Video" className="h-8 w-auto" loading="lazy" decoding="async" />
                     </a>
                   )}
                   {series.watch_links.hotstar && (
-                    <a href={series.watch_links.hotstar} target="_blank" rel="noopener noreferrer" className="btn-primary">
-                      JioHotstar
+                    <a href={series.watch_links.hotstar} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#0B5FFF] hover:bg-[#1b6dff] text-white transition font-semibold">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JioHotstar_2025.png" alt="JioHotstar" className="h-9 w-auto" loading="lazy" decoding="async" />
                     </a>
                   )}
                   {series.watch_links.zee5 && (
-                    <a href={series.watch_links.zee5} target="_blank" rel="noopener noreferrer" className="btn-ghost">
-                      ZEE5
+                    <a href={series.watch_links.zee5} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#2B2B2B] hover:bg-[#3a3a3a] text-white transition font-semibold">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/ZEE5_2025.svg/250px-ZEE5_2025.svg.png" alt="ZEE5" className="h-7 w-auto" loading="lazy" decoding="async" />
                     </a>
                   )}
                 </div>

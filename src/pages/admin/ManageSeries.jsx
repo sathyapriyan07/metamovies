@@ -57,10 +57,28 @@ const ManageSeries = () => {
 
   const handleSaveRatings = async () => {
     if (!editingRatings) return;
-    await updateSeries(editingRatings.id, {
-      imdb_rating: imdbRating === '' ? null : parseFloat(imdbRating),
-      rotten_rating: rottenRating === '' ? null : parseInt(rottenRating, 10)
+    const imdbValue = imdbRating === '' ? null : parseFloat(imdbRating);
+    const rottenValue = rottenRating === '' ? null : parseInt(rottenRating, 10);
+
+    if (imdbValue !== null && (Number.isNaN(imdbValue) || imdbValue > 10)) {
+      alert('IMDb rating must be between 0 and 10.');
+      return;
+    }
+    if (rottenValue !== null && (Number.isNaN(rottenValue) || rottenValue > 100)) {
+      alert('Rotten Tomatoes rating must be between 0 and 100.');
+      return;
+    }
+
+    const { error } = await updateSeries(editingRatings.id, {
+      imdb_rating: imdbValue,
+      rotten_rating: rottenValue
     });
+
+    if (error) {
+      alert(`Failed to update ratings: ${error.message}`);
+      return;
+    }
+
     setEditingRatings(null);
     setImdbRating('');
     setRottenRating('');

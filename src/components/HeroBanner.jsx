@@ -124,6 +124,19 @@ const HeroBanner = () => {
             <button onClick={handleViewClick} className="btn-primary">
               Watch Now
             </button>
+            {featured.type === 'movie' && featured.is_now_showing && featured.booking_url && (
+              <button
+                onClick={() => window.open(featured.booking_url, '_blank', 'noopener,noreferrer')}
+                className="btn-ticket flex items-center gap-2"
+              >
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/7/75/Bookmyshow-logoid.png"
+                  alt="Ticket"
+                className="ticket-logo"
+                  loading="lazy"
+                  decoding="async"
+                />\n</button>
+            )}
             <button onClick={handleViewClick} className="btn-ghost">
               View Details
             </button>
@@ -150,3 +163,6 @@ const HeroBanner = () => {
 };
 
 export default HeroBanner;
+
+
+

@@ -76,8 +76,19 @@ const PersonDetail = () => {
     }))
     .sort((a, b) => (b.year || '0') - (a.year || '0'));
 
+  const directorCredits = (person.crew_roles || [])
+    .filter((c) => c.job?.includes('Director'))
+    .map((c) => ({
+      ...(c.movie || c.series),
+      type: c.movie ? 'movie' : 'series',
+      role: c.job,
+      year: (c.movie || c.series)?.release_date?.split('-')[0]
+    }))
+    .sort((a, b) => (b.year || '0') - (a.year || '0'));
+
   const hasActing = actingCredits.length > 0;
   const hasSound = soundCredits.length > 0;
+  const hasDirector = directorCredits.length > 0;
 
   return (
     <div className="min-h-screen pb-24 md:pb-12">
@@ -104,18 +115,36 @@ const PersonDetail = () => {
               <h1 className="text-3xl md:text-5xl font-semibold mt-2">{person.name}</h1>
               <div className="flex gap-3 mt-4">
                 {person.social_links?.instagram && (
-                  <a href={person.social_links.instagram} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs">
-                    Instagram
+                  <a href={person.social_links.instagram} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs flex items-center">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"
+                      alt="Instagram"
+                      className="h-5 w-auto object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </a>
                 )}
                 {person.social_links?.twitter && (
-                  <a href={person.social_links.twitter} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs">
-                    Twitter
+                  <a href={person.social_links.twitter} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs flex items-center">
+                    <img
+                      src="https://static.vecteezy.com/system/resources/previews/042/148/611/non_2x/new-twitter-x-logo-twitter-icon-x-social-media-icon-free-png.png"
+                      alt="X"
+                      className="h-5 w-auto object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </a>
                 )}
                 {person.social_links?.facebook && (
-                  <a href={person.social_links.facebook} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs">
-                    Facebook
+                  <a href={person.social_links.facebook} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs flex items-center">
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/500px-Facebook_Logo_%282019%29.png"
+                      alt="Facebook"
+                      className="h-5 w-auto object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </a>
                 )}
               </div>
@@ -151,7 +180,7 @@ const PersonDetail = () => {
 
             {allWorks.length > 0 && <KnownForCarousel works={allWorks} />}
 
-            {(hasActing || hasSound) && (
+            {(hasActing || hasSound || hasDirector) && (
               <div className="glass-card rounded-2xl p-6">
                 <div className="flex gap-6 border-b border-white/10 mb-6">
                   <button
@@ -177,6 +206,15 @@ const PersonDetail = () => {
                       aria-selected={activeTab === 'sound'}
                     >
                       Sound
+                    </button>
+                  )}
+                  {hasDirector && (
+                    <button
+                      onClick={() => setActiveTab('director')}
+                      className={`tab-item ${activeTab === 'director' ? 'tab-item-active' : ''}`}
+                      aria-selected={activeTab === 'director'}
+                    >
+                      Director
                     </button>
                   )}
                 </div>
@@ -226,6 +264,26 @@ const PersonDetail = () => {
                     ))}
                   </div>
                 )}
+
+                {activeTab === 'director' && (
+                  <div className="space-y-2">
+                    {directorCredits.map((credit, i) => (
+                      <button
+                        key={i}
+                        onClick={() => navigate(`/${credit.type}/${credit.id}`)}
+                        className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition"
+                      >
+                        <div className="flex items-start gap-4">
+                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || '—'}</span>
+                          <div>
+                            <p className="text-white font-medium">{credit.title}</p>
+                            <p className="text-gray-400 text-sm">as {credit.role}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -236,3 +294,6 @@ const PersonDetail = () => {
 };
 
 export default PersonDetail;
+
+
+

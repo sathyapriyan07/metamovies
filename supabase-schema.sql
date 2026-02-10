@@ -27,6 +27,10 @@ CREATE TABLE movies (
   genres TEXT[],
   trailer_url TEXT,
   trending BOOLEAN DEFAULT false,
+  is_now_showing BOOLEAN DEFAULT false,
+  booking_url TEXT,
+  booking_label TEXT DEFAULT 'Book Tickets',
+  booking_last_updated TIMESTAMP,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -47,6 +51,10 @@ CREATE TABLE series (
   genres TEXT[],
   trailer_url TEXT,
   trending BOOLEAN DEFAULT false,
+  is_now_showing BOOLEAN DEFAULT false,
+  booking_url TEXT,
+  booking_label TEXT DEFAULT 'Book Tickets',
+  booking_last_updated TIMESTAMP,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

@@ -14,6 +14,10 @@ const ManageMovies = () => {
   const [editingRatings, setEditingRatings] = useState(null);
   const [imdbRating, setImdbRating] = useState('');
   const [rottenRating, setRottenRating] = useState('');
+  const [editingBooking, setEditingBooking] = useState(null);
+  const [bookingUrl, setBookingUrl] = useState('');
+  const [bookingLabel, setBookingLabel] = useState('');
+  const [isNowShowing, setIsNowShowing] = useState(false);
 
   useEffect(() => {
     loadMovies();
@@ -64,15 +68,72 @@ const ManageMovies = () => {
 
   const handleSaveRatings = async () => {
     if (!editingRatings) return;
-    await updateMovie(editingRatings.id, {
-      imdb_rating: imdbRating === '' ? null : parseFloat(imdbRating),
-      rotten_rating: rottenRating === '' ? null : parseInt(rottenRating, 10)
+    const imdbValue = imdbRating === '' ? null : parseFloat(imdbRating);
+    const rottenValue = rottenRating === '' ? null : parseInt(rottenRating, 10);
+
+    if (imdbValue !== null && (Number.isNaN(imdbValue) || imdbValue > 10)) {
+      alert('IMDb rating must be between 0 and 10.');
+      return;
+    }
+    if (rottenValue !== null && (Number.isNaN(rottenValue) || rottenValue > 100)) {
+      alert('Rotten Tomatoes rating must be between 0 and 100.');
+      return;
+    }
+
+    const { error } = await updateMovie(editingRatings.id, {
+      imdb_rating: imdbValue,
+      rotten_rating: rottenValue
     });
+
+    if (error) {
+      alert(`Failed to update ratings: ${error.message}`);
+      return;
+    }
+
     setEditingRatings(null);
     setImdbRating('');
     setRottenRating('');
     loadMovies();
   };
+  const handleEditBooking = (movie) => {
+    setEditingBooking(movie);
+    setIsNowShowing(!!movie.is_now_showing);
+    setBookingUrl(movie.booking_url || '');
+    setBookingLabel(movie.booking_label || '');
+  };
+
+  const handleSaveBooking = async () => {
+    if (!editingBooking) return;
+    if (isNowShowing && bookingUrl) {
+      try {
+        new URL(bookingUrl);
+      } catch {
+        alert('Please enter a valid booking URL.');
+        return;
+      }
+    }
+
+    const cleanedBookingLabel = (bookingLabel || '').replace(/[\r\n]+/g, ' ').trim();
+
+    const { error } = await updateMovie(editingBooking.id, {
+      is_now_showing: !!isNowShowing,
+      booking_url: isNowShowing ? (bookingUrl || null) : null,
+      booking_label: isNowShowing ? (cleanedBookingLabel || 'Book Tickets') : null,
+      booking_last_updated: isNowShowing && bookingUrl ? new Date().toISOString() : null
+    });
+
+    if (error) {
+      alert(`Failed to update booking: ${error.message}`);
+      return;
+    }
+
+    setEditingBooking(null);
+    setBookingUrl('');
+    setBookingLabel('');
+    setIsNowShowing(false);
+    loadMovies();
+  };
+
 
   const handleSaveBackdrop = async () => {
     if (editingMovie) {
@@ -127,6 +188,12 @@ const ManageMovies = () => {
                     Edit Ratings
                   </button>
                   <button
+                    onClick={() => handleEditBooking(movie)}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm"
+                  >
+                    Edit Booking
+                  </button>
+                  <button
                     onClick={() => handleToggleTrending(movie)}
                     className={`px-4 py-2 rounded-lg text-sm ${movie.trending ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'}`}
                   >
@@ -158,6 +225,35 @@ const ManageMovies = () => {
                   onError={(e) => e.target.src = 'https://via.placeholder.com/800x450'}
                 />
               )}
+
+              <input
+                type="text"
+                placeholder="Backdrop URL"
+                value={backdropUrl}
+                onChange={(e) => setBackdropUrl(e.target.value)}
+                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 mb-4"
+              />
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSaveBackdrop}
+                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingMovie(null);
+                    setBackdropUrl('');
+                  }}
+                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {editingRatings && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
@@ -218,28 +314,50 @@ const ManageMovies = () => {
           </div>
         )}
 
-              <input
-                type="text"
-                placeholder="Backdrop URL"
-                value={backdropUrl}
-                onChange={(e) => setBackdropUrl(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 mb-4"
-              />
+        {editingBooking && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-xl w-full">
+              <h2 className="text-2xl font-bold mb-4">Edit Booking - {editingBooking.title}</h2>
+              <label className="flex items-center gap-2 text-sm font-medium mb-4">
+                <input
+                  type="checkbox"
+                  checked={isNowShowing}
+                  onChange={(e) => setIsNowShowing(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                Currently Streaming / In Theatres
+              </label>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={handleSaveBackdrop}
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold"
-                >
-                  Save
+              {isNowShowing && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Booking URL</label>
+                    <input
+                      type="url"
+                      value={bookingUrl}
+                      onChange={(e) => setBookingUrl(e.target.value)}
+                      placeholder="https://..."
+                      className="w-full px-4 py-3 glass-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Button Label (optional)</label>
+                    <input
+                      type="text"
+                      value={bookingLabel}
+                      onChange={(e) => setBookingLabel(e.target.value)}
+                      placeholder="Book Tickets"
+                      className="w-full px-4 py-3 glass-input"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 mt-6">
+                <button onClick={handleSaveBooking} className="flex-1 btn-primary">
+                  Save Booking
                 </button>
-                <button
-                  onClick={() => {
-                    setEditingMovie(null);
-                    setBackdropUrl('');
-                  }}
-                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold"
-                >
+                <button onClick={() => setEditingBooking(null)} className="flex-1 btn-ghost">
                   Cancel
                 </button>
               </div>

@@ -80,6 +80,14 @@
     box-shadow: 0 12px 32px rgba(79, 209, 255, 0.45);
   }
 
+  .ticket-logo {
+    height: 22px;
+    width: auto;
+    max-width: 140px;
+    object-fit: contain;
+    display: block;
+  }
+
   .btn-ghost {
     @apply px-5 py-2 rounded-full font-medium border border-white/15 bg-white/5 backdrop-blur transition-all duration-300;
   }
@@ -96,6 +104,17 @@
   .btn-secondary:hover {
     background: rgba(59, 167, 255, 0.15);
     border-color: rgba(59, 167, 255, 0.4);
+  }
+
+  .btn-ticket {
+    @apply px-6 py-3 rounded-full font-semibold transition-all duration-300 text-black;
+    background: #ffffff;
+    box-shadow: 0 10px 28px rgba(255, 255, 255, 0.18);
+  }
+
+  .btn-ticket:hover {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 12px 32px rgba(255, 255, 255, 0.25);
   }
 
   .chip {
