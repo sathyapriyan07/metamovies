@@ -67,12 +67,12 @@ const MovieDetail = () => {
     <div className="min-h-screen bg-black">
       <DetailHero backdrop={movie.backdrop_url} poster={movie.poster_url} title={movie.title} />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 mt-14 md:mt-20 text-center">
-        <h1 className="text-2xl md:text-5xl font-bold text-white mb-3 z-30">
+      <div className="mt-14 md:mt-20 text-center px-4">
+        <h1 className="text-2xl md:text-5xl font-bold text-white mb-3">
           {movie.title} <span className="text-gray-400">{movie.release_date && `(${movie.release_date.split('-')[0]})`}</span>
         </h1>
         
-        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4 flex-wrap">
+        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-4 flex-wrap text-gray-300">
           {movie.genres && movie.genres.length > 0 && (
             <div className="flex gap-2">
               {movie.genres.slice(0, 3).map((genre, i) => (
@@ -97,7 +97,7 @@ const MovieDetail = () => {
         </div>
 
         {movie.overview && (
-          <p className="text-gray-400 text-sm md:text-base max-w-4xl mx-auto mb-6 line-clamp-4">
+          <p className="text-gray-400 text-sm md:text-base max-w-3xl mx-auto mb-6">
             {movie.overview}
           </p>
         )}
