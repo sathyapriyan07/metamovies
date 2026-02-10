@@ -1,19 +1,11 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { signOut } from '../services/supabase';
-import { useState } from 'react';
 import Avatar from './Avatar';
 
 const Navbar = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [showMenu, setShowMenu] = useState(false);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -78,9 +70,9 @@ const Navbar = () => {
               )}
               <div className="relative">
                 <button 
-                  onClick={() => setShowMenu(!showMenu)} 
+                  onClick={() => navigate('/profile')} 
                   className="focus:outline-none focus:ring-2 focus:ring-red-600 rounded-full"
-                  aria-label="User Menu"
+                  aria-label="Profile"
                 >
                   <Avatar 
                     src={user.user_metadata?.avatar_url} 
@@ -88,16 +80,6 @@ const Navbar = () => {
                     size="lg"
                   />
                 </button>
-                {showMenu && (
-                  <div className="absolute right-0 mt-2 w-48 glass-dark rounded-lg py-2 shadow-xl">
-                    <button 
-                      onClick={handleSignOut} 
-                      className="w-full px-4 py-2 text-left hover:bg-white/10 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
               </div>
             </>
           ) : (

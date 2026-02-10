@@ -1,19 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { signOut } from '../services/supabase';
-import { useState } from 'react';
 import Avatar from './Avatar';
 
 const HomeHeader = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [showMenu, setShowMenu] = useState(false);
-
-  const handleSignOut = async () => {
-    await signOut();
-    setShowMenu(false);
-    navigate('/');
-  };
 
   return (
     <div className="w-full bg-black sticky top-0 z-40 px-4 md:px-8 py-3">
@@ -42,37 +33,15 @@ const HomeHeader = () => {
         {user ? (
           <div className="relative">
             <button 
-              onClick={() => setShowMenu(!showMenu)} 
+              onClick={() => navigate('/profile')} 
               className="focus:outline-none focus:ring-2 focus:ring-red-600 rounded-full"
-              aria-label="User Menu"
+              aria-label="Profile"
             >
               <Avatar 
                 src={user.user_metadata?.avatar_url} 
                 name={user.user_metadata?.username || user.email}
               />
             </button>
-            {showMenu && (
-              <>
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => setShowMenu(false)}
-                />
-                <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg py-2 shadow-xl z-50">
-                  <button 
-                    onClick={() => { navigate('/watchlist'); setShowMenu(false); }} 
-                    className="w-full px-4 py-2 text-left text-white hover:bg-white/10 transition-colors"
-                  >
-                    Watchlist
-                  </button>
-                  <button 
-                    onClick={handleSignOut} 
-                    className="w-full px-4 py-2 text-left text-white hover:bg-white/10 transition-colors"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </>
-            )}
           </div>
         ) : (
           <button 

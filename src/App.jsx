@@ -14,6 +14,7 @@ import Search from './pages/Search';
 import Watchlist from './pages/Watchlist';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Profile from './pages/Profile';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TMDBImport from './pages/admin/TMDBImport';
@@ -29,6 +30,7 @@ import ManagePersons from './pages/admin/ManagePersons';
 import ManageCrew from './pages/admin/ManageCrew';
 import ManageHeroBanner from './pages/admin/ManageHeroBanner';
 import ManageUsers from './pages/admin/ManageUsers';
+import ManageAvatars from './pages/admin/ManageAvatars';
 
 function App() {
   return (
@@ -46,6 +48,12 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
             
             <Route path="/watchlist" element={
               <ProtectedRoute>
@@ -134,6 +142,12 @@ function App() {
             <Route path="/admin/manage-users" element={
               <ProtectedRoute adminOnly>
                 <ManageUsers />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/manage-avatars" element={
+              <ProtectedRoute adminOnly>
+                <ManageAvatars />
               </ProtectedRoute>
             } />
           </Routes>

@@ -111,6 +111,10 @@ const AdminDashboard = () => {
             <h3 className="text-xl font-bold mb-2">👥 Manage Users</h3>
             <p className="text-gray-400 text-sm">Approve and manage user accounts</p>
           </Link>
+          <Link to="/admin/manage-avatars" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
+            <h3 className="text-xl font-bold mb-2">🎭 Manage Avatars</h3>
+            <p className="text-gray-400 text-sm">Add avatar options for users</p>
+          </Link>
         </div>
       </div>
     </div>

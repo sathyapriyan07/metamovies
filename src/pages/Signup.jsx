@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { signUp } from '../services/supabase';
+import { supabase } from '../services/supabase';
+import Avatar from '../components/Avatar';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -8,8 +10,22 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarOptions, setAvatarOptions] = useState([]);
+  const [showCustomUrl, setShowCustomUrl] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadAvatarOptions();
+  }, []);
+
+  const loadAvatarOptions = async () => {
+    const { data } = await supabase
+      .from('avatar_options')
+      .select('*')
+      .order('created_at', { ascending: false });
+    setAvatarOptions(data || []);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,14 +89,41 @@ const Signup = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Avatar URL (Optional)</label>
-            <input
-              type="url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://example.com/avatar.jpg"
-              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
-            />
+            <label className="block text-sm font-medium mb-2">Choose Avatar (Optional)</label>
+            {avatarOptions.length > 0 && (
+              <div className="grid grid-cols-4 gap-3 mb-3">
+                {avatarOptions.slice(0, 8).map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => { setAvatarUrl(option.url); setShowCustomUrl(false); }}
+                    className={`p-2 rounded-lg border-2 transition ${
+                      avatarUrl === option.url
+                        ? 'border-red-600 bg-red-600/20'
+                        : 'border-white/10 hover:border-white/30'
+                    }`}
+                  >
+                    <Avatar src={option.url} name={option.name} size="md" />
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowCustomUrl(!showCustomUrl)}
+              className="text-sm text-red-500 hover:underline mb-2"
+            >
+              {showCustomUrl ? 'Hide' : 'Use'} custom URL
+            </button>
+            {showCustomUrl && (
+              <input
+                type="url"
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="https://example.com/avatar.jpg"
+                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+              />
+            )}
           </div>
 
           <button type="submit" className="w-full btn-primary py-3" disabled={loading}>
