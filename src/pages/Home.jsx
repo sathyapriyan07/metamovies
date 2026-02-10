@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { getTrendingMovies, getTrendingSeries, getUpcomingMovies, getMovies, getCollections, getCollectionWithItems } from '../services/supabase';
 import PosterRow from '../components/PosterRow';
 import HeroBanner from '../components/HeroBanner';
-import HomeSearchBar from '../components/HomeSearchBar';
+import HomeHeader from '../components/HomeHeader';
 
 const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -48,10 +48,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen pb-20 md:pb-8">
-      {/* Top Black Header with Search Bar */}
-      <div className="w-full bg-black pt-16 md:pt-20 pb-3 px-4">
-        <HomeSearchBar />
-      </div>
+      {/* Top Header with Search Bar and Login */}
+      <HomeHeader />
       
       {/* Hero Banner */}
       <HeroBanner />
