@@ -113,16 +113,16 @@ const SeriesDetail = () => {
           </p>
         )}
 
-        <div className="flex gap-3 justify-center mb-8">
+        <div className="flex flex-wrap gap-3 justify-center mb-8">
           <button onClick={toggleWatchlist} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
             {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
           </button>
           {isAdmin && (
             <>
-              <button onClick={() => { setEditingPoster(true); setPosterUrl(series.poster_url || ''); }} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
+              <button onClick={() => { setEditingPoster(true); setPosterUrl(series.poster_url || ''); }} className="bg-blue-600 hover:bg-blue-700 border border-blue-500 rounded-lg px-5 py-2 transition">
                 Edit Poster
               </button>
-              <button onClick={() => { setEditingBackdrop(true); setBackdropUrl(series.backdrop_url || ''); }} className="bg-white/5 backdrop-blur border border-white/10 rounded-lg px-5 py-2 hover:bg-white/10 transition">
+              <button onClick={() => { setEditingBackdrop(true); setBackdropUrl(series.backdrop_url || ''); }} className="bg-purple-600 hover:bg-purple-700 border border-purple-500 rounded-lg px-5 py-2 transition">
                 Edit Backdrop
               </button>
             </>
