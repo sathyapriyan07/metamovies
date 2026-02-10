@@ -95,12 +95,6 @@ const SeriesDetail = () => {
               ))}
             </div>
           )}
-          {series.rating && (
-            <>
-              <span className="text-gray-500">•</span>
-              <span className="text-sky-200 font-semibold">? {series.rating.toFixed(1)}</span>
-            </>
-          )}
           {series.seasons?.length > 0 && (
             <>
               <span className="text-gray-500">•</span>
@@ -108,6 +102,47 @@ const SeriesDetail = () => {
             </>
           )}
         </div>
+
+        {((typeof series.rating === 'number') || (typeof series.imdb_rating === 'number') || (typeof series.rotten_rating === 'number')) && (
+          <div className="flex flex-wrap justify-center gap-3 mb-6">
+            {typeof series.rating === 'number' && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-medium bg-black/60 backdrop-blur border border-white/10 hover:shadow-[0_0_18px_rgba(16,185,129,0.25)] transition">
+                <img
+                  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'><path fill='%2310b981' d='M12 2l2.9 6.1L22 9l-5 4.7L18.2 21 12 17.8 5.8 21 7 13.7 2 9l7.1-0.9z'/></svg>"
+                  alt="TMDB"
+                  className="w-4 h-4"
+                  loading="lazy"
+                  decoding="async"
+                />
+                {series.rating.toFixed(1)}
+              </span>
+            )}
+            {typeof series.imdb_rating === 'number' && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-medium bg-black/60 backdrop-blur border border-white/10 hover:shadow-[0_0_18px_rgba(245,197,24,0.25)] transition">
+                <img
+                  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='16' viewBox='0 0 24 16'><rect width='24' height='16' rx='3' fill='%23f5c518'/><text x='12' y='11' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='9' font-weight='700' fill='%23000000'>IMDb</text></svg>"
+                  alt="IMDb"
+                  className="w-6 h-4"
+                  loading="lazy"
+                  decoding="async"
+                />
+                {series.imdb_rating.toFixed(1)}
+              </span>
+            )}
+            {typeof series.rotten_rating === 'number' && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-medium bg-black/60 backdrop-blur border border-white/10 hover:shadow-[0_0_18px_rgba(229,9,20,0.25)] transition">
+                <img
+                  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2c3 2.5 6 5.5 6 9a6 6 0 1 1-12 0c0-3.5 3-6.5 6-9z'/><circle cx='9' cy='11' r='1.2' fill='%23ffffff'/><circle cx='15' cy='11' r='1.2' fill='%23ffffff'/></svg>"
+                  alt="Rotten Tomatoes"
+                  className="w-4 h-4"
+                  loading="lazy"
+                  decoding="async"
+                />
+                {Math.round(series.rotten_rating)}%
+              </span>
+            )}
+          </div>
+        )}
 
         {series.overview && (
           <p className="text-gray-300 text-sm md:text-base max-w-3xl mx-auto mb-6">
