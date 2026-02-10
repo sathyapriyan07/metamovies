@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManagePersons = () => {
   const [persons, setPersons] = useState([]);
@@ -93,9 +94,8 @@ const ManagePersons = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8">Manage Persons</h1>
+    <AdminLayout title="Manage Persons" subtitle="Edit cast and crew profiles.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Persons List */}
@@ -231,7 +231,7 @@ const ManagePersons = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

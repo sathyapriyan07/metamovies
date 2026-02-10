@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getSeries, deleteSeries, updateSeries } from '../../services/supabase';
 import { useNavigate } from 'react-router-dom';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManageSeries = () => {
   const navigate = useNavigate();
@@ -46,9 +47,8 @@ const ManageSeries = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-8">Manage Series</h1>
+    <AdminLayout title="Manage Series" subtitle="Edit or remove existing series.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="mb-6">
           <input
@@ -95,7 +95,7 @@ const ManageSeries = () => {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

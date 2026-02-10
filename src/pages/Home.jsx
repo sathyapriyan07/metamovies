@@ -1,13 +1,20 @@
-import { useEffect, useState } from 'react';
-import { getTrendingMovies, getTrendingSeries, getUpcomingMovies, getMovies, getCollections, getCollectionWithItems } from '../services/supabase';
-import PosterRow from '../components/PosterRow';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  getTrendingMovies,
+  getTrendingSeries,
+  getUpcomingMovies,
+  getMovies,
+  getCollections,
+  getCollectionWithItems
+} from '../services/supabase';
+import CarouselRow from '../components/CarouselRow';
 import HeroBanner from '../components/HeroBanner';
-import HomeHeader from '../components/HomeHeader';
 
 const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [trendingSeries, setTrendingSeries] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [allMovies, setAllMovies] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,52 +24,61 @@ const Home = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [trending, series, upcoming, cols] = await Promise.all([
+    const [trending, series, upcoming, movies, cols] = await Promise.all([
       getTrendingMovies(),
       getTrendingSeries(),
       getUpcomingMovies(),
+      getMovies(40, 0),
       getCollections()
     ]);
-    
+
     setTrendingMovies(trending.data || []);
     setTrendingSeries(series.data || []);
     setUpcomingMovies(upcoming.data || []);
-    
-    // Load collection items
+    setAllMovies(movies.data || []);
+
     const collectionsWithItems = await Promise.all(
       (cols.data || []).map(async (col) => {
         const { data } = await getCollectionWithItems(col.id);
         return {
           ...col,
-          items: data?.collection_items?.map(item => ({
-            ...(item.movie || item.series),
-            type: item.movie ? 'movie' : 'series'
-          })) || []
+          items:
+            data?.collection_items?.map((item) => ({
+              ...(item.movie || item.series),
+              type: item.movie ? 'movie' : 'series'
+            })) || []
         };
       })
     );
     setCollections(collectionsWithItems);
-    
+
     setLoading(false);
   };
 
+  const topRated = useMemo(() => {
+    return [...allMovies]
+      .filter((movie) => typeof movie.rating === 'number')
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 20);
+  }, [allMovies]);
+
+  const streamingNow = useMemo(() => {
+    return [...allMovies].slice(0, 20);
+  }, [allMovies]);
+
   return (
-    <div className="min-h-screen pb-20 md:pb-8">
-      {/* Top Header with Search Bar and Login */}
-      <HomeHeader />
-      
-      {/* Hero Banner */}
+    <div className="min-h-screen pb-24 md:pb-12">
       <HeroBanner />
-      
-      {/* Content Rows */}
-      <div className="max-w-7xl mx-auto pt-8">
-        <PosterRow title="Trending Movies" items={trendingMovies} type="movie" loading={loading} />
-        <PosterRow title="Trending Series" items={trendingSeries} type="series" loading={loading} />
-        <PosterRow title="Upcoming Movies" items={upcomingMovies} type="movie" loading={loading} />
-        
-        {/* Custom Collections */}
+
+      <div className="max-w-7xl mx-auto pt-10">
+        <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
+        <CarouselRow title="Trending Series" items={trendingSeries} type="series" loading={loading} />
+        <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
+        <CarouselRow title="Top Rated" items={topRated} type="movie" loading={loading} />
+        <CarouselRow title="Streaming Now" items={streamingNow} type="movie" loading={loading} />
+
         {collections.map((collection) => (
-          <PosterRow
+          <CarouselRow
             key={collection.id}
             title={collection.name}
             items={collection.items}

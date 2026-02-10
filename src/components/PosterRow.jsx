@@ -1,11 +1,16 @@
 import PosterCard from './PosterCard';
-import { SkeletonRow } from './SkeletonCard';
+import { SkeletonRow } from './SkeletonLoader';
 
-const PosterRow = ({ title, items, type = 'movie', loading = false }) => {
+const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle }) => {
   if (loading) return (
     <div className="mb-12">
-      <h2 className="section-title px-4 md:px-8">{title}</h2>
-      <div className="px-4 md:px-8">
+      <div className="px-4 md:px-8 flex items-end justify-between">
+        <div>
+          <h2 className="section-title">{title}</h2>
+          {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
+        </div>
+      </div>
+      <div className="px-4 md:px-8 mt-4">
         <SkeletonRow />
       </div>
     </div>
@@ -15,12 +20,17 @@ const PosterRow = ({ title, items, type = 'movie', loading = false }) => {
 
   return (
     <div className="mb-12 fade-in">
-      <h2 className="section-title px-4 md:px-8">{title}</h2>
-      <div className="px-4 md:px-8">
+      <div className="px-4 md:px-8 flex items-end justify-between">
+        <div>
+          <h2 className="section-title">{title}</h2>
+          {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
+        </div>
+      </div>
+      <div className="px-4 md:px-8 mt-4">
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           {items.map((item) => (
-            <div key={item.id} className="flex-shrink-0 w-[120px] md:w-[160px]">
-              <PosterCard item={item} type={type} />
+            <div key={item.id} className="flex-shrink-0 w-[125px] md:w-[185px]">
+              <PosterCard item={item} type={type} showQuickActions />
             </div>
           ))}
         </div>

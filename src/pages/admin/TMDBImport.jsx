@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getMovieDetails, getSeriesDetails, getSeasonDetails, getImageUrl, getPersonDetails, searchMovies, searchSeries, searchPerson } from '../../services/tmdb';
 import { createMovie, createSeries, createCast, createCrew, createSeason, createEpisode, createPerson } from '../../services/supabase';
 import { supabase } from '../../services/supabase';
+import AdminLayout from '../../components/AdminLayout';
 
 const TMDBImport = () => {
   const [tmdbId, setTmdbId] = useState('');
@@ -644,9 +645,8 @@ const TMDBImport = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-4xl font-bold mb-8">TMDB Import</h1>
+    <AdminLayout title="TMDB Import" subtitle="Import movies, series, and people from TMDB.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="flex gap-4 mb-6">
           <button
@@ -910,7 +910,7 @@ const TMDBImport = () => {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

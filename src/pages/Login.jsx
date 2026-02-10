@@ -15,7 +15,7 @@ const Login = () => {
     setLoading(true);
 
     const { error } = await signIn(email, password);
-    
+
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -25,12 +25,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="glass-dark p-8 rounded-2xl w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-8">Login to MetaMovies</h1>
+    <div className="min-h-screen flex items-center justify-center px-4 py-16">
+      <div className="glass-card rounded-2xl w-full max-w-md p-8">
+        <p className="text-sky-300 text-xs uppercase tracking-[0.3em] text-center">Welcome Back</p>
+        <h1 className="text-3xl font-semibold text-center mt-3 mb-8">Login to MetaMovies+</h1>
 
         {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-500/15 border border-red-500/40 text-red-200 px-4 py-3 rounded-xl mb-6">
             {error}
           </div>
         )}
@@ -43,7 +44,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+              className="w-full px-4 py-3 glass-input"
             />
           </div>
 
@@ -54,18 +55,18 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+              className="w-full px-4 py-3 glass-input"
             />
           </div>
 
-          <button type="submit" className="w-full btn-primary py-3" disabled={loading}>
+          <button type="submit" className="w-full btn-primary" disabled={loading}>
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <p className="text-center mt-6 text-gray-400">
-          Don't have an account?{' '}
-          <Link to="/signup" className="text-red-500 hover:underline">
+          Don&apos;t have an account?{' '}
+          <Link to="/signup" className="text-sky-300 hover:text-white">
             Sign Up
           </Link>
         </p>

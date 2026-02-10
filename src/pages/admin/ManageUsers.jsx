@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
 import Avatar from '../../components/Avatar';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
@@ -75,9 +76,8 @@ const ManageUsers = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-8">Manage Users</h1>
+    <AdminLayout title="Manage Users" subtitle="Approve and manage user accounts.">
+      <div className="glass-card rounded-2xl p-6">
 
         {/* Filter Tabs */}
         <div className="flex gap-4 mb-6">
@@ -216,7 +216,7 @@ const ManageUsers = () => {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 

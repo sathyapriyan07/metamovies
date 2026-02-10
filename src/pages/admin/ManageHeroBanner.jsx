@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManageHeroBanner = () => {
   const [banners, setBanners] = useState([]);
@@ -81,9 +82,8 @@ const ManageHeroBanner = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-8">Manage Hero Banners</h1>
+    <AdminLayout title="Hero Banner" subtitle="Curate the hero carousel content.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Add Banner */}
@@ -199,7 +199,7 @@ const ManageHeroBanner = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

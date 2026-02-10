@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
+import AdminLayout from '../../components/AdminLayout';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -34,90 +35,88 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="glass-dark p-6 rounded-xl">
-            <h3 className="text-gray-400 text-sm mb-2">Total Movies</h3>
-            <p className="text-3xl font-bold">{stats.movies}</p>
-          </div>
-          <div className="glass-dark p-6 rounded-xl">
-            <h3 className="text-gray-400 text-sm mb-2">Total Series</h3>
-            <p className="text-3xl font-bold">{stats.series}</p>
-          </div>
-          <div className="glass-dark p-6 rounded-xl">
-            <h3 className="text-gray-400 text-sm mb-2">Total Persons</h3>
-            <p className="text-3xl font-bold">{stats.persons}</p>
-          </div>
-          <div className="glass-dark p-6 rounded-xl">
-            <h3 className="text-gray-400 text-sm mb-2">Hero Banners</h3>
-            <p className="text-3xl font-bold">{stats.banners}</p>
-          </div>
+    <AdminLayout title="Dashboard" subtitle="Quick overview of your content library.">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="glass-card p-5 rounded-2xl">
+          <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Movies</h3>
+          <p className="text-3xl font-semibold mt-2">{stats.movies}</p>
         </div>
+        <div className="glass-card p-5 rounded-2xl">
+          <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Series</h3>
+          <p className="text-3xl font-semibold mt-2">{stats.series}</p>
+        </div>
+        <div className="glass-card p-5 rounded-2xl">
+          <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Persons</h3>
+          <p className="text-3xl font-semibold mt-2">{stats.persons}</p>
+        </div>
+        <div className="glass-card p-5 rounded-2xl">
+          <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Hero Banners</h3>
+          <p className="text-3xl font-semibold mt-2">{stats.banners}</p>
+        </div>
+      </div>
 
-        <h2 className="text-2xl font-bold mb-4">Quick Actions</h2>
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link to="/admin/add-movie" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">🎬 Add Movie</h3>
+          <Link to="/admin/add-movie" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Add Movie</h3>
             <p className="text-gray-400 text-sm">Add a new movie to the database</p>
           </Link>
-          <Link to="/admin/add-series" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">📺 Add Series</h3>
+          <Link to="/admin/add-series" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Add Series</h3>
             <p className="text-gray-400 text-sm">Add a new TV series</p>
           </Link>
-          <Link to="/admin/add-person" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">👤 Add Person</h3>
+          <Link to="/admin/add-person" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Add Person</h3>
             <p className="text-gray-400 text-sm">Add cast or crew member</p>
           </Link>
-          <Link to="/admin/tmdb-import" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">📥 TMDB Import</h3>
+          <Link to="/admin/tmdb-import" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">TMDB Import</h3>
             <p className="text-gray-400 text-sm">Import from TMDB database</p>
           </Link>
-          <Link to="/admin/manage-movies" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">✏️ Manage Movies</h3>
+          <Link to="/admin/manage-movies" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Movies</h3>
             <p className="text-gray-400 text-sm">Edit or delete movies</p>
           </Link>
-          <Link to="/admin/manage-series" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">✏️ Manage Series</h3>
+          <Link to="/admin/manage-series" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Series</h3>
             <p className="text-gray-400 text-sm">Edit or delete series</p>
           </Link>
-          <Link to="/admin/manage-collections" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">📂 Manage Collections</h3>
+          <Link to="/admin/manage-collections" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Collections</h3>
             <p className="text-gray-400 text-sm">Create custom home sections</p>
           </Link>
-          <Link to="/admin/update-persons" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">🔄 Update Persons</h3>
+          <Link to="/admin/update-persons" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Update Persons</h3>
             <p className="text-gray-400 text-sm">Fetch full cast/crew details</p>
           </Link>
-          <Link to="/admin/manage-links" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">🔗 Manage Links</h3>
-            <p className="text-gray-400 text-sm">Add trailer & music links</p>
+          <Link to="/admin/manage-links" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Links</h3>
+            <p className="text-gray-400 text-sm">Add trailer and music links</p>
           </Link>
-          <Link to="/admin/manage-persons" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">👥 Manage Persons</h3>
-            <p className="text-gray-400 text-sm">Edit persons & add images</p>
+          <Link to="/admin/manage-persons" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Persons</h3>
+            <p className="text-gray-400 text-sm">Edit persons and add images</p>
           </Link>
-          <Link to="/admin/manage-crew" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">🎭 Manage Crew</h3>
-            <p className="text-gray-400 text-sm">Add directors, composers to crew</p>
+          <Link to="/admin/manage-crew" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Crew</h3>
+            <p className="text-gray-400 text-sm">Add directors and composers</p>
           </Link>
-          <Link to="/admin/manage-hero-banner" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">🎬 Manage Hero Banner</h3>
+          <Link to="/admin/manage-hero-banner" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Hero Banner</h3>
             <p className="text-gray-400 text-sm">Control homepage hero section</p>
           </Link>
-          <Link to="/admin/manage-users" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">👥 Manage Users</h3>
+          <Link to="/admin/manage-users" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Users</h3>
             <p className="text-gray-400 text-sm">Approve and manage user accounts</p>
           </Link>
-          <Link to="/admin/manage-avatars" className="glass-dark p-6 rounded-xl hover:bg-white/20 transition">
-            <h3 className="text-xl font-bold mb-2">🎭 Manage Avatars</h3>
-            <p className="text-gray-400 text-sm">Add avatar options for users</p>
+          <Link to="/admin/manage-avatars" className="glass-card p-5 rounded-2xl hover:bg-white/5 transition">
+            <h3 className="text-lg font-semibold mb-2">Manage Avatars</h3>
+            <p className="text-gray-400 text-sm">Add avatar options</p>
           </Link>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

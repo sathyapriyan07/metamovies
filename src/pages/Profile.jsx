@@ -55,41 +55,44 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <h1 className="text-4xl font-bold mb-8">My Profile</h1>
+    <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="mb-8">
+          <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Account</p>
+          <h1 className="text-3xl md:text-5xl font-semibold mt-2">My Profile</h1>
+        </div>
 
-        {/* Current Profile */}
-        <div className="glass-dark p-6 rounded-xl mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Avatar 
-              src={user.user_metadata?.avatar_url} 
+        <div className="glass-card p-6 rounded-2xl mb-8">
+          <div className="flex items-center gap-4">
+            <Avatar
+              src={user.user_metadata?.avatar_url}
               name={user.user_metadata?.username || user.email}
               size="lg"
               className="w-20 h-20 text-2xl"
             />
             <div>
-              <h2 className="text-2xl font-bold">{user.user_metadata?.username || 'User'}</h2>
+              <h2 className="text-2xl font-semibold">{user.user_metadata?.username || 'User'}</h2>
               <p className="text-gray-400">{user.email}</p>
             </div>
           </div>
         </div>
 
-        {/* Change Avatar */}
-        <div className="glass-dark p-6 rounded-xl mb-8">
-          <h3 className="text-xl font-bold mb-4">Change Avatar</h3>
-          
-          {/* Avatar Options Grid */}
+        <div className="glass-card p-6 rounded-2xl mb-8">
+          <h3 className="text-xl font-semibold mb-4">Change Avatar</h3>
+
           {avatarOptions.length > 0 && (
             <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-4">
               {avatarOptions.map((option) => (
                 <button
                   key={option.id}
                   type="button"
-                  onClick={() => { setSelectedAvatar(option.url); setShowCustomUrl(false); }}
-                  className={`p-2 rounded-lg border-2 transition ${
+                  onClick={() => {
+                    setSelectedAvatar(option.url);
+                    setShowCustomUrl(false);
+                  }}
+                  className={`p-2 rounded-xl border-2 transition ${
                     selectedAvatar === option.url && !showCustomUrl
-                      ? 'border-red-600 bg-red-600/20'
+                      ? 'border-sky-300/70 bg-sky-400/20'
                       : 'border-white/10 hover:border-white/30'
                   }`}
                 >
@@ -99,16 +102,14 @@ const Profile = () => {
             </div>
           )}
 
-          {/* Custom URL Toggle */}
           <button
             type="button"
             onClick={() => setShowCustomUrl(!showCustomUrl)}
-            className="text-sm text-red-500 hover:underline mb-3"
+            className="text-sm text-sky-300 hover:text-white mb-3"
           >
             {showCustomUrl ? 'Hide' : 'Use'} custom URL
           </button>
 
-          {/* Custom URL Input */}
           {showCustomUrl && (
             <div className="mb-4">
               <input
@@ -116,7 +117,7 @@ const Profile = () => {
                 value={customUrl}
                 onChange={(e) => setCustomUrl(e.target.value)}
                 placeholder="https://example.com/avatar.jpg"
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+                className="w-full px-4 py-3 glass-input"
               />
               {customUrl && (
                 <div className="mt-3 flex items-center gap-3">
@@ -127,28 +128,16 @@ const Profile = () => {
             </div>
           )}
 
-          {/* Save Button */}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition disabled:opacity-50"
-          >
+          <button onClick={handleSave} disabled={saving} className="w-full btn-primary">
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
 
-        {/* Actions */}
         <div className="space-y-3">
-          <button
-            onClick={() => navigate('/watchlist')}
-            className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg transition"
-          >
+          <button onClick={() => navigate('/watchlist')} className="w-full btn-ghost">
             My Watchlist
           </button>
-          <button
-            onClick={handleSignOut}
-            className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg transition text-red-400"
-          >
+          <button onClick={handleSignOut} className="w-full btn-ghost text-red-300">
             Sign Out
           </button>
         </div>

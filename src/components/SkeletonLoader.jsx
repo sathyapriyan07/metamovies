@@ -1,5 +1,5 @@
 const SkeletonCard = () => (
-  <div className="flex-shrink-0 w-[140px] md:w-[180px]">
+  <div className="flex-shrink-0 w-[140px] md:w-[190px]">
     <div className="skeleton w-full aspect-[2/3] rounded-2xl" />
   </div>
 );

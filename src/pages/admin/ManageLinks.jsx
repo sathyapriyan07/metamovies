@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getMovies, getSeries, updateMovie, updateSeries } from '../../services/supabase';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManageLinks = () => {
   const [type, setType] = useState('movie');
@@ -106,9 +107,8 @@ const ManageLinks = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8">Manage Links</h1>
+    <AdminLayout title="Manage Links" subtitle="Configure trailers and music links.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="mb-6">
           <select
@@ -330,7 +330,7 @@ const ManageLinks = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

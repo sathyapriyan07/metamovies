@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getMovies, deleteMovie, updateMovie } from '../../services/supabase';
 import { useNavigate } from 'react-router-dom';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManageMovies = () => {
   const navigate = useNavigate();
@@ -62,9 +63,8 @@ const ManageMovies = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-8">Manage Movies</h1>
+    <AdminLayout title="Manage Movies" subtitle="Edit or remove existing movies.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="mb-6">
           <input
@@ -161,7 +161,7 @@ const ManageMovies = () => {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

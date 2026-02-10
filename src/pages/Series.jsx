@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getSeries } from '../services/supabase';
 import PosterCard from '../components/PosterCard';
-import { SkeletonRow } from '../components/SkeletonCard';
+import { SkeletonRow } from '../components/SkeletonLoader';
 
 const Series = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,9 +29,9 @@ const Series = () => {
     if (data) {
       let filtered = data;
       if (selectedGenre !== 'All') {
-        filtered = data.filter(s => s.genres?.includes(selectedGenre));
+        filtered = data.filter((m) => m.genres?.includes(selectedGenre));
       }
-      setSeries(prev => reset ? filtered : [...prev, ...filtered]);
+      setSeries((prev) => (reset ? filtered : [...prev, ...filtered]));
       setHasMore(data.length === 20);
     }
     setLoading(false);
@@ -48,41 +48,39 @@ const Series = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-6">TV Series</h1>
-        
-        {/* Genre Filter */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
+    <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12 page-fade">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="mb-8">
+          <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Explore</p>
+          <h1 className="text-3xl md:text-5xl font-semibold mt-2">Series</h1>
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-4 mb-8 scrollbar-hide">
           {genres.map((genre) => (
             <button
               key={genre}
               onClick={() => handleGenreClick(genre)}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-all duration-300 shadow-lg ${
-                selectedGenre === genre
-                  ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-red-600/50'
-                  : 'glass glass-hover'
-              }`}
+              className={`chip ${selectedGenre === genre ? 'chip-active' : ''}`}
             >
               {genre}
             </button>
           ))}
         </div>
-        
+
         {loading && page === 0 ? (
           <SkeletonRow count={10} />
         ) : (
           <>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {series.map((item) => (
-                <PosterCard key={item.id} item={item} type="series" />
+                <PosterCard key={item.id} item={item} type="series" showQuickActions />
               ))}
             </div>
-            
+
             {hasMore && (
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-10">
                 <button
-                  onClick={() => setPage(p => p + 1)}
+                  onClick={() => setPage((p) => p + 1)}
                   className="btn-primary"
                   disabled={loading}
                 >

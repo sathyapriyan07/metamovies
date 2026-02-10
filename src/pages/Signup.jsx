@@ -33,7 +33,7 @@ const Signup = () => {
     setLoading(true);
 
     const { error } = await signUp(email, password, username, avatarUrl);
-    
+
     if (error) {
       setError(error.message);
       setLoading(false);
@@ -43,12 +43,13 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="glass-dark p-8 rounded-2xl w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-8">Join MetaMovies</h1>
+    <div className="min-h-screen flex items-center justify-center px-4 py-16">
+      <div className="glass-card rounded-2xl w-full max-w-md p-8">
+        <p className="text-sky-300 text-xs uppercase tracking-[0.3em] text-center">Get Started</p>
+        <h1 className="text-3xl font-semibold text-center mt-3 mb-8">Join MetaMovies+</h1>
 
         {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-500/15 border border-red-500/40 text-red-200 px-4 py-3 rounded-xl mb-6">
             {error}
           </div>
         )}
@@ -61,7 +62,7 @@ const Signup = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+              className="w-full px-4 py-3 glass-input"
             />
           </div>
 
@@ -72,7 +73,7 @@ const Signup = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+              className="w-full px-4 py-3 glass-input"
             />
           </div>
 
@@ -84,7 +85,7 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+              className="w-full px-4 py-3 glass-input"
             />
           </div>
 
@@ -96,10 +97,13 @@ const Signup = () => {
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => { setAvatarUrl(option.url); setShowCustomUrl(false); }}
-                    className={`p-2 rounded-lg border-2 transition ${
+                    onClick={() => {
+                      setAvatarUrl(option.url);
+                      setShowCustomUrl(false);
+                    }}
+                    className={`p-2 rounded-xl border-2 transition ${
                       avatarUrl === option.url
-                        ? 'border-red-600 bg-red-600/20'
+                        ? 'border-sky-300/70 bg-sky-400/20'
                         : 'border-white/10 hover:border-white/30'
                     }`}
                   >
@@ -111,7 +115,7 @@ const Signup = () => {
             <button
               type="button"
               onClick={() => setShowCustomUrl(!showCustomUrl)}
-              className="text-sm text-red-500 hover:underline mb-2"
+              className="text-sm text-sky-300 hover:text-white mb-2"
             >
               {showCustomUrl ? 'Hide' : 'Use'} custom URL
             </button>
@@ -121,19 +125,19 @@ const Signup = () => {
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
                 placeholder="https://example.com/avatar.jpg"
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+                className="w-full px-4 py-3 glass-input"
               />
             )}
           </div>
 
-          <button type="submit" className="w-full btn-primary py-3" disabled={loading}>
+          <button type="submit" className="w-full btn-primary" disabled={loading}>
             {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
 
         <p className="text-center mt-6 text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="text-red-500 hover:underline">
+          <Link to="/login" className="text-sky-300 hover:text-white">
             Login
           </Link>
         </p>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
 import Avatar from '../../components/Avatar';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManageAvatars = () => {
   const [avatars, setAvatars] = useState([]);
@@ -43,9 +44,8 @@ const ManageAvatars = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-8">Manage Avatar Options</h1>
+    <AdminLayout title="Manage Avatars" subtitle="Add or remove avatar options.">
+      <div className="glass-card rounded-2xl p-6">
 
         {/* Add New Avatar */}
         <div className="glass-dark p-6 rounded-xl mb-8">
@@ -107,7 +107,7 @@ const ManageAvatars = () => {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

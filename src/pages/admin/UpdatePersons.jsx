@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../../services/supabase';
 import { getPersonDetails, getImageUrl } from '../../services/tmdb';
+import AdminLayout from '../../components/AdminLayout';
 
 const UpdatePersons = () => {
   const [loading, setLoading] = useState(false);
@@ -59,9 +60,8 @@ const UpdatePersons = () => {
   };
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <h1 className="text-4xl font-bold mb-8">Update Persons</h1>
+    <AdminLayout title="Update Persons" subtitle="Refresh cast and crew metadata from TMDB.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="glass-dark p-6 rounded-xl">
           <p className="mb-4">
@@ -90,7 +90,7 @@ const UpdatePersons = () => {
           </button>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

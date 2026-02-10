@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getMovies, getSeries, createCrew, supabase } from '../../services/supabase';
+import AdminLayout from '../../components/AdminLayout';
 
 const ManageCrew = () => {
   const [type, setType] = useState('movie');
@@ -100,9 +101,8 @@ const ManageCrew = () => {
   );
 
   return (
-    <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8">Manage Crew</h1>
+    <AdminLayout title="Manage Crew" subtitle="Assign crew roles to titles.">
+      <div className="glass-card rounded-2xl p-6">
 
         <div className="mb-6">
           <select
@@ -219,7 +219,7 @@ const ManageCrew = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

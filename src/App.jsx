@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/Navbar';
-import MobileNav from './components/MobileNav';
+import GlassNavbar from './components/GlassNavbar';
+import BottomNav from './components/BottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
@@ -36,8 +36,8 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-black text-white">
-          <Navbar />
+        <div className="app-shell">
+          <GlassNavbar />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/movies" element={<Movies />} />
@@ -48,110 +48,161 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/watchlist" element={
-              <ProtectedRoute>
-                <Watchlist />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin" element={
-              <ProtectedRoute adminOnly>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/tmdb-import" element={
-              <ProtectedRoute adminOnly>
-                <TMDBImport />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/add-movie" element={
-              <ProtectedRoute adminOnly>
-                <AddMovie />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/add-series" element={
-              <ProtectedRoute adminOnly>
-                <AddSeries />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/add-person" element={
-              <ProtectedRoute adminOnly>
-                <AddPerson />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-movies" element={
-              <ProtectedRoute adminOnly>
-                <ManageMovies />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-series" element={
-              <ProtectedRoute adminOnly>
-                <ManageSeries />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-collections" element={
-              <ProtectedRoute adminOnly>
-                <ManageCollections />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/update-persons" element={
-              <ProtectedRoute adminOnly>
-                <UpdatePersons />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-links" element={
-              <ProtectedRoute adminOnly>
-                <ManageLinks />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-persons" element={
-              <ProtectedRoute adminOnly>
-                <ManagePersons />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-crew" element={
-              <ProtectedRoute adminOnly>
-                <ManageCrew />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-hero-banner" element={
-              <ProtectedRoute adminOnly>
-                <ManageHeroBanner />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-users" element={
-              <ProtectedRoute adminOnly>
-                <ManageUsers />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/admin/manage-avatars" element={
-              <ProtectedRoute adminOnly>
-                <ManageAvatars />
-              </ProtectedRoute>
-            } />
+
+            <Route
+              path="/profile"
+              element={(
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/watchlist"
+              element={(
+                <ProtectedRoute>
+                  <Watchlist />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/tmdb-import"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <TMDBImport />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/add-movie"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <AddMovie />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/add-series"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <AddSeries />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/add-person"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <AddPerson />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-movies"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageMovies />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-series"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageSeries />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-collections"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageCollections />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/update-persons"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <UpdatePersons />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-links"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageLinks />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-persons"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManagePersons />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-crew"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageCrew />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-hero-banner"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageHeroBanner />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-users"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageUsers />
+                </ProtectedRoute>
+              )}
+            />
+
+            <Route
+              path="/admin/manage-avatars"
+              element={(
+                <ProtectedRoute adminOnly>
+                  <ManageAvatars />
+                </ProtectedRoute>
+              )}
+            />
           </Routes>
-          <MobileNav />
+          <BottomNav />
         </div>
       </Router>
     </AuthProvider>
