@@ -75,15 +75,6 @@
     box-shadow: 0 10px 28px rgba(40, 133, 255, 0.4);
   }
 
-  .btn-secondary {
-    @apply px-5 py-2 rounded-full font-semibold border border-white/15 bg-white/10 text-white transition-all duration-300;
-  }
-
-  .btn-secondary:hover {
-    background: rgba(59, 167, 255, 0.15);
-    border-color: rgba(59, 167, 255, 0.4);
-  }
-
   .btn-primary:hover {
     transform: translateY(-1px) scale(1.01);
     box-shadow: 0 12px 32px rgba(79, 209, 255, 0.45);
@@ -96,6 +87,15 @@
   .btn-ghost:hover {
     border-color: rgba(59, 167, 255, 0.4);
     background: rgba(59, 167, 255, 0.12);
+  }
+
+  .btn-secondary {
+    @apply px-5 py-2 rounded-full font-semibold border border-white/15 bg-white/10 text-white transition-all duration-300;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(59, 167, 255, 0.15);
+    border-color: rgba(59, 167, 255, 0.4);
   }
 
   .chip {
