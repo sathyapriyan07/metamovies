@@ -11,6 +11,8 @@ const AddSeries = () => {
     overview: '',
     first_air_date: '',
     rating: '',
+    imdb_rating: '',
+    rotten_rating: '',
     genres: '',
     trailer_url: '',
     trending: false
@@ -39,6 +41,8 @@ const AddSeries = () => {
       const seriesData = {
         ...formData,
         rating: parseFloat(formData.rating),
+        imdb_rating: formData.imdb_rating ? parseFloat(formData.imdb_rating) : null,
+        rotten_rating: formData.rotten_rating ? parseInt(formData.rotten_rating, 10) : null,
         genres: formData.genres.split(',').map((g) => g.trim()),
         poster_url: posterUrl,
         backdrop_url: backdropUrl
@@ -97,6 +101,50 @@ const AddSeries = () => {
             onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
             className="w-full px-4 py-3 glass-input"
           />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+              <span>IMDb Rating</span>
+              <img
+                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='16' viewBox='0 0 24 16'><rect width='24' height='16' rx='3' fill='%23f5c518'/><text x='12' y='11' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='9' font-weight='700' fill='%23000000'>IMDb</text></svg>"
+                alt="IMDb"
+                className="w-6 h-4"
+                loading="lazy"
+                decoding="async"
+              />
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              max="10"
+              value={formData.imdb_rating}
+              onChange={(e) => setFormData({ ...formData, imdb_rating: e.target.value })}
+              placeholder="0 - 10"
+              className="w-full px-4 py-3 glass-input"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+              <span>Rotten Tomatoes</span>
+              <img
+                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2c3 2.5 6 5.5 6 9a6 6 0 1 1-12 0c0-3.5 3-6.5 6-9z'/><circle cx='9' cy='11' r='1.2' fill='%23ffffff'/><circle cx='15' cy='11' r='1.2' fill='%23ffffff'/></svg>"
+                alt="Rotten Tomatoes"
+                className="w-4 h-4"
+                loading="lazy"
+                decoding="async"
+              />
+            </label>
+            <input
+              type="number"
+              max="100"
+              value={formData.rotten_rating}
+              onChange={(e) => setFormData({ ...formData, rotten_rating: e.target.value })}
+              placeholder="0 - 100"
+              className="w-full px-4 py-3 glass-input"
+            />
+          </div>
         </div>
 
         <div>

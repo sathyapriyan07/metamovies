@@ -138,7 +138,7 @@ const Search = () => {
                     <h2 className="section-title">Movies</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                       {results.movies.map((movie) => (
-                        <PosterCard key={movie.id} item={movie} type="movie" showQuickActions />
+                        <PosterCard key={movie.id} item={movie} type="movie" />
                       ))}
                     </div>
                   </div>
@@ -149,7 +149,7 @@ const Search = () => {
                     <h2 className="section-title">Series</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                       {results.series.map((item) => (
-                        <PosterCard key={item.id} item={item} type="series" showQuickActions />
+                        <PosterCard key={item.id} item={item} type="series" />
                       ))}
                     </div>
                   </div>

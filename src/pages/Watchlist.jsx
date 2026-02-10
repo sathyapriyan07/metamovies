@@ -61,7 +61,7 @@ const Watchlist = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {items.map((item) => (
               <div key={item.id} className="space-y-2">
-                <PosterCard item={item} type={activeTab === 'movies' ? 'movie' : 'series'} showQuickActions />
+                <PosterCard item={item} type={activeTab === 'movies' ? 'movie' : 'series'} />
                 <button
                   onClick={() => removeItem(item.id, activeTab === 'movies' ? 'movie' : 'series')}
                   className="w-full text-xs text-gray-300 hover:text-white border border-white/10 rounded-full py-2 hover:bg-white/10 transition"
