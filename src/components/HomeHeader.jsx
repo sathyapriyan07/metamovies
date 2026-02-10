@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/supabase';
 import { useState } from 'react';
+import Avatar from './Avatar';
 
 const HomeHeader = () => {
   const navigate = useNavigate();
@@ -42,10 +43,13 @@ const HomeHeader = () => {
           <div className="relative">
             <button 
               onClick={() => setShowMenu(!showMenu)} 
-              className="w-9 h-9 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center text-white font-bold transition-all duration-200 hover:scale-105"
+              className="focus:outline-none focus:ring-2 focus:ring-red-600 rounded-full"
               aria-label="User Menu"
             >
-              {user.user_metadata?.username?.[0]?.toUpperCase() || 'U'}
+              <Avatar 
+                src={user.user_metadata?.avatar_url} 
+                name={user.user_metadata?.username || user.email}
+              />
             </button>
             {showMenu && (
               <>

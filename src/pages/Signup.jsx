@@ -7,6 +7,7 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +16,7 @@ const Signup = () => {
     setError('');
     setLoading(true);
 
-    const { error } = await signUp(email, password, username);
+    const { error } = await signUp(email, password, username, avatarUrl);
     
     if (error) {
       setError(error.message);
@@ -67,6 +68,17 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+              className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Avatar URL (Optional)</label>
+            <input
+              type="url"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              placeholder="https://example.com/avatar.jpg"
               className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 focus:outline-none focus:border-red-600"
             />
           </div>

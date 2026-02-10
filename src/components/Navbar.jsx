@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/supabase';
 import { useState } from 'react';
+import Avatar from './Avatar';
 
 const Navbar = () => {
   const { user, isAdmin } = useAuth();
@@ -78,9 +79,14 @@ const Navbar = () => {
               <div className="relative">
                 <button 
                   onClick={() => setShowMenu(!showMenu)} 
-                  className="w-10 h-10 rounded-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 flex items-center justify-center font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
+                  className="focus:outline-none focus:ring-2 focus:ring-red-600 rounded-full"
+                  aria-label="User Menu"
                 >
-                  {user.user_metadata?.username?.[0]?.toUpperCase() || 'U'}
+                  <Avatar 
+                    src={user.user_metadata?.avatar_url} 
+                    name={user.user_metadata?.username || user.email}
+                    size="lg"
+                  />
                 </button>
                 {showMenu && (
                   <div className="absolute right-0 mt-2 w-48 glass-dark rounded-lg py-2 shadow-xl">

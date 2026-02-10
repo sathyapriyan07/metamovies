@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
+import Avatar from '../../components/Avatar';
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, pending, approved
+  const [editingUser, setEditingUser] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   useEffect(() => {
     loadUsers();
@@ -56,6 +59,21 @@ const ManageUsers = () => {
     }
   };
 
+  const handleUpdateAvatar = async () => {
+    if (!editingUser) return;
+    
+    const { error } = await supabase.auth.admin.updateUserById(
+      editingUser.id,
+      { user_metadata: { avatar_url: avatarUrl } }
+    );
+    
+    if (!error) {
+      setEditingUser(null);
+      setAvatarUrl('');
+      loadUsers();
+    }
+  };
+
   return (
     <div className="min-h-screen pt-20 md:pt-24 pb-20 md:pb-8">
       <div className="container mx-auto px-4">
@@ -99,9 +117,11 @@ const ManageUsers = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-bold">
-                        {user.username?.[0]?.toUpperCase() || 'U'}
-                      </div>
+                      <Avatar 
+                        src={user.avatar_url} 
+                        name={user.username || user.auth_user?.email}
+                        size="lg"
+                      />
                       <div>
                         <p className="font-bold">{user.username || 'No username'}</p>
                         <p className="text-sm text-gray-400">{user.auth_user?.email}</p>
@@ -119,6 +139,12 @@ const ManageUsers = () => {
                   </div>
 
                   <div className="flex gap-2">
+                    <button
+                      onClick={() => { setEditingUser(user); setAvatarUrl(user.avatar_url || ''); }}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm"
+                    >
+                      Edit Avatar
+                    </button>
                     {!user.approved ? (
                       <button
                         onClick={() => handleApprove(user.id)}
@@ -152,6 +178,44 @@ const ManageUsers = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Avatar Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setEditingUser(null)}>
+          <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4">Update Avatar</h3>
+            <div className="mb-4 flex justify-center">
+              <Avatar 
+                src={avatarUrl} 
+                name={editingUser.username || editingUser.auth_user?.email}
+                size="lg"
+                className="w-20 h-20 text-2xl"
+              />
+            </div>
+            <input 
+              type="text" 
+              value={avatarUrl} 
+              onChange={(e) => setAvatarUrl(e.target.value)} 
+              placeholder="Avatar Image URL" 
+              className="w-full px-4 py-2 bg-gray-800 rounded-lg mb-4 text-white" 
+            />
+            <div className="flex gap-3">
+              <button 
+                onClick={handleUpdateAvatar} 
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg"
+              >
+                Save
+              </button>
+              <button 
+                onClick={() => setEditingUser(null)} 
+                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
