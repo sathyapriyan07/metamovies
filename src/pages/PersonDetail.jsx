@@ -109,27 +109,17 @@ const PersonDetail = () => {
   };
 
   return (
-    <div className="pb-24 md:pb-12">
-      {/* Banner Header */}
-      <div className="relative h-[260px] md:h-[300px] overflow-hidden">
-        <img
-          src={person.profile_url || 'https://via.placeholder.com/1200x600'}
-          alt={person.name}
-          className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-30"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/75 to-[#05070c]" />
-      </div>
-
+    <div className="pb-24 md:pb-12 pt-20">
       {/* Profile Section */}
-      <div className="max-w-[1320px] mx-auto px-4 md:px-8 -mt-20">
-        <div className="flex flex-col md:flex-row md:items-end gap-6 mb-10 relative z-10">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-8 pt-8">
+        <div className="flex flex-col md:flex-row md:items-end gap-6 mb-10">
           <img
             src={person.profile_url || 'https://via.placeholder.com/400x400'}
             alt={person.name}
             className="w-36 h-36 md:w-48 md:h-48 rounded-full border-4 border-black object-cover shadow-2xl mx-auto md:mx-0"
           />
           <div className="pb-4 text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl font-bold text-white" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>{person.name}</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white">{person.name}</h1>
             <p className="text-gray-400 mt-2">{person.known_for_department || 'Actor'}</p>
             {(person.social_links?.instagram || person.social_links?.twitter || person.social_links?.facebook) && (
               <div className="flex gap-3 mt-4 justify-center md:justify-start">

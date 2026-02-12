@@ -146,62 +146,67 @@ const ManageMovies = () => {
 
   return (
     <AdminLayout title="Manage Movies" subtitle="Edit or remove existing movies.">
-      <div className="glass-card rounded-2xl p-6">
+      <div className="glass-card rounded-2xl p-4 md:p-6 pb-24 md:pb-12">
 
-        <div className="mb-6">
+        <div className="mb-4">
           <input
             type="text"
             placeholder="Search movies..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+            className="w-full px-4 py-2.5 bg-white/10 rounded-lg border border-white/20 text-sm"
           />
         </div>
 
         {loading ? (
-          <div className="text-center">Loading...</div>
+          <div className="text-center py-8">Loading...</div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             {filteredMovies.map((movie) => (
-              <div key={movie.id} className="glass-dark p-4 rounded-xl flex gap-4">
-                <img
-                  src={movie.poster_url || 'https://via.placeholder.com/100x150'}
-                  alt={movie.title}
-                  className="w-16 h-24 object-cover rounded"
-                />
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold">{movie.title}</h3>
-                  <p className="text-sm text-gray-400">{movie.release_date?.split('-')[0]}</p>
-                  <p className="text-sm text-gray-400 line-clamp-2">{movie.overview}</p>
+              <div key={movie.id} className="glass-card rounded-2xl border border-white/10 backdrop-blur-md hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-250">
+                {/* Poster + Title Row */}
+                <div className="flex gap-3 items-center p-4">
+                  <img
+                    src={movie.poster_url || 'https://via.placeholder.com/100x150'}
+                    alt={movie.title}
+                    className="w-14 h-20 object-cover rounded-md shadow-md flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold truncate">{movie.title}</h3>
+                    <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
+                    <p className="text-xs text-gray-400 line-clamp-2 mt-1">{movie.overview}</p>
+                  </div>
                 </div>
-                <div className="flex gap-2">
+
+                {/* Action Buttons */}
+                <div className="px-4 pb-4 grid grid-cols-3 md:flex md:flex-wrap gap-2">
                   <button
                     onClick={() => handleEditBackdrop(movie)}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm"
+                    className="px-3 py-2 bg-blue-600/70 hover:bg-blue-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
-                    Edit Backdrop
+                    Backdrop
                   </button>
                   <button
                     onClick={() => handleEditRatings(movie)}
-                    className="px-4 py-2 bg-sky-600 hover:bg-sky-700 rounded-lg text-sm"
+                    className="px-3 py-2 bg-cyan-600/70 hover:bg-cyan-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
-                    Edit Ratings
+                    Ratings
                   </button>
                   <button
                     onClick={() => handleEditBooking(movie)}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm"
+                    className="px-3 py-2 bg-purple-600/70 hover:bg-purple-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
-                    Edit Booking
+                    Booking
                   </button>
                   <button
                     onClick={() => handleToggleTrending(movie)}
-                    className={`px-4 py-2 rounded-lg text-sm ${movie.trending ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+                    className={`px-3 py-2 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200 ${movie.trending ? 'bg-green-600/70 hover:bg-green-600' : 'bg-gray-600/60 hover:bg-gray-600'}`}
                   >
-                    {movie.trending ? '⭐ Trending' : 'Set Trending'}
+                    {movie.trending ? '⭐ Trending' : 'Trending'}
                   </button>
                   <button
                     onClick={() => handleDelete(movie.id, movie.title)}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm"
+                    className="px-3 py-2 bg-red-600/80 hover:bg-red-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200 col-span-2 md:col-span-1"
                   >
                     Delete
                   </button>

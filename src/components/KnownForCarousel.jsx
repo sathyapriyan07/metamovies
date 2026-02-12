@@ -7,8 +7,6 @@ const KnownForCarousel = ({ works }) => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Known For</h2>
-      
       <div className="grid grid-cols-3 gap-3 md:gap-5">
         {displayedWorks.map((work, i) => (
           <KnownForCard key={i} work={work} />
