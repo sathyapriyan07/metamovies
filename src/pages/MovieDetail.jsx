@@ -305,13 +305,13 @@ const MovieDetail = () => {
             )}
 
             {/* Streaming Platforms Card */}
-            {movie.watch_links && (movie.watch_links.netflix || movie.watch_links.prime || movie.watch_links.hotstar || movie.watch_links.zee5) && (
+            {movie.watch_links && (movie.watch_links.netflix || movie.watch_links.prime || movie.watch_links.hotstar || movie.watch_links.zee5 || movie.watch_links.sonyliv) && (
               <div className="glass-card p-6">
                 <h3 className="font-semibold mb-4 text-lg">Watch Now</h3>
                 <div className="flex flex-col gap-3">
                   {movie.watch_links.netflix && (
                     <a href={movie.watch_links.netflix} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 rounded-xl bg-[#E50914] hover:bg-[#f6121d] text-white transition">
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png" alt="Netflix" className="h-6 w-auto" loading="lazy" decoding="async" />
+                      <img src="https://www.edigitalagency.com.au/wp-content/uploads/netflix-logo-black-png-900x244.png" alt="Netflix" className="h-6 w-auto" loading="lazy" decoding="async" />
                     </a>
                   )}
                   {movie.watch_links.prime && (
@@ -322,6 +322,11 @@ const MovieDetail = () => {
                   {movie.watch_links.hotstar && (
                     <a href={movie.watch_links.hotstar} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 rounded-xl bg-[#0B5FFF] hover:bg-[#1b6dff] text-white transition">
                       <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JioHotstar_2025.png" alt="JioHotstar" className="h-7 w-auto" loading="lazy" decoding="async" />
+                    </a>
+                  )}
+                  {movie.watch_links.sonyliv && (
+                    <a href={movie.watch_links.sonyliv} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 rounded-xl bg-[#1F1F1F] hover:bg-[#2a2a2a] text-white transition">
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/f/f7/SonyLIV_2020.png" alt="SonyLIV" className="h-6 w-auto" loading="lazy" decoding="async" />
                     </a>
                   )}
                   {movie.watch_links.zee5 && (
