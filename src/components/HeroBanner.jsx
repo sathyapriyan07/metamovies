@@ -25,11 +25,10 @@ const HeroBanner = () => {
   const loadFeaturedContent = async () => {
     const { data } = await getHeroBanners();
 
-    const allContent = (data || [])      .map((banner) => ({
-        ...(banner.movie || {}),
-        type: 'movie'
-      }))
-      .filter((item) => item.backdrop_url);
+    const allContent = (data || []).map((banner) => ({
+      ...(banner.movie || {}),
+      type: 'movie'
+    })).filter((item) => item.backdrop_url);
 
     setBanners(allContent);
     setLoading(false);
