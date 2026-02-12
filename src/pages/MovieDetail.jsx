@@ -170,7 +170,7 @@ const MovieDetail = () => {
             {activeTab === 'overview' && movie.overview && (
               <section className="glass-card p-6">
                 <h2 className="text-2xl font-semibold mb-4">Overview</h2>
-                <p className={`text-gray-300 leading-relaxed ${!showFullOverview ? 'line-clamp-3' : ''}`}>
+                <p className={`text-gray-300 leading-relaxed ${!showFullOverview ? 'md:line-clamp-3 line-clamp-4' : ''}`}>
                   {movie.overview}
                 </p>
                 {movie.overview.length > 200 && (
