@@ -171,15 +171,6 @@
     background: rgba(59, 167, 255, 0.15);
   }
 
-  .poster-card {
-    @apply rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 bg-white/5 border border-white/10 shadow-lg;
-  }
-
-  .poster-card:hover {
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 18px 40px rgba(10, 30, 60, 0.6);
-  }
-
   .skeleton {
     @apply rounded-xl relative overflow-hidden bg-white/5;
   }
@@ -279,6 +270,10 @@
 
 .fade-in {
   animation: fadeIn 0.6s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
 }
 
 .page-fade {

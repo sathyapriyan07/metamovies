@@ -10,11 +10,19 @@ const PersonDetail = () => {
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showFullBio, setShowFullBio] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('acting');
 
   useEffect(() => {
     loadPerson();
   }, [id]);
+
+  useEffect(() => {
+    if (person) {
+      if (actingCredits.length > 0) setActiveTab('acting');
+      else if (soundCredits.length > 0) setActiveTab('sound');
+      else if (directorCredits.length > 0) setActiveTab('director');
+    }
+  }, [person]);
 
   const allWorks = useMemo(() => {
     if (!person) return [];
@@ -90,87 +98,75 @@ const PersonDetail = () => {
   const hasSound = soundCredits.length > 0;
   const hasDirector = directorCredits.length > 0;
 
+  const groupedCredits = (credits) => {
+    const grouped = {};
+    credits.forEach((credit) => {
+      const year = credit.year || 'Unknown';
+      if (!grouped[year]) grouped[year] = [];
+      grouped[year].push(credit);
+    });
+    return Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]));
+  };
+
   return (
-    <div className="min-h-screen pb-24 md:pb-12">
-      <div className="relative h-[40vh] md:h-[45vh] overflow-hidden">
+    <div className="pb-24 md:pb-12">
+      {/* Banner Header */}
+      <div className="relative h-[260px] md:h-[300px] overflow-hidden">
         <img
           src={person.profile_url || 'https://via.placeholder.com/1200x600'}
           alt={person.name}
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+          className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/70 to-[#05070c]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,167,255,0.25),transparent_45%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/75 to-[#05070c]" />
+      </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 md:px-8 h-full flex items-end pb-10">
-          <div className="flex flex-col md:flex-row md:items-end gap-6">
-            <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-2 border-sky-300/40 neon-ring">
-              <img
-                src={person.profile_url || 'https://via.placeholder.com/400x400'}
-                alt={`${person.name} profile`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Spotlight</p>
-              <h1 className="text-3xl md:text-5xl font-semibold mt-2">{person.name}</h1>
-              <div className="flex gap-3 mt-4">
+      {/* Profile Section */}
+      <div className="max-w-[1320px] mx-auto px-4 md:px-8 -mt-20">
+        <div className="flex flex-col md:flex-row md:items-end gap-6 mb-10 relative z-10">
+          <img
+            src={person.profile_url || 'https://via.placeholder.com/400x400'}
+            alt={person.name}
+            className="w-36 h-36 md:w-48 md:h-48 rounded-full border-4 border-black object-cover shadow-2xl mx-auto md:mx-0"
+          />
+          <div className="pb-4 text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-bold text-white" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>{person.name}</h1>
+            <p className="text-gray-400 mt-2">{person.known_for_department || 'Actor'}</p>
+            {(person.social_links?.instagram || person.social_links?.twitter || person.social_links?.facebook) && (
+              <div className="flex gap-3 mt-4 justify-center md:justify-start">
                 {person.social_links?.instagram && (
                   <a href={person.social_links.instagram} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs flex items-center">
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"
-                      alt="Instagram"
-                      className="h-5 w-auto object-contain"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" className="h-5 w-auto" />
                   </a>
                 )}
                 {person.social_links?.twitter && (
                   <a href={person.social_links.twitter} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs flex items-center">
-                    <img
-                      src="https://static.vecteezy.com/system/resources/previews/042/148/611/non_2x/new-twitter-x-logo-twitter-icon-x-social-media-icon-free-png.png"
-                      alt="X"
-                      className="h-5 w-auto object-contain"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <img src="https://static.vecteezy.com/system/resources/previews/042/148/611/non_2x/new-twitter-x-logo-twitter-icon-x-social-media-icon-free-png.png" alt="X" className="h-5 w-auto" />
                   </a>
                 )}
                 {person.social_links?.facebook && (
                   <a href={person.social_links.facebook} target="_blank" rel="noopener noreferrer" className="btn-ghost text-xs flex items-center">
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/500px-Facebook_Logo_%282019%29.png"
-                      alt="Facebook"
-                      className="h-5 w-auto object-contain"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Facebook_Logo_%282019%29.png/500px-Facebook_Logo_%282019%29.png" alt="Facebook" className="h-5 w-auto" />
                   </a>
                 )}
               </div>
-            </div>
+            )}
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-10">
-        <div className="grid lg:grid-cols-[280px_1fr] gap-10">
-          <div className="space-y-6">
-            <PersonalInfoCard person={person} creditsCount={creditsCount} />
-          </div>
-
-          <div className="space-y-8">
+        <div className="grid lg:grid-cols-12 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-8 space-y-8">
+            {/* Biography */}
             {person.biography && (
               <div className="glass-card rounded-2xl p-6">
-                <h2 className="text-xl font-semibold mb-3">Biography</h2>
-                <p className={`text-gray-300 leading-relaxed whitespace-pre-line ${!showFullBio && 'line-clamp-6'}`}>
+                <h2 className="text-2xl font-semibold mb-4">Biography</h2>
+                <p className={`text-gray-300 leading-relaxed whitespace-pre-line ${!showFullBio && 'line-clamp-4'}`}>
                   {person.biography}
                 </p>
                 {person.biography.length > 500 && (
                   <button
                     onClick={() => setShowFullBio(!showFullBio)}
-                    className="text-sky-300 hover:text-white font-semibold mt-3"
-                    aria-label={showFullBio ? 'Read Less' : 'Read More'}
+                    className="text-sky-300 hover:text-white font-semibold mt-3 transition"
                   >
                     {showFullBio ? 'Read Less' : 'Read More'}
                   </button>
@@ -178,23 +174,23 @@ const PersonDetail = () => {
               </div>
             )}
 
-            {allWorks.length > 0 && <KnownForCarousel works={allWorks} />}
+            {/* Known For Carousel */}
+            {allWorks.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Known For</h2>
+                <KnownForCarousel works={allWorks} />
+              </div>
+            )}
 
+            {/* Filmography */}
             {(hasActing || hasSound || hasDirector) && (
               <div className="glass-card rounded-2xl p-6">
+                <h2 className="text-2xl font-semibold mb-6">Filmography</h2>
                 <div className="flex gap-6 border-b border-white/10 mb-6">
-                  <button
-                    onClick={() => setActiveTab('overview')}
-                    className={`tab-item ${activeTab === 'overview' ? 'tab-item-active' : ''}`}
-                    aria-selected={activeTab === 'overview'}
-                  >
-                    Overview
-                  </button>
                   {hasActing && (
                     <button
                       onClick={() => setActiveTab('acting')}
                       className={`tab-item ${activeTab === 'acting' ? 'tab-item-active' : ''}`}
-                      aria-selected={activeTab === 'acting'}
                     >
                       Acting
                     </button>
@@ -203,7 +199,6 @@ const PersonDetail = () => {
                     <button
                       onClick={() => setActiveTab('sound')}
                       className={`tab-item ${activeTab === 'sound' ? 'tab-item-active' : ''}`}
-                      aria-selected={activeTab === 'sound'}
                     >
                       Sound
                     </button>
@@ -212,81 +207,85 @@ const PersonDetail = () => {
                     <button
                       onClick={() => setActiveTab('director')}
                       className={`tab-item ${activeTab === 'director' ? 'tab-item-active' : ''}`}
-                      aria-selected={activeTab === 'director'}
                     >
                       Director
                     </button>
                   )}
                 </div>
 
-                {activeTab === 'overview' && (
-                  <div className="text-center text-gray-400 py-8">
-                    Select a department tab to view credits
-                  </div>
-                )}
-
                 {activeTab === 'acting' && (
-                  <div className="space-y-2">
-                    {actingCredits.map((credit, i) => (
-                      <button
-                        key={i}
-                        onClick={() => navigate(`/${credit.type}/${credit.id}`)}
-                        className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition"
-                      >
-                        <div className="flex items-start gap-4">
-                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || ''}</span>
-                          <div>
-                            <p className="text-white font-medium">{credit.title}</p>
-                            <p className="text-gray-400 text-sm">as {credit.role}</p>
-                          </div>
+                  <div className="space-y-6">
+                    {groupedCredits(actingCredits).map(([year, credits]) => (
+                      <div key={year}>
+                        <h3 className="text-lg font-semibold text-sky-300 mb-3">{year}</h3>
+                        <div className="space-y-2">
+                          {credits.map((credit, i) => (
+                            <button
+                              key={i}
+                              onClick={() => navigate(`/${credit.type}/${credit.id}`)}
+                              className="w-full text-left py-3 px-4 rounded-xl hover:bg-white/5 transition"
+                            >
+                              <p className="text-white font-medium">{credit.title}</p>
+                              <p className="text-gray-400 text-sm">as {credit.role}</p>
+                            </button>
+                          ))}
                         </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
 
                 {activeTab === 'sound' && (
-                  <div className="space-y-2">
-                    {soundCredits.map((credit, i) => (
-                      <button
-                        key={i}
-                        onClick={() => navigate(`/${credit.type}/${credit.id}`)}
-                        className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition"
-                      >
-                        <div className="flex items-start gap-4">
-                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || ''}</span>
-                          <div>
-                            <p className="text-white font-medium">{credit.title}</p>
-                            <p className="text-gray-400 text-sm">{credit.role}</p>
-                          </div>
+                  <div className="space-y-6">
+                    {groupedCredits(soundCredits).map(([year, credits]) => (
+                      <div key={year}>
+                        <h3 className="text-lg font-semibold text-sky-300 mb-3">{year}</h3>
+                        <div className="space-y-2">
+                          {credits.map((credit, i) => (
+                            <button
+                              key={i}
+                              onClick={() => navigate(`/${credit.type}/${credit.id}`)}
+                              className="w-full text-left py-3 px-4 rounded-xl hover:bg-white/5 transition"
+                            >
+                              <p className="text-white font-medium">{credit.title}</p>
+                              <p className="text-gray-400 text-sm">{credit.role}</p>
+                            </button>
+                          ))}
                         </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
 
                 {activeTab === 'director' && (
-                  <div className="space-y-2">
-                    {directorCredits.map((credit, i) => (
-                      <button
-                        key={i}
-                        onClick={() => navigate(`/${credit.type}/${credit.id}`)}
-                        className="w-full text-left py-3 px-3 rounded-xl hover:bg-white/5 transition"
-                      >
-                        <div className="flex items-start gap-4">
-                          <span className="text-gray-500 text-sm w-12 flex-shrink-0">{credit.year || ''}</span>
-                          <div>
-                            <p className="text-white font-medium">{credit.title}</p>
-                            <p className="text-gray-400 text-sm">as {credit.role}</p>
-                          </div>
+                  <div className="space-y-6">
+                    {groupedCredits(directorCredits).map(([year, credits]) => (
+                      <div key={year}>
+                        <h3 className="text-lg font-semibold text-sky-300 mb-3">{year}</h3>
+                        <div className="space-y-2">
+                          {credits.map((credit, i) => (
+                            <button
+                              key={i}
+                              onClick={() => navigate(`/${credit.type}/${credit.id}`)}
+                              className="w-full text-left py-3 px-4 rounded-xl hover:bg-white/5 transition"
+                            >
+                              <p className="text-white font-medium">{credit.title}</p>
+                              <p className="text-gray-400 text-sm">as {credit.role}</p>
+                            </button>
+                          ))}
                         </div>
-                      </button>
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
             )}
           </div>
+
+          {/* Sidebar */}
+          <aside className="lg:col-span-4 space-y-6">
+            <PersonalInfoCard person={person} creditsCount={creditsCount} />
+          </aside>
         </div>
       </div>
     </div>

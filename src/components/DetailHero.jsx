@@ -1,6 +1,6 @@
 const DetailHero = ({ backdrop, poster, title }) => {
   return (
-    <div className="relative w-full h-[55vh] md:h-[70vh] overflow-visible">
+    <div className="relative w-full h-[50vh] md:h-[65vh] overflow-visible">
       <img
         src={backdrop || poster || 'https://via.placeholder.com/1920x1080'}
         alt={title}

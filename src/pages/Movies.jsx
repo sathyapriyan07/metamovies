@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getMovies } from '../services/supabase';
 import PosterCard from '../components/PosterCard';
-import { SkeletonRow } from '../components/SkeletonLoader';
+import { SkeletonGrid } from '../components/SkeletonLoader';
 
 const Movies = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,13 +49,13 @@ const Movies = () => {
 
   return (
     <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12 page-fade">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-8">
         <div className="mb-8">
-          <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Explore</p>
-          <h1 className="text-3xl md:text-5xl font-semibold mt-2">Movies</h1>
+          <h1 className="text-3xl md:text-4xl font-bold">Movies</h1>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-8 scrollbar-hide">
+        {/* Mobile Filter Chips */}
+        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
           {genres.map((genre) => (
             <button
               key={genre}
@@ -67,29 +67,59 @@ const Movies = () => {
           ))}
         </div>
 
-        {loading && page === 0 ? (
-          <SkeletonRow count={10} />
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {movies.map((movie) => (
-                <PosterCard key={movie.id} item={movie} type="movie" />
-              ))}
-            </div>
-
-            {hasMore && (
-              <div className="flex justify-center mt-10">
-                <button
-                  onClick={() => setPage((p) => p + 1)}
-                  className="btn-primary"
-                  disabled={loading}
-                >
-                  {loading ? 'Loading...' : 'Load More'}
-                </button>
+        <div className="flex gap-8">
+          {/* Desktop Filter Sidebar */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <div className="glass-card rounded-2xl p-6 sticky top-28">
+              <h3 className="font-semibold mb-4">Filters</h3>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Genre</label>
+                <div className="space-y-2">
+                  {genres.map((genre) => (
+                    <button
+                      key={genre}
+                      onClick={() => handleGenreClick(genre)}
+                      className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                        selectedGenre === genre
+                          ? 'bg-sky-500/20 text-sky-300 font-medium'
+                          : 'hover:bg-white/5 text-gray-300'
+                      }`}
+                    >
+                      {genre}
+                    </button>
+                  ))}
+                </div>
               </div>
+            </div>
+          </aside>
+
+          {/* Poster Grid */}
+          <div className="flex-1">
+            {loading && page === 0 ? (
+              <SkeletonGrid count={12} />
+            ) : (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                  {movies.map((movie) => (
+                    <PosterCard key={movie.id} item={movie} type="movie" />
+                  ))}
+                </div>
+
+                {hasMore && (
+                  <div className="flex justify-center mt-10">
+                    <button
+                      onClick={() => setPage((p) => p + 1)}
+                      className="btn-primary"
+                      disabled={loading}
+                    >
+                      {loading ? 'Loading...' : 'Load More'}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

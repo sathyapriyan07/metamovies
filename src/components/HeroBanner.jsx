@@ -75,7 +75,7 @@ const HeroBanner = () => {
 
   return (
     <div
-      className="relative w-full h-[55vh] md:h-[70vh] overflow-hidden"
+      className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -83,42 +83,39 @@ const HeroBanner = () => {
       <img
         src={featured.backdrop_url || 'https://via.placeholder.com/1920x1080'}
         alt={featured.title || featured.name}
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+        className="absolute inset-0 w-full h-full object-cover"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,167,255,0.25),transparent_45%)]" />
 
-      <div className="relative h-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col justify-end pb-12 md:pb-16">
-        <div className="max-w-2xl fade-in">
-          <p className="text-sky-300 text-xs uppercase tracking-[0.3em] mb-3">Featured</p>
-          <h1 className="text-4xl md:text-6xl font-semibold mb-4 tracking-tight">
+      <div className="relative h-full max-w-[1320px] mx-auto px-4 md:px-8 flex items-end pb-12 md:pb-16">
+        <div className="max-w-3xl animate-fade-in">
+          <h1 className="text-3xl md:text-5xl font-bold mb-3 tracking-tight">
             {featured.title || featured.name}
           </h1>
 
-          <div className="flex items-center gap-3 mb-4 text-sm md:text-base text-gray-300 flex-wrap">
+          <div className="flex items-center gap-3 mb-4 text-sm text-gray-300 flex-wrap">
             {featured.release_date && <span>{featured.release_date.split('-')[0]}</span>}
             {featured.genres && featured.genres.length > 0 && (
               <>
-                <span className="meta-separator"></span>
-                <span>{featured.genres.slice(0, 2).join(' / ')}</span>
+                <span>•</span>
+                <span>{featured.genres.slice(0, 2).join(', ')}</span>
               </>
             )}
             {(typeof featured.rating === 'number' ||
               typeof featured.imdb_rating === 'number' ||
               typeof featured.rotten_rating === 'number') && (
               <>
-                <span className="meta-separator"></span>
-                <span className="inline-flex items-center gap-2 text-sky-200 flex-wrap">
+                <span>•</span>
+                <span className="inline-flex items-center gap-2 flex-wrap">
                   {typeof featured.rating === 'number' && (
                     <span className="inline-flex items-center gap-1.5">
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/3840px-Tmdb.new.logo.svg.png"
                         alt="TMDB"
                         className="h-4 w-auto"
-                        loading="lazy"
-                        decoding="async"
                       />
                       {featured.rating.toFixed(1)}
                     </span>
@@ -129,8 +126,6 @@ const HeroBanner = () => {
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/960px-IMDB_Logo_2016.svg.png"
                         alt="IMDb"
                         className="h-4 w-auto"
-                        loading="lazy"
-                        decoding="async"
                       />
                       {featured.imdb_rating.toFixed(1)}
                     </span>
@@ -141,8 +136,6 @@ const HeroBanner = () => {
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Rotten_Tomatoes.svg/3840px-Rotten_Tomatoes.svg.png"
                         alt="Rotten Tomatoes"
                         className="h-4 w-auto"
-                        loading="lazy"
-                        decoding="async"
                       />
                       {Math.round(featured.rotten_rating)}%
                     </span>
@@ -153,14 +146,22 @@ const HeroBanner = () => {
           </div>
 
           {featured.overview && (
-            <p className="text-gray-300 text-sm md:text-base mb-6 line-clamp-3 leading-relaxed">
+            <p className="text-gray-300 text-base mb-6 line-clamp-3 leading-relaxed">
               {featured.overview}
             </p>
           )}
 
           <div className="flex flex-wrap gap-3">
-            <button onClick={handleViewClick} className="btn-primary">
-              Watch Now
+            {featured.trailer_url && (
+              <button
+                onClick={() => window.open(featured.trailer_url, '_blank', 'noopener,noreferrer')}
+                className="btn-primary"
+              >
+                Watch Trailer
+              </button>
+            )}
+            <button onClick={handleViewClick} className="btn-ghost">
+              View Details
             </button>
             {featured.is_now_showing && featured.booking_url && (
               <button
@@ -170,14 +171,10 @@ const HeroBanner = () => {
                 <img
                   src="https://upload.wikimedia.org/wikipedia/commons/7/75/Bookmyshow-logoid.png"
                   alt="Ticket"
-                className="ticket-logo"
-                  loading="lazy"
-                  decoding="async"
-                />\n</button>
+                  className="ticket-logo"
+                />
+              </button>
             )}
-            <button onClick={handleViewClick} className="btn-ghost">
-              View Details
-            </button>
           </div>
         </div>
       </div>
