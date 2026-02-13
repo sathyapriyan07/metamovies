@@ -111,7 +111,7 @@ const ManageHeroBanner = () => {
                         </p>
                       </div>
                       <button
-                        onClick={() => handleAddBanner(item.id, searchType)}
+                        onClick={() => handleAddBanner(item.id)}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm"
                       >
                         Add
