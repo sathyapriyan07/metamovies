@@ -37,10 +37,17 @@ const BottomNav = () => {
             </svg>
           )}
           {navItem(
-            '/music',
-            'Music',
+            '/videos',
+            'Videos',
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 4v12.2a2.5 2.5 0 1 0 1.5 2.3V8l8-2v6.2a2.5 2.5 0 1 0 1.5 2.3V3.5L9 4z" />
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+          {navItem(
+            '/news',
+            'News',
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
             </svg>
           )}
           {navItem(

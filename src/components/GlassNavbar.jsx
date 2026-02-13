@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Avatar from './Avatar';
+import ThemeToggle from './ThemeToggle';
 import { useState } from 'react';
 
 const GlassNavbar = () => {
@@ -32,8 +33,11 @@ const GlassNavbar = () => {
             <Link to="/movies" className={`transition-colors ${isActive('/movies') ? 'text-white' : 'hover:text-white'}`}>
               Movies
             </Link>
-            <Link to="/music" className={`transition-colors ${isActive('/music') ? 'text-white' : 'hover:text-white'}`}>
-              Music
+            <Link to="/videos" className={`transition-colors ${isActive('/videos') ? 'text-white' : 'hover:text-white'}`}>
+              Videos
+            </Link>
+            <Link to="/news" className={`transition-colors ${isActive('/news') ? 'text-white' : 'hover:text-white'}`}>
+              News
             </Link>
             {user && (
               <Link to="/watchlist" className={`transition-colors ${isActive('/watchlist') ? 'text-white' : 'hover:text-white'}`}>
@@ -63,6 +67,7 @@ const GlassNavbar = () => {
           </form>
 
           <div className="ml-auto flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
               <button
                 onClick={() => navigate('/profile')}

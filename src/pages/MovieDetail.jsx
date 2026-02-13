@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 import CastCard from '../components/CastCard';
 import DetailHero from '../components/DetailHero';
-import MusicPlatforms from '../components/MusicPlatforms';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -240,17 +239,6 @@ const MovieDetail = () => {
                     <a href={movie.telegram_link} target="_blank" rel="noopener noreferrer" className="btn-ghost inline-block">
                       Download on Telegram
                     </a>
-                  </section>
-                )}
-
-                {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music) && (
-                  <section>
-                    <h2 className="text-2xl font-semibold mb-4">Soundtrack</h2>
-                    <MusicPlatforms
-                      spotifyUrl={movie.music_links.spotify}
-                      appleMusicUrl={movie.music_links.apple_music}
-                      youtubeMusicUrl={movie.music_links.youtube_music}
-                    />
                   </section>
                 )}
               </div>

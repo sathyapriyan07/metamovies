@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getMovies, deleteMovie, updateMovie } from '../../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
+import Toast from '../../components/Toast';
 
 const ManageMovies = () => {
   const navigate = useNavigate();
@@ -9,29 +10,56 @@ const ManageMovies = () => {
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Modal states
   const [editingMovie, setEditingMovie] = useState(null);
   const [backdropUrl, setBackdropUrl] = useState('');
+  const [backdropError, setBackdropError] = useState('');
+  const [savingBackdrop, setSavingBackdrop] = useState(false);
+  
   const [editingRatings, setEditingRatings] = useState(null);
   const [imdbRating, setImdbRating] = useState('');
   const [rottenRating, setRottenRating] = useState('');
+  const [ratingError, setRatingError] = useState('');
+  const [savingRatings, setSavingRatings] = useState(false);
+  
   const [editingBooking, setEditingBooking] = useState(null);
   const [bookingUrl, setBookingUrl] = useState('');
   const [bookingLabel, setBookingLabel] = useState('');
   const [isNowShowing, setIsNowShowing] = useState(false);
+  const [bookingError, setBookingError] = useState('');
+  const [savingBooking, setSavingBooking] = useState(false);
+  
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     loadMovies();
   }, []);
 
   const loadMovies = async () => {
-    setLoading(true);
-    const { data } = await getMovies(null, 0);
-    setMovies(data || []);
-    setFilteredMovies(data || []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const { data, error } = await getMovies(null, 0);
+      if (error) throw error;
+      setMovies(data || []);
+      setFilteredMovies(data || []);
+    } catch (error) {
+      console.error('Error loading movies:', error);
+      showToast('Failed to load movies', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSearch = (query) => {
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
+
+  // Debounced search
+  const handleSearch = useCallback((query) => {
     setSearchQuery(query);
     if (!query.trim()) {
       setFilteredMovies(movies);
@@ -41,135 +69,207 @@ const ManageMovies = () => {
       );
       setFilteredMovies(filtered);
     }
+  }, [movies]);
+
+  const validateUrl = (url) => {
+    if (!url) return true;
+    try {
+      const urlObj = new URL(url);
+      return urlObj.protocol === 'https:';
+    } catch {
+      return false;
+    }
   };
 
   const handleToggleTrending = async (movie) => {
-    await updateMovie(movie.id, { trending: !movie.trending });
-    loadMovies();
+    try {
+      const { error } = await updateMovie(movie.id, { trending: !movie.trending });
+      if (error) throw error;
+      showToast(`${movie.title} ${!movie.trending ? 'marked as' : 'removed from'} trending`, 'success');
+      loadMovies();
+    } catch (error) {
+      console.error('Error toggling trending:', error);
+      showToast('Failed to update trending status', 'error');
+    }
   };
 
-  const handleDelete = async (id, title) => {
-    if (confirm(`Delete "${title}"?`)) {
-      await deleteMovie(id);
+  const handleDelete = (movie) => {
+    setDeleteConfirm(movie);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm) return;
+    try {
+      setDeleting(true);
+      const { error } = await deleteMovie(deleteConfirm.id);
+      if (error) throw error;
+      showToast(`${deleteConfirm.title} deleted successfully`, 'success');
+      setDeleteConfirm(null);
       loadMovies();
+    } catch (error) {
+      console.error('Error deleting movie:', error);
+      showToast('Failed to delete movie', 'error');
+    } finally {
+      setDeleting(false);
     }
   };
 
   const handleEditBackdrop = (movie) => {
     setEditingMovie(movie);
     setBackdropUrl(movie.backdrop_url || '');
+    setBackdropError('');
+  };
+
+  const handleSaveBackdrop = async () => {
+    if (!editingMovie) return;
+    
+    setBackdropError('');
+    
+    if (backdropUrl && !validateUrl(backdropUrl)) {
+      setBackdropError('URL must start with https://');
+      return;
+    }
+
+    try {
+      setSavingBackdrop(true);
+      const { error } = await updateMovie(editingMovie.id, { backdrop_url: backdropUrl || null });
+      if (error) throw error;
+      
+      showToast('Backdrop updated successfully', 'success');
+      setEditingMovie(null);
+      setBackdropUrl('');
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating backdrop:', error);
+      setBackdropError(error.message || 'Failed to update backdrop');
+    } finally {
+      setSavingBackdrop(false);
+    }
   };
 
   const handleEditRatings = (movie) => {
     setEditingRatings(movie);
     setImdbRating(movie.imdb_rating ?? '');
     setRottenRating(movie.rotten_rating ?? '');
+    setRatingError('');
   };
 
   const handleSaveRatings = async () => {
     if (!editingRatings) return;
+    
+    setRatingError('');
+    
     const imdbValue = imdbRating === '' ? null : parseFloat(imdbRating);
     const rottenValue = rottenRating === '' ? null : parseInt(rottenRating, 10);
 
-    if (imdbValue !== null && (Number.isNaN(imdbValue) || imdbValue > 10)) {
-      alert('IMDb rating must be between 0 and 10.');
+    if (imdbValue !== null && (Number.isNaN(imdbValue) || imdbValue < 0 || imdbValue > 10)) {
+      setRatingError('IMDb rating must be between 0 and 10');
       return;
     }
-    if (rottenValue !== null && (Number.isNaN(rottenValue) || rottenValue > 100)) {
-      alert('Rotten Tomatoes rating must be between 0 and 100.');
-      return;
-    }
-
-    const { error } = await updateMovie(editingRatings.id, {
-      imdb_rating: imdbValue,
-      rotten_rating: rottenValue
-    });
-
-    if (error) {
-      alert(`Failed to update ratings: ${error.message}`);
+    if (rottenValue !== null && (Number.isNaN(rottenValue) || rottenValue < 0 || rottenValue > 100)) {
+      setRatingError('Rotten Tomatoes rating must be between 0 and 100');
       return;
     }
 
-    setEditingRatings(null);
-    setImdbRating('');
-    setRottenRating('');
-    loadMovies();
+    try {
+      setSavingRatings(true);
+      const { error } = await updateMovie(editingRatings.id, {
+        imdb_rating: imdbValue,
+        rotten_rating: rottenValue
+      });
+      if (error) throw error;
+
+      showToast('Ratings updated successfully', 'success');
+      setEditingRatings(null);
+      setImdbRating('');
+      setRottenRating('');
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating ratings:', error);
+      setRatingError(error.message || 'Failed to update ratings');
+    } finally {
+      setSavingRatings(false);
+    }
   };
+
   const handleEditBooking = (movie) => {
     setEditingBooking(movie);
     setIsNowShowing(!!movie.is_now_showing);
     setBookingUrl(movie.booking_url || '');
     setBookingLabel(movie.booking_label || '');
+    setBookingError('');
   };
 
   const handleSaveBooking = async () => {
     if (!editingBooking) return;
-    if (isNowShowing && bookingUrl) {
-      try {
-        new URL(bookingUrl);
-      } catch {
-        alert('Please enter a valid booking URL.');
-        return;
-      }
+    
+    setBookingError('');
+    
+    if (isNowShowing && bookingUrl && !validateUrl(bookingUrl)) {
+      setBookingError('Booking URL must start with https://');
+      return;
     }
 
     const cleanedBookingLabel = (bookingLabel || '').replace(/[\r\n]+/g, ' ').trim();
 
-    const { error } = await updateMovie(editingBooking.id, {
-      is_now_showing: !!isNowShowing,
-      booking_url: isNowShowing ? (bookingUrl || null) : null,
-      booking_label: isNowShowing ? (cleanedBookingLabel || 'Book Tickets') : null,
-      booking_last_updated: isNowShowing && bookingUrl ? new Date().toISOString() : null
-    });
+    try {
+      setSavingBooking(true);
+      const { error } = await updateMovie(editingBooking.id, {
+        is_now_showing: !!isNowShowing,
+        booking_url: isNowShowing ? (bookingUrl || null) : null,
+        booking_label: isNowShowing ? (cleanedBookingLabel || 'Book Tickets') : null,
+        booking_last_updated: isNowShowing && bookingUrl ? new Date().toISOString() : null
+      });
+      if (error) throw error;
 
-    if (error) {
-      alert(`Failed to update booking: ${error.message}`);
-      return;
-    }
-
-    setEditingBooking(null);
-    setBookingUrl('');
-    setBookingLabel('');
-    setIsNowShowing(false);
-    loadMovies();
-  };
-
-
-  const handleSaveBackdrop = async () => {
-    if (editingMovie) {
-      await updateMovie(editingMovie.id, { backdrop_url: backdropUrl });
-      setEditingMovie(null);
-      setBackdropUrl('');
+      showToast('Booking info updated successfully', 'success');
+      setEditingBooking(null);
+      setBookingUrl('');
+      setBookingLabel('');
+      setIsNowShowing(false);
       loadMovies();
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      setBookingError(error.message || 'Failed to update booking');
+    } finally {
+      setSavingBooking(false);
     }
   };
 
   return (
     <AdminLayout title="Manage Movies" subtitle="Edit or remove existing movies.">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      
       <div className="glass-card rounded-2xl p-4 md:p-6 pb-24 md:pb-12">
-
         <div className="mb-4">
           <input
             type="text"
             placeholder="Search movies..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full px-4 py-2.5 bg-white/10 rounded-lg border border-white/20 text-sm"
+            className="w-full px-4 py-2.5 glass-input text-sm"
           />
         </div>
 
         {loading ? (
-          <div className="text-center py-8">Loading...</div>
+          <div className="text-center py-8">
+            <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="mt-2 text-gray-400">Loading movies...</p>
+          </div>
+        ) : filteredMovies.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            {searchQuery ? 'No movies found matching your search' : 'No movies available'}
+          </div>
         ) : (
           <div className="grid gap-3">
             {filteredMovies.map((movie) => (
               <div key={movie.id} className="glass-card rounded-2xl border border-white/10 backdrop-blur-md hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-250">
-                {/* Poster + Title Row */}
                 <div className="flex gap-3 items-center p-4">
                   <img
                     src={movie.poster_url || 'https://via.placeholder.com/100x150'}
                     alt={movie.title}
                     className="w-14 h-20 object-cover rounded-md shadow-md flex-shrink-0"
+                    loading="lazy"
                   />
                   <div className="flex-1 min-w-0">
                     <h3 className="text-base font-semibold truncate">{movie.title}</h3>
@@ -178,7 +278,6 @@ const ManageMovies = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="px-4 pb-4 grid grid-cols-3 md:flex md:flex-wrap gap-2">
                   <button
                     onClick={() => handleEditBackdrop(movie)}
@@ -205,7 +304,7 @@ const ManageMovies = () => {
                     {movie.trending ? '⭐ Trending' : 'Trending'}
                   </button>
                   <button
-                    onClick={() => handleDelete(movie.id, movie.title)}
+                    onClick={() => handleDelete(movie)}
                     className="px-3 py-2 bg-red-600/80 hover:bg-red-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200 col-span-2 md:col-span-1"
                   >
                     Delete
@@ -233,25 +332,32 @@ const ManageMovies = () => {
 
               <input
                 type="text"
-                placeholder="Backdrop URL"
+                placeholder="https://image.tmdb.org/t/p/original/..."
                 value={backdropUrl}
-                onChange={(e) => setBackdropUrl(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 mb-4"
+                onChange={(e) => {
+                  setBackdropUrl(e.target.value);
+                  setBackdropError('');
+                }}
+                className="w-full px-4 py-3 glass-input mb-2"
               />
+              {backdropError && <p className="text-red-400 text-sm mb-4">{backdropError}</p>}
 
               <div className="flex gap-3">
                 <button
                   onClick={handleSaveBackdrop}
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold"
+                  disabled={savingBackdrop}
+                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Save
+                  {savingBackdrop ? 'Saving...' : 'Save'}
                 </button>
                 <button
                   onClick={() => {
                     setEditingMovie(null);
                     setBackdropUrl('');
+                    setBackdropError('');
                   }}
-                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold"
+                  disabled={savingBackdrop}
+                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -260,6 +366,7 @@ const ManageMovies = () => {
           </div>
         )}
 
+        {/* Edit Ratings Modal */}
         {editingRatings && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div className="glass-dark p-6 rounded-xl max-w-xl w-full">
@@ -272,16 +379,18 @@ const ManageMovies = () => {
                       src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='16' viewBox='0 0 24 16'><rect width='24' height='16' rx='3' fill='%23f5c518'/><text x='12' y='11' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='9' font-weight='700' fill='%23000000'>IMDb</text></svg>"
                       alt="IMDb"
                       className="w-6 h-4"
-                      loading="lazy"
-                      decoding="async"
                     />
                   </label>
                   <input
                     type="number"
                     step="0.1"
+                    min="0"
                     max="10"
                     value={imdbRating}
-                    onChange={(e) => setImdbRating(e.target.value)}
+                    onChange={(e) => {
+                      setImdbRating(e.target.value);
+                      setRatingError('');
+                    }}
                     placeholder="0 - 10"
                     className="w-full px-4 py-3 glass-input"
                   />
@@ -293,25 +402,39 @@ const ManageMovies = () => {
                       src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2c3 2.5 6 5.5 6 9a6 6 0 1 1-12 0c0-3.5 3-6.5 6-9z'/><circle cx='9' cy='11' r='1.2' fill='%23ffffff'/><circle cx='15' cy='11' r='1.2' fill='%23ffffff'/></svg>"
                       alt="Rotten Tomatoes"
                       className="w-4 h-4"
-                      loading="lazy"
-                      decoding="async"
                     />
                   </label>
                   <input
                     type="number"
+                    min="0"
                     max="100"
                     value={rottenRating}
-                    onChange={(e) => setRottenRating(e.target.value)}
+                    onChange={(e) => {
+                      setRottenRating(e.target.value);
+                      setRatingError('');
+                    }}
                     placeholder="0 - 100"
                     className="w-full px-4 py-3 glass-input"
                   />
                 </div>
               </div>
+              {ratingError && <p className="text-red-400 text-sm mt-2">{ratingError}</p>}
               <div className="flex gap-3 mt-6">
-                <button onClick={handleSaveRatings} className="flex-1 btn-primary">
-                  Save Ratings
+                <button
+                  onClick={handleSaveRatings}
+                  disabled={savingRatings}
+                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingRatings ? 'Saving...' : 'Save Ratings'}
                 </button>
-                <button onClick={() => setEditingRatings(null)} className="flex-1 btn-ghost">
+                <button
+                  onClick={() => {
+                    setEditingRatings(null);
+                    setRatingError('');
+                  }}
+                  disabled={savingRatings}
+                  className="flex-1 btn-ghost disabled:opacity-50"
+                >
                   Cancel
                 </button>
               </div>
@@ -319,6 +442,7 @@ const ManageMovies = () => {
           </div>
         )}
 
+        {/* Edit Booking Modal */}
         {editingBooking && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div className="glass-dark p-6 rounded-xl max-w-xl w-full">
@@ -340,7 +464,10 @@ const ManageMovies = () => {
                     <input
                       type="url"
                       value={bookingUrl}
-                      onChange={(e) => setBookingUrl(e.target.value)}
+                      onChange={(e) => {
+                        setBookingUrl(e.target.value);
+                        setBookingError('');
+                      }}
                       placeholder="https://..."
                       className="w-full px-4 py-3 glass-input"
                     />
@@ -357,12 +484,52 @@ const ManageMovies = () => {
                   </div>
                 </div>
               )}
+              {bookingError && <p className="text-red-400 text-sm mt-2">{bookingError}</p>}
 
               <div className="flex gap-3 mt-6">
-                <button onClick={handleSaveBooking} className="flex-1 btn-primary">
-                  Save Booking
+                <button
+                  onClick={handleSaveBooking}
+                  disabled={savingBooking}
+                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingBooking ? 'Saving...' : 'Save Booking'}
                 </button>
-                <button onClick={() => setEditingBooking(null)} className="flex-1 btn-ghost">
+                <button
+                  onClick={() => {
+                    setEditingBooking(null);
+                    setBookingError('');
+                  }}
+                  disabled={savingBooking}
+                  className="flex-1 btn-ghost disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-md w-full">
+              <h2 className="text-2xl font-bold mb-4">Delete Movie</h2>
+              <p className="text-gray-300 mb-6">
+                Are you sure you want to delete <strong>{deleteConfirm.title}</strong>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  disabled={deleting}
+                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold disabled:opacity-50"
+                >
                   Cancel
                 </button>
               </div>
