@@ -44,8 +44,8 @@ const CastCrew = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#04060b] to-[#0a0f1a] pb-24 md:pb-12">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/[0.12] backdrop-blur-[28px] border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 py-4">
+      <div className="sticky top-0 z-20 bg-black/60 backdrop-blur-lg border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
@@ -56,26 +56,26 @@ const CastCrew = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <h1 className="text-xl md:text-2xl font-semibold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              {movie.title} - Cast & Crew
+            <h1 className="text-xl md:text-2xl font-semibold text-white text-center flex-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              {movie.title} – Cast & Crew
             </h1>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-5 md:px-8 py-6 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 pb-28 space-y-8">
         {/* Cast Section */}
         {movie.cast?.length > 0 && (
-          <section className="glass-card p-6 rounded-2xl">
+          <section className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
             <h2 className="text-xl font-semibold mb-6 text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Cast</h2>
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
               {movie.cast.map((c) => (
                 <div
                   key={c.id}
                   onClick={() => navigate(`/person/${c.person.id}`)}
-                  className="cursor-pointer group text-center"
+                  className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 cursor-pointer group text-center transition-all duration-300 hover:scale-105 hover:border-white/20"
                 >
-                  <div className="w-full aspect-square rounded-full overflow-hidden bg-white/10 mb-3 transition-all duration-200 group-hover:scale-105">
+                  <div className="w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] lg:w-[160px] lg:h-[160px] rounded-full overflow-hidden mx-auto mb-3 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
                     {c.person.profile_url ? (
                       <img
                         src={c.person.profile_url}
@@ -84,15 +84,15 @@ const CastCrew = () => {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                      <div className="w-full h-full flex items-center justify-center bg-white/10">
+                        <svg className="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                         </svg>
                       </div>
                     )}
                   </div>
-                  <p className="text-sm font-semibold text-white line-clamp-2">{c.person.name}</p>
-                  <p className="text-xs text-gray-400 line-clamp-1 mt-1">{c.character}</p>
+                  <p className="text-base font-semibold text-white line-clamp-1">{c.person.name}</p>
+                  <p className="text-sm text-white/70 line-clamp-2 mt-1">{c.character}</p>
                 </div>
               ))}
             </div>
@@ -101,20 +101,20 @@ const CastCrew = () => {
 
         {/* Crew Section */}
         {Object.keys(crewGroups).length > 0 && (
-          <section className="glass-card p-6 rounded-2xl">
+          <section className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
             <h2 className="text-xl font-semibold mb-6 text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Crew</h2>
-            <div className="space-y-6">
+            <div className="space-y-8">
               {Object.entries(crewGroups).map(([job, members]) => (
                 <div key={job}>
                   <h3 className="text-lg font-medium text-white mb-4">{job}</h3>
-                  <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
                     {members.map((member) => (
                       <div
                         key={member.id}
                         onClick={() => navigate(`/person/${member.person.id}`)}
-                        className="flex-shrink-0 cursor-pointer group text-center w-20"
+                        className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 cursor-pointer group text-center transition-all duration-300 hover:scale-105 hover:border-white/20"
                       >
-                        <div className="w-16 h-16 rounded-full overflow-hidden bg-white/10 mb-2 mx-auto transition-all duration-200 group-hover:scale-105">
+                        <div className="w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] lg:w-[160px] lg:h-[160px] rounded-full overflow-hidden mx-auto mb-3 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
                           {member.person.profile_url ? (
                             <img
                               src={member.person.profile_url}
@@ -123,14 +123,14 @@ const CastCrew = () => {
                               loading="lazy"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                            <div className="w-full h-full flex items-center justify-center bg-white/10">
+                              <svg className="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                               </svg>
                             </div>
                           )}
                         </div>
-                        <p className="text-xs font-semibold text-white line-clamp-2">{member.person.name}</p>
+                        <p className="text-base font-semibold text-white line-clamp-1">{member.person.name}</p>
                       </div>
                     ))}
                   </div>

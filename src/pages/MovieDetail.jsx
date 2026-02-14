@@ -396,7 +396,7 @@ const MovieDetail = () => {
                   rel="noopener noreferrer"
                   className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
                 >
-                  <img src="https://www.edigitalagency.com.au/wp-content/uploads/netflix-logo-black-png-900x244.png" alt="Netflix" className="h-5 w-auto" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))' }} />
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png" alt="Netflix" className="h-5 w-auto" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))' }} />
                 </a>
               )}
               {movie.watch_links.prime && (
@@ -416,7 +416,7 @@ const MovieDetail = () => {
                   rel="noopener noreferrer"
                   className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
                 >
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JioHotstar_2025.png" alt="JioHotstar" className="h-6 w-auto" />
+                  <img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/jiohotstar.png" alt="JioHotstar" className="h-6 w-auto" />
                 </a>
               )}
             </div>
