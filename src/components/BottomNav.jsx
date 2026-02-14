@@ -7,83 +7,44 @@ const BottomNav = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  const navItem = (to, label, icon) => (
-    <Link
-      to={to}
-      className={`flex flex-col items-center gap-1 text-[11px] font-medium transition ${isActive(to) ? 'text-sky-300' : 'text-gray-400'}`}
-    >
-      {icon}
-      {label}
-    </Link>
-  );
+  const navItems = [
+    { to: '/', label: 'Home', icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8z" /></svg> },
+    { to: '/movies', label: 'Movies', icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v12H4z" opacity="0.35" /><path d="M4 6l4 3V6m0 3l4-3m-4 3l4 3m-4-3l-4 3m12-3l4-3m-4 3l4 3m-4-3l-4 3" /></svg> },
+    { to: '/search', label: 'Search', icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M11 4a7 7 0 105.2 11.7l3.6 3.6 1.4-1.4-3.6-3.6A7 7 0 0011 4z" /></svg> },
+    { to: '/news', label: 'News', icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" /></svg> },
+    user ? (
+      isAdmin ? 
+        { to: '/admin', label: 'Admin', icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 4v6c0 5-3.5 9.7-8 10-4.5-.3-8-5-8-10V6l8-4z" /></svg> }
+        : { to: '/watchlist', label: 'Watchlist', icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4h10a2 2 0 012 2v16l-7-4-7 4V6a2 2 0 012-2z" /></svg> }
+    ) : { to: '/login', label: 'Profile', icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" /></svg> }
+  ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-      <div className="glass-nav backdrop-blur-2xl border-t border-white/10">
-        <div className="flex items-center justify-around py-3">
-          {navItem(
-            '/',
-            'Home',
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3l9-8z" />
-            </svg>
-          )}
-          {navItem(
-            '/movies',
-            'Movies',
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M4 6h16v12H4z" opacity="0.35" />
-              <path d="M4 6l4 3V6m0 3l4-3m-4 3l4 3m-4-3l-4 3m12-3l4-3m-4 3l4 3m-4-3l-4 3" />
-            </svg>
-          )}
-          {navItem(
-            '/videos',
-            'Videos',
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          )}
-          {navItem(
-            '/news',
-            'News',
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-            </svg>
-          )}
-          {navItem(
-            '/search',
-            'Search',
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M11 4a7 7 0 105.2 11.7l3.6 3.6 1.4-1.4-3.6-3.6A7 7 0 0011 4z" />
-            </svg>
-          )}
-          {user ? (
-            isAdmin ? (
-              navItem(
-                '/admin',
-                'Admin',
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2l8 4v6c0 5-3.5 9.7-8 10-4.5-.3-8-5-8-10V6l8-4z" />
-                </svg>
-              )
-            ) : (
-              navItem(
-                '/watchlist',
-                'Watchlist',
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M7 4h10a2 2 0 012 2v16l-7-4-7 4V6a2 2 0 012-2z" />
-                </svg>
-              )
-            )
-          ) : (
-            navItem(
-              '/login',
-              'Profile',
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" />
-              </svg>
-            )
-          )}
+    <nav className="fixed bottom-4 left-0 right-0 z-50 md:hidden px-[5%]">
+      <div className="mx-auto max-w-md">
+        <div className="flex items-center justify-around gap-2 h-16 px-4 rounded-full backdrop-blur-xl bg-[rgba(7,12,22,0.85)] border border-white/10 shadow-lg">
+          {navItems.map((item) => {
+            const active = isActive(item.to);
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                aria-label={item.label}
+                className={`flex items-center justify-center gap-2 transition-all duration-300 ease-out ${
+                  active
+                    ? 'px-5 py-2 rounded-full bg-white/10 text-[#3ba7ff] shadow-[0_0_20px_rgba(59,167,255,0.4)]'
+                    : 'w-10 h-10 rounded-full text-white/60 hover:text-white hover:scale-105'
+                }`}
+              >
+                <span className={active ? 'scale-100' : 'scale-110'}>{item.icon}</span>
+                {active && (
+                  <span className="text-sm font-medium whitespace-nowrap animate-[fadeIn_0.3s_ease-out]">
+                    {item.label}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>
