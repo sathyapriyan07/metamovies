@@ -13,6 +13,7 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
+  const [trailerDuration, setTrailerDuration] = useState(null);
 
   const formatRuntime = (mins) => {
     if (!mins || mins <= 0) return null;
@@ -28,6 +29,43 @@ const MovieDetail = () => {
     return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
   };
 
+  const getYouTubeVideoId = (url) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/);
+    return match ? match[1] : null;
+  };
+
+  const fetchTrailerDuration = async (url) => {
+    const videoId = getYouTubeVideoId(url);
+    if (!videoId) return null;
+    
+    try {
+      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=contentDetails&key=${import.meta.env.VITE_YOUTUBE_API_KEY}`);
+      const data = await response.json();
+      if (data.items?.[0]?.contentDetails?.duration) {
+        return parseDuration(data.items[0].contentDetails.duration);
+      }
+    } catch (error) {
+      console.error('Error fetching YouTube duration:', error);
+    }
+    return null;
+  };
+
+  const parseDuration = (isoDuration) => {
+    const match = isoDuration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return null;
+    
+    const hours = parseInt(match[1] || 0);
+    const minutes = parseInt(match[2] || 0);
+    const seconds = parseInt(match[3] || 0);
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes.toString().padStart(2, '0')}m`;
+    } else {
+      return `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+    }
+  };
+
   useEffect(() => {
     loadMovie();
   }, [id]);
@@ -39,6 +77,10 @@ const MovieDetail = () => {
     if (user && data) {
       const isIn = await checkInWatchlist(data.id, 'movie');
       setInWatchlist(isIn);
+    }
+    if (data?.trailer_url) {
+      const duration = await fetchTrailerDuration(data.trailer_url);
+      setTrailerDuration(duration);
     }
     setLoading(false);
   };
@@ -167,7 +209,7 @@ const MovieDetail = () => {
             </div>
             <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory px-4 md:px-8 -mx-4 md:-mx-8">
               <div className="flex-shrink-0 snap-start group cursor-pointer">
-                <div className="relative w-[280px] md:w-[320px] aspect-video rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_25px_rgba(59,167,255,0.3)] hover:scale-[1.02]">
+                <div className="relative w-[280px] md:w-[320px] aspect-video rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_25px_rgba(59,167,255,0.3)] hover:scale-[1.03]">
                   <img
                     src={getYouTubeThumbnail(movie.trailer_url) || movie.backdrop_url}
                     alt="Official Trailer"
@@ -177,7 +219,7 @@ const MovieDetail = () => {
                   
                   {/* Play Button */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/30">
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/30 group-hover:shadow-[0_0_15px_rgba(59,167,255,0.4)]">
                       <svg className="w-7 h-7 ml-1 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
@@ -193,14 +235,13 @@ const MovieDetail = () => {
                           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          <span>2:30</span>
+                          {trailerDuration ? (
+                            <span>{trailerDuration}</span>
+                          ) : (
+                            <div className="w-8 h-3 bg-white/20 rounded animate-pulse" />
+                          )}
                         </div>
                       </div>
-                      <button className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-white/20">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                        </svg>
-                      </button>
                     </div>
                   </div>
                   
