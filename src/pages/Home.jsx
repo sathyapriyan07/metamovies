@@ -72,9 +72,10 @@ const Home = () => {
               }}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-250 snap-start ${
                 activeTab === tab.id
-                  ? 'bg-gradient-to-br from-[rgba(59,167,255,0.35)] to-[rgba(59,167,255,0.15)] text-white shadow-[0_0_20px_rgba(59,167,255,0.25)]'
-                  : 'bg-white/[0.06] border border-white/[0.12] text-gray-300 hover:bg-white/[0.12]'
+                  ? 'bg-white/[0.18] border border-white/35 text-white shadow-[0_4px_18px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.4)] backdrop-blur-[22px]'
+                  : 'bg-white/[0.05] border border-white/[0.12] text-slate-300 hover:bg-white/[0.08] backdrop-blur-[10px]'
               }`}
+              style={activeTab === tab.id ? { textShadow: '0 1px 2px rgba(0,0,0,0.6)' } : {}}
             >
               {tab.label}
             </button>
