@@ -50,7 +50,7 @@ const BottomNav = () => {
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 md:hidden px-[5%]">
       <div className="mx-auto max-w-md">
-        <div className="flex items-center justify-around gap-2 h-16 px-3 rounded-[28px] backdrop-blur-[28px] bg-white/[0.12] border border-white/25 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
+        <div className="flex items-center justify-center gap-3 h-16 px-4 rounded-full bg-[rgba(10,15,25,0.85)] backdrop-blur-[20px] shadow-[0_10px_40px_rgba(59,167,255,0.15)]">
           {navItems.map((item) => {
             const active = isActive(item.to);
             return (
@@ -58,13 +58,20 @@ const BottomNav = () => {
                 key={item.to}
                 to={item.to}
                 aria-label={item.label}
-                className={`flex items-center justify-center w-11 h-11 rounded-[14px] backdrop-blur-[18px] border transition-all duration-200 ${
+                className={`flex items-center justify-center rounded-full transition-all duration-300 ease-out ${
                   active
-                    ? 'bg-white/[0.28] border-white/50 shadow-[0_0_24px_rgba(255,255,255,0.35)] scale-[1.06]'
-                    : 'bg-white/[0.10] border-white/28 hover:bg-white/[0.14]'
+                    ? 'w-[120px] h-10 px-4 bg-gradient-to-br from-[rgba(59,167,255,0.25)] to-[rgba(59,167,255,0.08)]'
+                    : 'w-10 h-10 bg-white/[0.06] hover:bg-white/[0.12]'
                 }`}
               >
-                <span className={`${active ? 'text-white' : 'text-white/80'}`}>{item.icon}</span>
+                <span className={`flex-shrink-0 ${active ? 'text-white' : 'text-slate-300'}`}>
+                  {item.icon}
+                </span>
+                {active && (
+                  <span className="ml-2 text-sm font-medium text-white whitespace-nowrap animate-in slide-in-from-left-2 fade-in duration-200">
+                    {item.label}
+                  </span>
+                )}
               </Link>
             );
           })}
