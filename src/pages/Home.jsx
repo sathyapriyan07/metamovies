@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  getTrendingMovies,  getUpcomingMovies,
+  getTrendingMovies, getUpcomingMovies,
   getMovies,
   getCollections,
   getCollectionWithItems
@@ -9,10 +9,12 @@ import CarouselRow from '../components/CarouselRow';
 import HeroBanner from '../components/HeroBanner';
 
 const Home = () => {
-  const [trendingMovies, setTrendingMovies] = useState([]);  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [allMovies, setAllMovies] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('trending');
 
   useEffect(() => {
     loadData();
@@ -45,30 +47,70 @@ const Home = () => {
       })
     );
     setCollections(collectionsWithItems);
-
     setLoading(false);
   };
+
+  const tabs = [
+    { id: 'trending', label: 'Trending' },
+    { id: 'upcoming', label: 'Upcoming' },
+    { id: 'collections', label: 'Collections' }
+  ];
 
   return (
     <div className="min-h-screen pb-24 md:pb-12">
       <HeroBanner />
 
-      <div className="max-w-7xl mx-auto pt-10">
-        <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
-        <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
-        {collections.map((collection) => (
-          <CarouselRow
-            key={collection.id}
-            title={collection.name}
-            items={collection.items}
-            type={collection.items[0]?.type || 'movie'}
-            loading={loading}
-          />
-        ))}
+      <div className="md:hidden px-4 pt-6 pb-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`chip whitespace-nowrap snap-start ${
+                activeTab === tab.id ? 'chip-active' : 'chip-inactive'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto pt-4">
+        <div className="md:hidden">
+          {activeTab === 'trending' && (
+            <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
+          )}
+          {activeTab === 'upcoming' && (
+            <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
+          )}
+          {activeTab === 'collections' && collections.map((collection) => (
+            <CarouselRow
+              key={collection.id}
+              title={collection.name}
+              items={collection.items}
+              type={collection.items[0]?.type || 'movie'}
+              loading={loading}
+            />
+          ))}
+        </div>
+
+        <div className="hidden md:block">
+          <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
+          <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
+          {collections.map((collection) => (
+            <CarouselRow
+              key={collection.id}
+              title={collection.name}
+              items={collection.items}
+              type={collection.items[0]?.type || 'movie'}
+              loading={loading}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
 export default Home;
-

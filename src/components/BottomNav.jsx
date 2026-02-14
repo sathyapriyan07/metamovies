@@ -22,7 +22,7 @@ const BottomNav = () => {
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 md:hidden px-[5%]">
       <div className="mx-auto max-w-md">
-        <div className="flex items-center justify-around gap-2 h-16 px-4 rounded-full backdrop-blur-xl bg-[rgba(7,12,22,0.85)] border border-white/10 shadow-lg">
+        <div className="flex items-center justify-around gap-2 h-16 px-4 rounded-full backdrop-blur-xl bg-[#1C1C1E]/95 border border-[rgba(255,255,255,0.12)] shadow-lg">
           {navItems.map((item) => {
             const active = isActive(item.to);
             return (
@@ -30,15 +30,15 @@ const BottomNav = () => {
                 key={item.to}
                 to={item.to}
                 aria-label={item.label}
-                className={`flex items-center justify-center gap-2 transition-all duration-300 ease-out ${
+                className={`flex items-center justify-center gap-2 transition-all duration-200 ${
                   active
-                    ? 'px-5 py-2 rounded-full bg-white/10 text-[#3ba7ff] shadow-[0_0_20px_rgba(59,167,255,0.4)]'
-                    : 'w-10 h-10 rounded-full text-white/60 hover:text-white hover:scale-105'
+                    ? 'px-5 py-2 rounded-full bg-[#0A84FF] text-white'
+                    : 'w-10 h-10 rounded-full text-[#8E8E93] hover:text-white hover:scale-105'
                 }`}
               >
                 <span className={active ? 'scale-100' : 'scale-110'}>{item.icon}</span>
                 {active && (
-                  <span className="text-sm font-medium whitespace-nowrap animate-[fadeIn_0.3s_ease-out]">
+                  <span className="text-sm font-medium whitespace-nowrap animate-[fadeIn_0.2s_ease-out]">
                     {item.label}
                   </span>
                 )}
