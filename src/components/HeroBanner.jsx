@@ -74,7 +74,7 @@ const HeroBanner = () => {
 
   return (
     <div
-      className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden"
+      className="relative w-full h-[58vh] md:h-[60vh] overflow-hidden"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -85,93 +85,42 @@ const HeroBanner = () => {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,167,255,0.25),transparent_45%)]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-      <div className="relative h-full max-w-[1320px] mx-auto px-4 md:px-8 flex items-end pb-12 md:pb-16">
+      <div className="relative h-full max-w-[1320px] mx-auto px-4 md:px-8 flex flex-col justify-end pb-8 md:pb-16">
         <div className="max-w-3xl animate-fade-in">
-          <h1 className="text-3xl md:text-5xl font-bold mb-3 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-3 tracking-tight">
             {featured.title || featured.name}
           </h1>
 
-          <div className="flex items-center gap-3 mb-4 text-sm text-gray-300 flex-wrap">
+          <div className="flex items-center gap-2 md:gap-3 mb-4 text-xs md:text-sm text-gray-300 flex-wrap">
             {featured.release_date && <span>{featured.release_date.split('-')[0]}</span>}
             {featured.genres && featured.genres.length > 0 && (
               <>
                 <span>•</span>
-                <span>{featured.genres.slice(0, 2).join(', ')}</span>
+                <span>{featured.genres[0]}</span>
               </>
             )}
-            {(typeof featured.rating === 'number' ||
-              typeof featured.imdb_rating === 'number' ||
-              typeof featured.rotten_rating === 'number') && (
+            {typeof featured.rating === 'number' && (
               <>
                 <span>•</span>
-                <span className="inline-flex items-center gap-2 flex-wrap">
-                  {typeof featured.rating === 'number' && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/3840px-Tmdb.new.logo.svg.png"
-                        alt="TMDB"
-                        className="h-4 w-auto"
-                      />
-                      {featured.rating.toFixed(1)}
-                    </span>
-                  )}
-                  {typeof featured.imdb_rating === 'number' && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/960px-IMDB_Logo_2016.svg.png"
-                        alt="IMDb"
-                        className="h-4 w-auto"
-                      />
-                      {featured.imdb_rating.toFixed(1)}
-                    </span>
-                  )}
-                  {typeof featured.rotten_rating === 'number' && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Rotten_Tomatoes.svg/3840px-Rotten_Tomatoes.svg.png"
-                        alt="Rotten Tomatoes"
-                        className="h-4 w-auto"
-                      />
-                      {Math.round(featured.rotten_rating)}%
-                    </span>
-                  )}
+                <span className="inline-flex items-center gap-1">
+                  ⭐ {featured.rating.toFixed(1)}
                 </span>
               </>
             )}
           </div>
 
-          {featured.overview && (
-            <p className="text-gray-300 text-base mb-6 line-clamp-3 leading-relaxed">
-              {featured.overview}
-            </p>
-          )}
-
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 md:gap-3 mt-4">
+            <button onClick={handleViewClick} className="px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold bg-white text-black hover:bg-white/90 transition-all active:scale-95">
+              View Details
+            </button>
             {featured.trailer_url && (
               <button
                 onClick={() => window.open(featured.trailer_url, '_blank', 'noopener,noreferrer')}
-                className="btn-primary"
+                className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-medium border border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 transition-all active:scale-95"
               >
-                Watch Trailer
-              </button>
-            )}
-            <button onClick={handleViewClick} className="btn-ghost">
-              View Details
-            </button>
-            {featured.is_now_showing && featured.booking_url && (
-              <button
-                onClick={() => window.open(featured.booking_url, '_blank', 'noopener,noreferrer')}
-                className="btn-ticket inline-flex items-center gap-2 whitespace-nowrap"
-              >
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/7/75/Bookmyshow-logoid.png"
-                  alt="Ticket"
-                  className="ticket-logo"
-                />
+                Trailer
               </button>
             )}
           </div>
@@ -179,13 +128,13 @@ const HeroBanner = () => {
       </div>
 
       {banners.length > 1 && (
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        <div className="absolute bottom-3 md:bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {banners.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`h-1.5 rounded-full transition-all ${
-                index === currentIndex ? 'bg-sky-300 w-10' : 'bg-white/40 w-4'
+              className={`h-1 md:h-1.5 rounded-full transition-all ${
+                index === currentIndex ? 'bg-white w-8 md:w-10' : 'bg-white/40 w-4'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
