@@ -157,11 +157,11 @@ const MovieDetail = () => {
               )}
             </div>
 
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex items-center gap-3 md:gap-4 flex-wrap">
               {movie.is_now_showing && movie.booking_url && (
                 <button
                   onClick={() => window.open(movie.booking_url, '_blank')}
-                  className="px-6 py-3 rounded-full font-semibold bg-white text-black transition-all duration-200 hover:scale-[1.02]"
+                  className="h-12 md:h-[52px] px-6 md:px-8 rounded-2xl font-semibold text-white bg-white/[0.18] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.28] hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)] focus-visible:outline-2 focus-visible:outline-white/60" style={{ letterSpacing: '0.3px' }}
                 >
                   Book Tickets
                 </button>
@@ -169,26 +169,26 @@ const MovieDetail = () => {
               {movie.trailer_url && (
                 <button
                   onClick={() => window.open(movie.trailer_url, '_blank')}
-                  className="px-6 py-3 md:px-8 md:py-4 rounded-2xl font-semibold text-white bg-white/[0.18] backdrop-blur-xl border border-white/35 shadow-[0_8px_32px_rgba(255,255,255,0.15)] transition-all duration-250 ease-out hover:bg-white/[0.24] hover:scale-[1.02] active:bg-white/[0.12] focus-visible:outline-2 focus-visible:outline-white/60" style={{ letterSpacing: '0.3px' }}
+                  className="h-12 md:h-[52px] px-6 md:px-8 rounded-2xl font-semibold text-white bg-white/[0.18] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.28] hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)] focus-visible:outline-2 focus-visible:outline-white/60" style={{ letterSpacing: '0.3px' }}
                 >
                   Watch Trailer
                 </button>
               )}
               <button
                 onClick={toggleWatchlist}
-                className={`w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center backdrop-blur-xl border transition-all duration-250 ease-out hover:scale-105 focus-visible:outline-2 focus-visible:outline-white/60 focus-visible:outline-offset-2 shadow-[0_8px_28px_rgba(0,0,0,0.35)] ${inWatchlist ? 'bg-white/[0.28] border-white/45 shadow-[inset_0_0_10px_rgba(255,255,255,0.25)]' : 'bg-white/[0.14] border-white/28 hover:bg-white/[0.22] hover:border-white/45 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)]'}`}
+                className={`w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center backdrop-blur-[22px] border transition-all duration-250 ease-out hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-white/60 ${inWatchlist ? 'bg-white/[0.28] border-white/45 shadow-[0_0_24px_rgba(255,255,255,0.25)]' : 'bg-white/[0.14] border-white/28 hover:bg-white/[0.22] hover:border-white/45 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)]'}`}
                 aria-label={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
               >
-                <svg className={`w-5 h-5 ${inWatchlist ? 'text-white' : 'text-white/90'}`} fill={inWatchlist ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-5 h-5 md:w-[22px] md:h-[22px] ${inWatchlist ? 'text-white' : 'text-white/92'}`} fill={inWatchlist ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
               </button>
               <button
                 onClick={() => navigator.share?.({ title: movie.title, url: window.location.href })}
-                className="w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center bg-white/[0.14] backdrop-blur-xl border border-white/28 shadow-[0_8px_28px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.22] hover:border-white/45 hover:scale-105 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] focus-visible:outline-2 focus-visible:outline-white/60 focus-visible:outline-offset-2"
+                className="w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center bg-white/[0.14] backdrop-blur-[22px] border border-white/28 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.22] hover:border-white/45 hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] focus-visible:outline-2 focus-visible:outline-white/60"
                 aria-label="Share movie"
               >
-                <svg className="w-5 h-5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-[22px] md:h-[22px] text-white/92" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                 </svg>
               </button>
