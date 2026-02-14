@@ -61,7 +61,19 @@ const HeroBanner = () => {
 
       <div className="relative h-full max-w-[1320px] mx-auto px-4 md:px-8 flex items-end pb-12 md:pb-16">
         <div className="max-w-3xl animate-fade-in">
-          <h1 className="text-3xl md:text-5xl font-bold mb-3">
+          {/* Title Logo or Text */}
+          {featured.title_logo_url && !featured.use_text_title ? (
+            <img
+              src={featured.title_logo_url}
+              alt={featured.title || featured.name}
+              className="hero-logo mb-2"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+          ) : null}
+          <h1 className={`text-3xl md:text-5xl font-bold mb-3 ${featured.title_logo_url && !featured.use_text_title ? 'hidden' : ''}`} style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             {featured.title || featured.name}
           </h1>
 

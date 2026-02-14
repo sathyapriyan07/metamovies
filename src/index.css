@@ -183,6 +183,19 @@
     max-width: 140px;
     object-fit: contain;
   }
+
+  .hero-logo {
+    max-height: 72px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.6));
+  }
+
+  @media (max-width: 768px) {
+    .hero-logo {
+      max-height: 52px;
+    }
+  }
 }
 
 ::-webkit-scrollbar {
