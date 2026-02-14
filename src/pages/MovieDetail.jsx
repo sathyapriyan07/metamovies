@@ -79,11 +79,11 @@ const MovieDetail = () => {
           <div className="w-full max-w-4xl">
             {/* Title Logo or Text */}
             {movie.title_logo_url && !movie.use_text_title ? (
-              <div className="mb-3">
+              <div className="mb-3 md:mb-4">
                 <img
                   src={movie.title_logo_url}
                   alt={`${movie.title} logo`}
-                  className="max-h-16 md:max-h-24 lg:max-h-32 object-contain mx-auto drop-shadow-[0_0_20px_rgba(59,167,255,0.35)] mb-3 md:mb-4"
+                  className="max-h-16 md:max-h-20 lg:max-h-28 object-contain self-start drop-shadow-[0_0_20px_rgba(59,167,255,0.35)]"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextElementSibling.style.display = 'block';
@@ -94,7 +94,7 @@ const MovieDetail = () => {
                 </h1>
               </div>
             ) : (
-              <h1 className="text-3xl md:text-5xl font-bold mb-3 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              <h1 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 {movie.title || 'Untitled'}
               </h1>
             )}
