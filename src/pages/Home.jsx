@@ -15,6 +15,7 @@ const Home = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('trending');
+  const [activeCollection, setActiveCollection] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -53,7 +54,7 @@ const Home = () => {
   const tabs = [
     { id: 'trending', label: 'Trending' },
     { id: 'upcoming', label: 'Upcoming' },
-    { id: 'collections', label: 'Collections' }
+    ...collections.slice(0, 6).map(col => ({ id: `collection-${col.id}`, label: col.name, collection: col }))
   ];
 
   return (
@@ -65,9 +66,14 @@ const Home = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`chip whitespace-nowrap snap-start ${
-                activeTab === tab.id ? 'chip-active' : 'chip-inactive'
+              onClick={() => {
+                setActiveTab(tab.id);
+                setActiveCollection(tab.collection || null);
+              }}
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-250 snap-start ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-br from-[rgba(59,167,255,0.35)] to-[rgba(59,167,255,0.15)] text-white shadow-[0_0_20px_rgba(59,167,255,0.25)]'
+                  : 'bg-white/[0.06] border border-white/[0.12] text-gray-300 hover:bg-white/[0.12]'
               }`}
             >
               {tab.label}
@@ -84,15 +90,14 @@ const Home = () => {
           {activeTab === 'upcoming' && (
             <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
           )}
-          {activeTab === 'collections' && collections.map((collection) => (
+          {activeCollection && (
             <CarouselRow
-              key={collection.id}
-              title={collection.name}
-              items={collection.items}
-              type={collection.items[0]?.type || 'movie'}
+              title={activeCollection.name}
+              items={activeCollection.items}
+              type={activeCollection.items[0]?.type || 'movie'}
               loading={loading}
             />
-          ))}
+          )}
         </div>
 
         <div className="hidden md:block">
