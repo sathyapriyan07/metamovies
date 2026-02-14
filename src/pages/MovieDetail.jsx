@@ -77,9 +77,27 @@ const MovieDetail = () => {
         
         <div className="relative h-full flex items-end pb-6 px-5 md:px-8">
           <div className="w-full max-w-4xl">
-            <h1 className="text-3xl md:text-5xl font-bold mb-3 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              {movie.title}
-            </h1>
+            {/* Title Logo or Text */}
+            {movie.title_logo_url && !movie.use_text_title ? (
+              <div className="mb-3">
+                <img
+                  src={movie.title_logo_url}
+                  alt={`${movie.title} logo`}
+                  className="max-h-16 md:max-h-24 lg:max-h-32 object-contain mx-auto drop-shadow-[0_0_20px_rgba(59,167,255,0.35)] mb-3 md:mb-4"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                  }}
+                />
+                <h1 className="text-3xl md:text-5xl font-bold leading-tight hidden" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                  {movie.title || 'Untitled'}
+                </h1>
+              </div>
+            ) : (
+              <h1 className="text-3xl md:text-5xl font-bold mb-3 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                {movie.title || 'Untitled'}
+              </h1>
+            )}
             
             <div className="flex items-center gap-2 text-xs md:text-sm text-gray-300 flex-wrap mb-4">
               {movie.release_date && <span>{movie.release_date.split('-')[0]}</span>}

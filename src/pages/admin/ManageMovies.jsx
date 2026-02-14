@@ -30,6 +30,12 @@ const ManageMovies = () => {
   const [bookingError, setBookingError] = useState('');
   const [savingBooking, setSavingBooking] = useState(false);
   
+  const [editingTitleLogo, setEditingTitleLogo] = useState(null);
+  const [titleLogoUrl, setTitleLogoUrl] = useState('');
+  const [useTextTitle, setUseTextTitle] = useState(false);
+  const [titleLogoError, setTitleLogoError] = useState('');
+  const [savingTitleLogo, setSavingTitleLogo] = useState(false);
+  
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [deleting, setDeleting] = useState(false);
   
@@ -200,6 +206,44 @@ const ManageMovies = () => {
     setBookingError('');
   };
 
+  const handleEditTitleLogo = (movie) => {
+    setEditingTitleLogo(movie);
+    setTitleLogoUrl(movie.title_logo_url || '');
+    setUseTextTitle(!!movie.use_text_title);
+    setTitleLogoError('');
+  };
+
+  const handleSaveTitleLogo = async () => {
+    if (!editingTitleLogo) return;
+    
+    setTitleLogoError('');
+    
+    if (titleLogoUrl && !validateUrl(titleLogoUrl)) {
+      setTitleLogoError('Logo URL must start with https://');
+      return;
+    }
+
+    try {
+      setSavingTitleLogo(true);
+      const { error } = await updateMovie(editingTitleLogo.id, {
+        title_logo_url: titleLogoUrl || null,
+        use_text_title: useTextTitle
+      });
+      if (error) throw error;
+
+      showToast('Title logo updated successfully', 'success');
+      setEditingTitleLogo(null);
+      setTitleLogoUrl('');
+      setUseTextTitle(false);
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating title logo:', error);
+      setTitleLogoError(error.message || 'Failed to update title logo');
+    } finally {
+      setSavingTitleLogo(false);
+    }
+  };
+
   const handleSaveBooking = async () => {
     if (!editingBooking) return;
     
@@ -280,6 +324,12 @@ const ManageMovies = () => {
 
                 <div className="px-4 pb-4 grid grid-cols-3 md:flex md:flex-wrap gap-2">
                   <button
+                    onClick={() => handleEditTitleLogo(movie)}
+                    className="px-3 py-2 bg-indigo-600/70 hover:bg-indigo-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                  >
+                    Title Logo
+                  </button>
+                  <button
                     onClick={() => handleEditBackdrop(movie)}
                     className="px-3 py-2 bg-blue-600/70 hover:bg-blue-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
@@ -312,6 +362,78 @@ const ManageMovies = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Edit Title Logo Modal */}
+        {editingTitleLogo && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-2xl w-full">
+              <h2 className="text-2xl font-bold mb-4">Edit Title Logo - {editingTitleLogo.title}</h2>
+              
+              {titleLogoUrl && (
+                <div className="mb-4 p-4 glass-card rounded-lg">
+                  <p className="text-xs text-gray-400 mb-2">Preview:</p>
+                  <img
+                    src={titleLogoUrl}
+                    alt="Logo Preview"
+                    className="max-h-24 object-contain mx-auto drop-shadow-[0_0_20px_rgba(59,167,255,0.35)]"
+                    onError={(e) => e.target.src = 'https://via.placeholder.com/300x100?text=Invalid+Logo'}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Title Logo URL</label>
+                  <input
+                    type="text"
+                    placeholder="https://image.tmdb.org/t/p/original/logo.png"
+                    value={titleLogoUrl}
+                    onChange={(e) => {
+                      setTitleLogoUrl(e.target.value);
+                      setTitleLogoError('');
+                    }}
+                    className="w-full px-4 py-3 glass-input"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Recommended: PNG/SVG with transparent background, landscape orientation</p>
+                </div>
+
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input
+                    type="checkbox"
+                    checked={useTextTitle}
+                    onChange={(e) => setUseTextTitle(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  Force use text title instead of logo
+                </label>
+              </div>
+
+              {titleLogoError && <p className="text-red-400 text-sm mt-2">{titleLogoError}</p>}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSaveTitleLogo}
+                  disabled={savingTitleLogo}
+                  className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingTitleLogo ? 'Saving...' : 'Save Logo'}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingTitleLogo(null);
+                    setTitleLogoUrl('');
+                    setUseTextTitle(false);
+                    setTitleLogoError('');
+                  }}
+                  disabled={savingTitleLogo}
+                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
