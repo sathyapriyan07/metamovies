@@ -55,6 +55,29 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   }
 
+  .glass-icon {
+    @apply backdrop-blur-md rounded-xl transition-all duration-200;
+    background: linear-gradient(135deg, rgba(59, 167, 255, 0.15), rgba(138, 99, 255, 0.1));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(59, 167, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .glass-icon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(59, 167, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    background: linear-gradient(135deg, rgba(59, 167, 255, 0.25), rgba(138, 99, 255, 0.15));
+  }
+
+  .glass-icon:active {
+    transform: scale(0.98);
+  }
+
+  .glass-icon-active {
+    background: linear-gradient(135deg, rgba(59, 167, 255, 0.35), rgba(138, 99, 255, 0.25));
+    box-shadow: 0 8px 24px rgba(59, 167, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(59, 167, 255, 0.5);
+  }
+
   .btn-primary {
     @apply px-6 py-3 rounded-full font-medium transition-all duration-200;
     background: var(--accent-blue);
