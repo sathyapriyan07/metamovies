@@ -50,7 +50,7 @@ const BottomNav = () => {
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 md:hidden px-[5%]">
       <div className="mx-auto max-w-md">
-        <div className="flex items-center justify-around gap-2 h-16 px-3 rounded-[24px] backdrop-blur-xl bg-[rgba(28,28,30,0.85)] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+        <div className="flex items-center justify-around gap-2 h-16 px-3 rounded-[28px] backdrop-blur-[28px] bg-white/[0.12] border border-white/25 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
           {navItems.map((item) => {
             const active = isActive(item.to);
             return (
@@ -58,13 +58,13 @@ const BottomNav = () => {
                 key={item.to}
                 to={item.to}
                 aria-label={item.label}
-                className={`flex items-center justify-center transition-all duration-200 ${
+                className={`flex items-center justify-center w-11 h-11 rounded-[14px] backdrop-blur-[18px] border transition-all duration-200 ${
                   active
-                    ? 'glass-icon glass-icon-active w-12 h-12'
-                    : 'glass-icon w-11 h-11 opacity-85'
+                    ? 'bg-white/[0.28] border-white/50 shadow-[0_0_24px_rgba(255,255,255,0.35)] scale-[1.06]'
+                    : 'bg-white/[0.10] border-white/28 hover:bg-white/[0.14]'
                 }`}
               >
-                <span className="text-white">{item.icon}</span>
+                <span className={`${active ? 'text-white' : 'text-white/80'}`}>{item.icon}</span>
               </Link>
             );
           })}

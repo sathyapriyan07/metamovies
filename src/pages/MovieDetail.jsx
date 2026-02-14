@@ -384,15 +384,15 @@ const MovieDetail = () => {
         {movie.watch_links && (movie.watch_links.netflix || movie.watch_links.prime || movie.watch_links.hotstar) && (
           <section>
             <h3 className="text-lg font-semibold mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Watch Now</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-wrap gap-3">
               {movie.watch_links.netflix && (
                 <a
                   href={movie.watch_links.netflix}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center px-4 py-3 rounded-2xl bg-[#E50914] hover:bg-[#f6121d] transition-all duration-200"
+                  className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
                 >
-                  <img src="https://www.edigitalagency.com.au/wp-content/uploads/netflix-logo-black-png-900x244.png" alt="Netflix" className="h-5 w-auto" />
+                  <img src="https://www.edigitalagency.com.au/wp-content/uploads/netflix-logo-black-png-900x244.png" alt="Netflix" className="h-5 w-auto" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))' }} />
                 </a>
               )}
               {movie.watch_links.prime && (
@@ -400,7 +400,7 @@ const MovieDetail = () => {
                   href={movie.watch_links.prime}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center px-4 py-3 rounded-2xl bg-[#1B4DB1] hover:bg-[#225dd6] transition-all duration-200"
+                  className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
                 >
                   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_Prime_Video_logo.svg/960px-Amazon_Prime_Video_logo.svg.png" alt="Prime" className="h-5 w-auto" />
                 </a>
@@ -410,7 +410,7 @@ const MovieDetail = () => {
                   href={movie.watch_links.hotstar}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center px-4 py-3 rounded-2xl bg-[#0B5FFF] hover:bg-[#1b6dff] transition-all duration-200"
+                  className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
                 >
                   <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/JioHotstar_2025.png" alt="JioHotstar" className="h-6 w-auto" />
                 </a>
