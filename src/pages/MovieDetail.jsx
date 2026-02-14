@@ -79,32 +79,65 @@ const MovieDetail = () => {
       <DetailHero backdrop={movie.backdrop_url} poster={movie.poster_url} title={movie.title} />
 
       {/* Title Section */}
-      <div className="-mt-12 md:-mt-16 relative z-10 text-center px-4">
-        <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">
-          {movie.title}
+      <div className="mt-16 md:mt-24 text-center px-4">
+        <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Movie</p>
+        <h1 className="text-3xl md:text-5xl font-semibold text-white mt-3">
+          {movie.title}{' '}
+          <span className="text-gray-400">
+            {movie.release_date && `(${movie.release_date.split('-')[0]})`}
+          </span>
         </h1>
-        <p className="text-gray-400 text-sm md:text-base mb-4">
-          {movie.release_date && movie.release_date.split('-')[0]}
-          {movie.genres && movie.genres.length > 0 && ` • ${movie.genres[0]}`}
-          {movie.runtime > 0 && ` • ${formatRuntime(movie.runtime)}`}
-        </p>
 
-        <div className="flex flex-wrap gap-2 md:gap-3 justify-center mb-6">
-          <button onClick={toggleWatchlist} className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-medium border border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 transition-all active:scale-95">
-            {inWatchlist ? '✓ Watchlist' : '+ Watchlist'}
+        <div className="flex items-center justify-center gap-3 text-sm md:text-base mb-6 flex-wrap text-gray-300 mt-4">
+          {movie.genres && movie.genres.length > 0 && (
+            <div className="flex gap-2 flex-wrap justify-center">
+              {movie.genres.slice(0, 3).map((genre, i) => (
+                <button key={i} onClick={() => navigate(`/movies?genre=${genre}`)} className="chip">
+                  {genre}
+                </button>
+              ))}
+            </div>
+          )}
+          {movie.runtime > 0 && (
+            <>
+              <span className="meta-separator">•</span>
+              <span className="text-sm md:text-base font-medium text-gray-300/90">{formatRuntime(movie.runtime)}</span>
+            </>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-3 justify-center mb-8">
+          <button onClick={toggleWatchlist} className="btn-ghost">
+            {inWatchlist ? 'In Watchlist' : '+ Add to Watchlist'}
           </button>
           {movie.trailer_url && (
-            <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold bg-white text-black hover:bg-white/90 transition-all active:scale-95">
-              ▶ Trailer
+            <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="btn-primary">
+              Watch Trailer
             </a>
           )}
           {movie.is_now_showing && movie.booking_url && (
             <button
               onClick={() => window.open(movie.booking_url, '_blank', 'noopener,noreferrer')}
-              className="px-5 md:px-6 py-2.5 md:py-3 rounded-full font-medium border border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 transition-all active:scale-95"
+              className="btn-ticket inline-flex items-center gap-2 whitespace-nowrap"
             >
-              Book Tickets
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/7/75/Bookmyshow-logoid.png"
+                alt="Ticket"
+                className="ticket-logo"
+                loading="lazy"
+                decoding="async"
+              />
             </button>
+          )}
+          {isAdmin && (
+            <>
+              <button onClick={() => { setEditingPoster(true); setPosterUrl(movie.poster_url || ''); }} className="btn-ghost">
+                Edit Poster
+              </button>
+              <button onClick={() => { setEditingBackdrop(true); setBackdropUrl(movie.backdrop_url || ''); }} className="btn-ghost">
+                Edit Backdrop
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -134,15 +167,15 @@ const MovieDetail = () => {
           {/* Main Content (8 cols) */}
           <div className="lg:col-span-8 space-y-8 overflow-hidden">
             {activeTab === 'overview' && movie.overview && (
-              <section className="glass-card p-5 md:p-6">
-                <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4">Plot</h2>
-                <p className={`text-gray-300 leading-relaxed text-sm md:text-base ${!showFullOverview ? 'line-clamp-4' : ''}`}>
+              <section className="glass-card p-6">
+                <h2 className="text-2xl font-semibold mb-4">Overview</h2>
+                <p className={`text-gray-300 leading-relaxed ${!showFullOverview ? 'md:line-clamp-3 line-clamp-4' : ''}`}>
                   {movie.overview}
                 </p>
                 {movie.overview.length > 200 && (
                   <button 
                     onClick={() => setShowFullOverview(!showFullOverview)}
-                    className="text-sky-400 hover:text-sky-300 text-sm mt-3 transition active:scale-95"
+                    className="text-sky-400 hover:text-sky-300 text-sm mt-3 transition"
                   >
                     {showFullOverview ? 'Show Less' : 'Read More'}
                   </button>
@@ -152,12 +185,10 @@ const MovieDetail = () => {
 
             {activeTab === 'cast' && (
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Cast</h2>
-                <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                <h2 className="text-2xl font-semibold mb-6">Cast</h2>
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
                   {movie.cast?.map((c) => (
-                    <div key={c.id} className="snap-start">
-                      <CastCard person={c.person} role={c.character} personId={c.person.id} />
-                    </div>
+                    <CastCard key={c.id} person={c.person} role={c.character} personId={c.person.id} />
                   ))}
                 </div>
                 {(!movie.cast || movie.cast.length === 0) && (
@@ -168,12 +199,10 @@ const MovieDetail = () => {
 
             {activeTab === 'crew' && (
               <section>
-                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">Crew</h2>
-                <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                <h2 className="text-2xl font-semibold mb-6">Crew</h2>
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollSnapType: 'x mandatory' }}>
                   {movie.crew?.map((c) => (
-                    <div key={c.id} className="snap-start">
-                      <CastCard person={c.person} role={c.job} personId={c.person.id} />
-                    </div>
+                    <CastCard key={c.id} person={c.person} role={c.job} personId={c.person.id} />
                   ))}
                 </div>
                 {(!movie.crew || movie.crew.length === 0) && (

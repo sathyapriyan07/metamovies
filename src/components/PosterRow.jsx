@@ -27,9 +27,9 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle }) 
         </div>
       </div>
       <div className="px-4 md:px-8 mt-4">
-        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
           {items.map((item) => (
-            <div key={item.id} className="flex-shrink-0 w-[135px] md:w-[185px] snap-start">
+            <div key={item.id} className="flex-shrink-0 w-[125px] md:w-[185px]">
               <PosterCard item={item} type={type} />
             </div>
           ))}
