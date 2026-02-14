@@ -255,11 +255,15 @@ const MovieDetail = () => {
           <section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Cast & Crew</h2>
-              <div className="glass-icon w-8 h-8 flex items-center justify-center">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button
+                onClick={() => navigate(`/movie/${movie.id}/cast-crew`)}
+                className="w-8 h-8 rounded-xl bg-white/[0.18] backdrop-blur-[18px] border border-white/35 flex items-center justify-center transition-all duration-250 hover:bg-white/[0.28] hover:border-white/50 hover:shadow-[0_0_24px_rgba(255,255,255,0.3)] focus-visible:outline-2 focus-visible:outline-white/60"
+                aria-label="View full cast and crew"
+              >
+                <svg className="w-4 h-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </div>
+              </button>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
               {movie.cast.slice(0, 15).map((c) => (

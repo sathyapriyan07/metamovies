@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Movies from './pages/Movies';
 import MovieDetail from './pages/MovieDetail';
+import CastCrew from './pages/CastCrew';
 import PersonDetail from './pages/PersonDetail';
 import Videos from './pages/Videos';
 import VideoDetail from './pages/VideoDetail';
@@ -48,6 +49,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/movies" element={<Movies />} />
               <Route path="/movie/:id" element={<MovieDetail />} />
+              <Route path="/movie/:id/cast-crew" element={<CastCrew />} />
               <Route path="/person/:id" element={<PersonDetail />} />
               <Route path="/videos" element={<Videos />} />
               <Route path="/videos/:id" element={<VideoDetail />} />
