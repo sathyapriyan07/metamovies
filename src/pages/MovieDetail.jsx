@@ -165,28 +165,54 @@ const MovieDetail = () => {
                 </svg>
               </div>
             </div>
-            <div className="overflow-x-auto scrollbar-hide">
-              <a
-                href={movie.trailer_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block relative group w-full md:w-[480px] aspect-video rounded-2xl overflow-hidden"
-              >
-                <img
-                  src={getYouTubeThumbnail(movie.trailer_url) || movie.backdrop_url}
-                  alt="Trailer"
-                  className="w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.03]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="glass-icon glass-icon-active w-16 h-16 flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-                    <svg className="w-7 h-7 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+            <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory px-4 md:px-8 -mx-4 md:-mx-8">
+              <div className="flex-shrink-0 snap-start group cursor-pointer">
+                <div className="relative w-[280px] md:w-[320px] aspect-video rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_25px_rgba(59,167,255,0.3)] hover:scale-[1.02]">
+                  <img
+                    src={getYouTubeThumbnail(movie.trailer_url) || movie.backdrop_url}
+                    alt="Official Trailer"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  
+                  {/* Play Button */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/30">
+                      <svg className="w-7 h-7 ml-1 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
                   </div>
+                  
+                  {/* Bottom Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <div className="flex items-end justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-sm md:text-base font-semibold text-white mb-1">Official Trailer</h3>
+                        <div className="flex items-center gap-2 text-xs md:text-sm text-gray-300">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                          <span>2:30</span>
+                        </div>
+                      </div>
+                      <button className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-white/20">
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Click Handler */}
+                  <a
+                    href={movie.trailer_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 z-10"
+                  />
                 </div>
-                <div className="absolute bottom-3 left-3 text-sm font-medium">Official Trailer</div>
-              </a>
+              </div>
             </div>
           </section>
         )}
