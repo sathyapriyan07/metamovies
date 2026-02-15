@@ -16,6 +16,12 @@ const ManageMovies = () => {
   const [backdropUrl, setBackdropUrl] = useState('');
   const [backdropError, setBackdropError] = useState('');
   const [savingBackdrop, setSavingBackdrop] = useState(false);
+
+  const [editingPoster, setEditingPoster] = useState(null);
+  const [posterUrl, setPosterUrl] = useState('');
+  const [posterError, setPosterError] = useState('');
+  const [posterPreviewError, setPosterPreviewError] = useState('');
+  const [savingPoster, setSavingPoster] = useState(false);
   
   const [editingRatings, setEditingRatings] = useState(null);
   const [imdbRating, setImdbRating] = useState('');
@@ -106,6 +112,21 @@ const ManageMovies = () => {
     }
   };
 
+  const validatePosterUrl = (url) => {
+    if (!url) return { valid: true, message: '' };
+    if (!validateUrl(url)) return { valid: false, message: 'Poster URL must start with https://' };
+    if (url.length > 2048) return { valid: false, message: 'Poster URL is too long (max 2048 characters)' };
+
+    const cleanUrl = url.split('?')[0].toLowerCase();
+    const allowedExt = ['.jpg', '.jpeg', '.png', '.webp'];
+    const hasAllowedExt = allowedExt.some((ext) => cleanUrl.endsWith(ext));
+    if (!hasAllowedExt) {
+      return { valid: false, message: 'Poster URL must end with .jpg, .jpeg, .png, or .webp' };
+    }
+
+    return { valid: true, message: '' };
+  };
+
   const validateEmbedUrl = (url) => {
     if (!url) return true;
     try {
@@ -153,6 +174,13 @@ const ManageMovies = () => {
     setEditingMovie(movie);
     setBackdropUrl(movie.backdrop_url || '');
     setBackdropError('');
+  };
+
+  const handleEditPoster = (movie) => {
+    setEditingPoster(movie);
+    setPosterUrl(movie.poster_url || '');
+    setPosterError('');
+    setPosterPreviewError('');
   };
 
   const handleSaveBackdrop = async () => {
@@ -233,6 +261,46 @@ const ManageMovies = () => {
     setBookingUrl(movie.booking_url || '');
     setBookingLabel(movie.booking_label || '');
     setBookingError('');
+  };
+
+  const handleSavePoster = async () => {
+    if (!editingPoster) return;
+
+    setPosterError('');
+    const trimmedPosterUrl = posterUrl.trim();
+    const validation = validatePosterUrl(trimmedPosterUrl);
+    if (!validation.valid) {
+      setPosterError(validation.message);
+      return;
+    }
+
+    if (!trimmedPosterUrl && editingPoster.poster_url) {
+      const confirmClear = window.confirm('This will remove the current poster image. Continue?');
+      if (!confirmClear) return;
+    }
+
+    if ((editingPoster.poster_url || '') === trimmedPosterUrl) {
+      setEditingPoster(null);
+      setPosterUrl('');
+      return;
+    }
+
+    try {
+      setSavingPoster(true);
+      const { error } = await updateMovie(editingPoster.id, { poster_url: trimmedPosterUrl || null });
+      if (error) throw error;
+
+      showToast('Poster updated successfully', 'success');
+      setEditingPoster(null);
+      setPosterUrl('');
+      setPosterPreviewError('');
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating poster:', error);
+      setPosterError(error.message || 'Failed to update poster');
+    } finally {
+      setSavingPoster(false);
+    }
   };
 
   const handleEditPlayer = (movie) => {
@@ -432,6 +500,12 @@ const ManageMovies = () => {
 
                 <div className="px-4 pb-4 grid grid-cols-3 md:flex md:flex-wrap gap-2">
                   <button
+                    onClick={() => handleEditPoster(movie)}
+                    className="px-3 py-2 bg-sky-600/70 hover:bg-sky-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                  >
+                    Poster
+                  </button>
+                  <button
                     onClick={() => handleEditTitleLogo(movie)}
                     className="px-3 py-2 bg-indigo-600/70 hover:bg-indigo-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
@@ -482,6 +556,72 @@ const ManageMovies = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Edit Title Logo Modal */}
+        {editingPoster && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-2xl w-full">
+              <h2 className="text-2xl font-bold mb-4">Edit Poster - {editingPoster.title}</h2>
+
+              <div className="mb-4 p-4 glass-card rounded-lg">
+                <p className="text-xs text-gray-400 mb-2">Preview (2:3):</p>
+                <div className="w-[120px] aspect-[2/3] rounded-lg overflow-hidden bg-white/10 border border-white/10">
+                  <img
+                    src={posterUrl || 'https://via.placeholder.com/300x450?text=No+Poster'}
+                    alt="Poster Preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/300x450?text=Invalid+Poster';
+                      setPosterPreviewError('Unable to load image from this URL.');
+                    }}
+                    onLoad={() => setPosterPreviewError('')}
+                  />
+                </div>
+                {posterPreviewError && <p className="text-amber-300 text-xs mt-2">{posterPreviewError}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Poster URL</label>
+                <input
+                  type="text"
+                  placeholder="https://image.tmdb.org/t/p/w500/poster.jpg"
+                  value={posterUrl}
+                  onChange={(e) => {
+                    setPosterUrl(e.target.value);
+                    setPosterError('');
+                    setPosterPreviewError('');
+                  }}
+                  className="w-full px-4 py-3 glass-input"
+                />
+                <p className="text-xs text-gray-400 mt-1">Allowed: .jpg, .jpeg, .png, .webp (max 2048 chars)</p>
+              </div>
+
+              {posterError && <p className="text-red-400 text-sm mt-2">{posterError}</p>}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSavePoster}
+                  disabled={savingPoster}
+                  className="flex-1 px-6 py-3 bg-sky-600 hover:bg-sky-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingPoster ? 'Saving...' : 'Save Poster'}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingPoster(null);
+                    setPosterUrl('');
+                    setPosterError('');
+                    setPosterPreviewError('');
+                  }}
+                  disabled={savingPoster}
+                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
