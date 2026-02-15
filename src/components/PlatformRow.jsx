@@ -17,12 +17,9 @@ const PlatformRow = ({
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [tabOffset, setTabOffset] = useState(0);
-  const [tabWidth, setTabWidth] = useState(0);
   const trackRef = useRef(null);
   const debounceRef = useRef(null);
   const cacheRef = useRef({});
-  const tabRefs = useRef({});
 
   useEffect(() => {
     if (!tabs.length) {
@@ -88,29 +85,14 @@ const PlatformRow = ({
     };
   }, [activePlatformId, type, limit]);
 
-  useEffect(() => {
-    const activeEl = tabRefs.current[String(activePlatformId)];
-    if (!activeEl) return;
-    setTabOffset(activeEl.offsetLeft);
-    setTabWidth(activeEl.offsetWidth);
-  }, [activePlatformId, tabs]);
-
   if (!activePlatformId) return null;
 
   return (
     <section className="mb-12 fade-in px-4 md:px-8">
-      <div className="rounded-2xl bg-white/15 backdrop-blur-lg border border-white/30 shadow-xl p-4 md:p-5">
+      <div className="rounded-2xl bg-white/12 backdrop-blur-xl border border-white/25 shadow-2xl p-4 md:p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="w-[3px] h-7 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.65)]" />
-            <h2 className="text-lg md:text-2xl font-semibold text-white">
-              {rowTitle}
-              {activePlatformName ? (
-                <span className="ml-2 text-red-400">
-                  {activePlatformName}
-                </span>
-              ) : null}
-            </h2>
+            <h2 className="text-lg md:text-2xl font-semibold text-white">{rowTitle}</h2>
           </div>
 
           {tabs.length > 0 && (
@@ -121,38 +103,31 @@ const PlatformRow = ({
                   return (
                     <button
                       key={tab.id}
-                      ref={(el) => {
-                        if (el) tabRefs.current[String(tab.id)] = el;
-                      }}
                       type="button"
                       onClick={() => {
                         setActivePlatformId(tab.id);
                         setActivePlatformName(tab.name);
                         localStorage.setItem('home_active_platform_id', String(tab.id));
                       }}
-                      className={`snap-start flex items-center gap-2 rounded-xl px-3 py-2 whitespace-nowrap transition-all duration-250 ${
+                      className={`snap-start flex items-center justify-center w-11 h-11 rounded-full border backdrop-blur-md transition-all duration-300 ${
                         isActive
-                          ? 'text-slate-900 bg-white/70 shadow-[0_4px_12px_rgba(255,255,255,0.25)]'
-                          : 'text-slate-100 hover:text-white hover:bg-white/15'
+                          ? 'bg-white/15 border-white/35 scale-[1.05] shadow-[0_0_18px_rgba(255,255,255,0.32)]'
+                          : 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_12px_rgba(255,255,255,0.18)]'
                       }`}
+                      aria-label={tab.name}
                     >
                       {tab.logo_url && (
                         <img
                           src={tab.logo_url}
                           alt={tab.name}
                           loading="lazy"
-                          className={`w-4 h-4 object-contain transition-all duration-250 ${isActive ? 'grayscale-0' : 'grayscale opacity-80'}`}
+                          className={`w-5 h-5 object-contain transition-all duration-300 ${isActive ? 'grayscale-0 opacity-100' : 'grayscale opacity-80'}`}
                         />
                       )}
-                      <span className="text-sm">{tab.name}</span>
                     </button>
                   );
                 })}
               </div>
-              <span
-                className="absolute bottom-0 h-[2px] bg-red-500 rounded-full shadow-[0_0_10px_rgba(239,68,68,0.75)] transition-all duration-250"
-                style={{ left: tabOffset, width: tabWidth }}
-              />
             </div>
           )}
         </div>
@@ -189,7 +164,7 @@ const PlatformRow = ({
             type="button"
             aria-label="Scroll right"
             onClick={() => trackRef.current?.scrollBy({ left: 420, behavior: 'smooth' })}
-            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-white/20 backdrop-blur-[14px] border border-white/30 hover:bg-white/30 transition-all duration-250"
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-white/10 backdrop-blur-md border border-white/25 hover:bg-white/15 transition-all duration-300"
           >
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
