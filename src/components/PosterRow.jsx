@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import PosterCard from './PosterCard';
 import { SkeletonRow } from './SkeletonLoader';
 
-const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle }) => {
+const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, padded = true }) => {
   const trackRef = useRef(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
+  const edgePaddingClass = padded ? 'px-4 md:px-8' : '';
 
   const updateFades = useCallback(() => {
     const el = trackRef.current;
@@ -37,14 +38,14 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle }) 
   }, [items, loading, updateFades]);
 
   if (loading) return (
-    <div className="mb-12">
-      <div className="px-4 md:px-8 flex items-end justify-between">
+    <div className="mb-8">
+      <div className={`${edgePaddingClass} flex items-end justify-between`}>
         <div>
           <h2 className="section-title">{title}</h2>
           {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
         </div>
       </div>
-      <div className="px-4 md:px-8 mt-4">
+      <div className={`${edgePaddingClass} mt-4`}>
         <SkeletonRow />
       </div>
     </div>
@@ -53,14 +54,14 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle }) 
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="mb-12 fade-in">
-      <div className="px-4 md:px-8 flex items-end justify-between">
+    <div className="mb-8 fade-in">
+      <div className={`${edgePaddingClass} flex items-end justify-between`}>
         <div>
           <h2 className="section-title">{title}</h2>
           {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
         </div>
       </div>
-      <div className="px-4 md:px-8 mt-4">
+      <div className={`${edgePaddingClass} mt-4`}>
         <div className="relative">
           <div ref={trackRef} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {items.map((item) => (

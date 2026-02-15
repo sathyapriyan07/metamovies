@@ -112,7 +112,7 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
   if (platforms.length === 0 && !loading) return null;
 
   return (
-    <section className="mb-12 fade-in px-4 md:px-8">
+    <section className="mb-8 fade-in">
       <div className="w-full rounded-2xl bg-white/12 backdrop-blur-xl border border-white/25 shadow-xl p-4 md:p-5">
         <div className="mb-4">
           <h2 className="text-lg md:text-2xl font-semibold text-white">

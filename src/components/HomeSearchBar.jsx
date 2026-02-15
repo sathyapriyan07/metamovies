@@ -6,7 +6,7 @@ const HomeSearchBar = () => {
   return (
     <div 
       onClick={() => navigate('/search')}
-      className="max-w-2xl mx-auto bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-all duration-200 focus-within:ring-1 focus-within:ring-red-600"
+      className="w-full bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-all duration-200 focus-within:ring-1 focus-within:ring-white/25"
       role="button"
       tabIndex={0}
       aria-label="Search Movies and People"

@@ -8,6 +8,7 @@ import CarouselRow from '../components/CarouselRow';
 import PlatformStreamingSection from '../components/PlatformStreamingSection';
 import HeroBanner from '../components/HeroBanner';
 import TopHeader from '../components/TopHeader';
+import HomeSearchBar from '../components/HomeSearchBar';
 
 const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -45,12 +46,18 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen pb-24 md:pb-12">
+    <div className="min-h-screen pb-[88px] md:pb-12">
       <TopHeader />
       <HeroBanner />
 
-      <div className="max-w-7xl mx-auto pt-4">
-        <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
+      <main className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pt-4">
+        <div className="mt-4">
+          <HomeSearchBar />
+        </div>
+
+        <div className="mt-6">
+          <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} padded={false} />
+        </div>
 
         <PlatformStreamingSection limit={12} />
 
@@ -61,9 +68,10 @@ const Home = () => {
             items={collection.items}
             type={collection.items[0]?.type || 'movie'}
             loading={loading}
+            padded={false}
           />
         ))}
-      </div>
+      </main>
     </div>
   );
 };
