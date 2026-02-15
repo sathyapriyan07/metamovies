@@ -1,21 +1,19 @@
 import { useEffect, useState } from 'react';
 import {
-  getTrendingMovies, getUpcomingMovies,
-  getMovies,
+  getTrendingMovies,
+  getPlatforms,
   getCollections,
   getCollectionWithItems
 } from '../services/supabase';
 import CarouselRow from '../components/CarouselRow';
+import PlatformRow from '../components/PlatformRow';
 import HeroBanner from '../components/HeroBanner';
 
 const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
-  const [upcomingMovies, setUpcomingMovies] = useState([]);
-  const [allMovies, setAllMovies] = useState([]);
+  const [platforms, setPlatforms] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('trending');
-  const [activeCollection, setActiveCollection] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -23,16 +21,14 @@ const Home = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [trending, upcoming, movies, cols] = await Promise.all([
+    const [trending, cols, platformsRes] = await Promise.all([
       getTrendingMovies(),
-      getUpcomingMovies(),
-      getMovies(40, 0),
-      getCollections()
+      getCollections(),
+      getPlatforms({ activeOnly: true })
     ]);
 
     setTrendingMovies(trending.data || []);
-    setUpcomingMovies(upcoming.data || []);
-    setAllMovies(movies.data || []);
+    setPlatforms(platformsRes.data || []);
 
     const collectionsWithItems = await Promise.all(
       (cols.data || []).map(async (col) => {
@@ -51,69 +47,61 @@ const Home = () => {
     setLoading(false);
   };
 
-  const tabs = [
-    { id: 'trending', label: 'Trending' },
-    { id: 'upcoming', label: 'Upcoming' },
-    ...collections.slice(0, 6).map(col => ({ id: `collection-${col.id}`, label: col.name, collection: col }))
-  ];
+  const preferredTabs = ['Netflix', 'Prime', 'Max', 'Disney+', 'Apple TV', 'Paramount'];
+  const platformTabs = preferredTabs
+    .map((name) => platforms.find((p) => p.name?.toLowerCase().includes(name.toLowerCase())))
+    .filter(Boolean);
+  const findPlatform = (keyword) => platforms.find((p) => p.name?.toLowerCase().includes(keyword.toLowerCase()));
+  const disneyPlatform = findPlatform('disney');
+  const netflixPlatform = findPlatform('netflix');
+  const primePlatform = findPlatform('prime');
 
   return (
     <div className="min-h-screen pb-24 md:pb-12">
       <HeroBanner />
 
-      <div className="md:hidden px-4 pt-6 pb-4">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                setActiveCollection(tab.collection || null);
-              }}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-250 snap-start ${
-                activeTab === tab.id
-                  ? 'bg-white/[0.18] border border-white/35 text-white shadow-[0_4px_18px_rgba(255,255,255,0.15),inset_0_1px_0_rgba(255,255,255,0.4)] backdrop-blur-[22px]'
-                  : 'bg-white/[0.05] border border-white/[0.12] text-slate-300 hover:bg-white/[0.08] backdrop-blur-[10px]'
-              }`}
-              style={activeTab === tab.id ? { textShadow: '0 1px 2px rgba(0,0,0,0.6)' } : {}}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto pt-4">
-        <div className="md:hidden">
-          {activeTab === 'trending' && (
-            <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
-          )}
-          {activeTab === 'upcoming' && (
-            <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
-          )}
-          {activeCollection && (
-            <CarouselRow
-              title={activeCollection.name}
-              items={activeCollection.items}
-              type={activeCollection.items[0]?.type || 'movie'}
-              loading={loading}
-            />
-          )}
-        </div>
+        <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
 
-        <div className="hidden md:block">
-          <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
-          <CarouselRow title="Upcoming" items={upcomingMovies} type="movie" loading={loading} />
-          {collections.map((collection) => (
-            <CarouselRow
-              key={collection.id}
-              title={collection.name}
-              items={collection.items}
-              type={collection.items[0]?.type || 'movie'}
-              loading={loading}
-            />
-          ))}
-        </div>
+        {disneyPlatform && (
+          <PlatformRow
+            platformId={disneyPlatform.id}
+            platformName={disneyPlatform.name}
+            type="series"
+            limit={12}
+            tabs={platformTabs}
+          />
+        )}
+
+        {netflixPlatform && (
+          <PlatformRow
+            platformId={netflixPlatform.id}
+            platformName={netflixPlatform.name}
+            type="movie"
+            limit={12}
+            tabs={platformTabs}
+          />
+        )}
+
+        {primePlatform && (
+          <PlatformRow
+            platformId={primePlatform.id}
+            platformName={primePlatform.name}
+            type="both"
+            limit={12}
+            tabs={platformTabs}
+          />
+        )}
+
+        {collections.map((collection) => (
+          <CarouselRow
+            key={collection.id}
+            title={collection.name}
+            items={collection.items}
+            type={collection.items[0]?.type || 'movie'}
+            loading={loading}
+          />
+        ))}
       </div>
     </div>
   );
