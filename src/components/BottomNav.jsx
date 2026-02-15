@@ -21,8 +21,8 @@ const BottomNav = () => {
       icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v12H4z" opacity="0.35" /><path d="M4 6l4 3V6m0 3l4-3m-4 3l4 3m-4-3l-4 3m12-3l4-3m-4 3l4 3m-4-3l-4 3" /></svg> 
     },
     {
-      to: '/studios',
-      label: 'Studios',
+      to: '/platforms',
+      label: 'Platforms',
       startsWith: true,
       icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 20h16v-2H4v2zm1-3h4V7H5v10zm5 0h4V4h-4v13zm5 0h4V10h-4v7z" /></svg>
     },

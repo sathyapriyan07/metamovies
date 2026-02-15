@@ -7,8 +7,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
 import Movies from './pages/Movies';
-import Studios from './pages/Studios';
-import StudioDetail from './pages/StudioDetail';
+import Platforms from './pages/Platforms';
+import PlatformDetail from './pages/PlatformDetail';
 import MovieDetail from './pages/MovieDetail';
 import CastCrew from './pages/CastCrew';
 import PersonDetail from './pages/PersonDetail';
@@ -40,7 +40,7 @@ import ManageCrew from './pages/admin/ManageCrew';
 import ManageHeroBanner from './pages/admin/ManageHeroBanner';
 import ManageUsers from './pages/admin/ManageUsers';
 import ManageAvatars from './pages/admin/ManageAvatars';
-import ManageStudios from './pages/admin/ManageStudios';
+import ManagePlatforms from './pages/admin/ManagePlatforms';
 
 function AppRoutes() {
   const location = useLocation();
@@ -52,8 +52,8 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
-        <Route path="/studios" element={<Studios />} />
-        <Route path="/studios/:id" element={<StudioDetail />} />
+        <Route path="/platforms" element={<Platforms />} />
+        <Route path="/platforms/:id" element={<PlatformDetail />} />
         <Route path="/movie/:id" element={<MovieDetail />} />
         <Route path="/watch/:id" element={<Watch />} />
         <Route path="/movie/:id/cast-crew" element={<CastCrew />} />
@@ -238,10 +238,10 @@ function AppRoutes() {
         />
 
         <Route
-          path="/admin/manage-studios"
+          path="/admin/manage-platforms"
           element={(
             <ProtectedRoute adminOnly>
-              <ManageStudios />
+              <ManagePlatforms />
             </ProtectedRoute>
           )}
         />

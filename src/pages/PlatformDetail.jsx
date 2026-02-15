@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import PosterCard from '../components/PosterCard';
 import { SkeletonGrid } from '../components/SkeletonLoader';
-import { getMoviesByStudio, getStudioById } from '../services/supabase';
+import { getMoviesByPlatform, getPlatformById } from '../services/supabase';
 
 const PAGE_SIZE = 20;
 
-const StudioDetail = () => {
+const PlatformDetail = () => {
   const { id } = useParams();
-  const [studio, setStudio] = useState(null);
+  const [platform, setPlatform] = useState(null);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -18,12 +18,12 @@ const StudioDetail = () => {
   useEffect(() => {
     const loadInitial = async () => {
       setLoading(true);
-      const [{ data: studioData }, { data: movieData }] = await Promise.all([
-        getStudioById(id),
-        getMoviesByStudio(id, PAGE_SIZE, 0)
+      const [{ data: platformData }, { data: movieData }] = await Promise.all([
+        getPlatformById(id),
+        getMoviesByPlatform(id, PAGE_SIZE, 0)
       ]);
 
-      setStudio(studioData || null);
+      setPlatform(platformData || null);
       setMovies(movieData || []);
       setHasMore((movieData || []).length === PAGE_SIZE);
       setPage(0);
@@ -36,7 +36,7 @@ const StudioDetail = () => {
   const loadMore = async () => {
     const nextPage = page + 1;
     setLoadingMore(true);
-    const { data } = await getMoviesByStudio(id, PAGE_SIZE, nextPage * PAGE_SIZE);
+    const { data } = await getMoviesByPlatform(id, PAGE_SIZE, nextPage * PAGE_SIZE);
     const nextMovies = data || [];
     setMovies((prev) => [...prev, ...nextMovies]);
     setHasMore(nextMovies.length === PAGE_SIZE);
@@ -54,10 +54,10 @@ const StudioDetail = () => {
     );
   }
 
-  if (!studio) {
+  if (!platform) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-300">
-        Studio not found
+        Platform not found
       </div>
     );
   }
@@ -66,19 +66,19 @@ const StudioDetail = () => {
     <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12">
       <div className="max-w-[1320px] mx-auto px-4 md:px-8">
         <div className="glass-card rounded-3xl p-6 md:p-8 mb-8 flex items-center gap-4 md:gap-6">
-          {studio.logo_url ? (
+          {platform.logo_url ? (
             <img
-              src={studio.logo_url}
-              alt={studio.name}
+              src={platform.logo_url}
+              alt={platform.name}
               loading="lazy"
               className="h-12 md:h-16 w-auto object-contain"
             />
           ) : (
-            <div className="h-12 md:h-16 flex items-center text-xl font-semibold">{studio.name}</div>
+            <div className="h-12 md:h-16 flex items-center text-xl font-semibold">{platform.name}</div>
           )}
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">{studio.name}</h1>
-            <p className="text-sm text-gray-400 capitalize">{studio.type}</p>
+            <h1 className="text-2xl md:text-3xl font-bold">{platform.name}</h1>
+            <p className="text-sm text-gray-400 capitalize">{platform.type}</p>
           </div>
         </div>
 
@@ -105,4 +105,4 @@ const StudioDetail = () => {
   );
 };
 
-export default StudioDetail;
+export default PlatformDetail;

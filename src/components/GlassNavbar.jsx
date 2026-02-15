@@ -33,8 +33,8 @@ const GlassNavbar = () => {
             <Link to="/movies" className={`transition-colors ${isActive('/movies') ? 'text-white' : 'hover:text-white'}`}>
               Movies
             </Link>
-            <Link to="/studios" className={`transition-colors ${location.pathname.startsWith('/studios') ? 'text-white' : 'hover:text-white'}`}>
-              Studios
+            <Link to="/platforms" className={`transition-colors ${location.pathname.startsWith('/platforms') ? 'text-white' : 'hover:text-white'}`}>
+              Platforms
             </Link>
             <Link to="/videos" className={`transition-colors ${isActive('/videos') ? 'text-white' : 'hover:text-white'}`}>
               Videos

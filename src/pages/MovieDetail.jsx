@@ -106,8 +106,8 @@ const MovieDetail = () => {
 
   if (!movie) return <div className="min-h-screen flex items-center justify-center">Movie not found</div>;
 
-  const studios = (movie.movie_studios || [])
-    .map((entry) => entry.studio)
+  const platforms = (movie.movie_platforms || [])
+    .map((entry) => entry.platform)
     .filter(Boolean);
 
   return (
@@ -312,28 +312,28 @@ const MovieDetail = () => {
           </section>
         )}
 
-        {studios.length > 0 && (
+        {platforms.length > 0 && (
           <section>
             <h2 className="text-xl md:text-2xl font-semibold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              Studios
+              Platforms
             </h2>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {studios.map((studio) => (
+              {platforms.map((platform) => (
                 <button
                   type="button"
-                  key={studio.id}
-                  onClick={() => navigate(`/studios/${studio.id}`)}
+                  key={platform.id}
+                  onClick={() => navigate(`/platforms/${platform.id}`)}
                   className="flex-shrink-0 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-[18px] p-3 min-w-[120px] h-16 flex items-center justify-center hover:bg-white/15 hover:scale-[1.03] transition-all duration-250"
                 >
-                  {studio.logo_url ? (
+                  {platform.logo_url ? (
                     <img
-                      src={studio.logo_url}
-                      alt={studio.name}
+                      src={platform.logo_url}
+                      alt={platform.name}
                       loading="lazy"
                       className="max-h-8 w-auto object-contain"
                     />
                   ) : (
-                    <span className="text-xs font-medium">{studio.name}</span>
+                    <span className="text-xs font-medium">{platform.name}</span>
                   )}
                 </button>
               ))}

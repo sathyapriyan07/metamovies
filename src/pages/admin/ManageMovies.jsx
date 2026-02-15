@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getMovies, deleteMovie, getStudios, getStudiosByMovie, setMovieStudios, updateMovie } from '../../services/supabase';
+import { getMovies, deleteMovie, getPlatforms, getPlatformsByMovie, setMoviePlatforms, updateMovie } from '../../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 import Toast from '../../components/Toast';
@@ -36,12 +36,12 @@ const ManageMovies = () => {
   const [playerError, setPlayerError] = useState('');
   const [savingPlayer, setSavingPlayer] = useState(false);
 
-  const [allStudios, setAllStudios] = useState([]);
-  const [editingStudiosMovie, setEditingStudiosMovie] = useState(null);
-  const [selectedStudios, setSelectedStudios] = useState([]);
-  const [studioSearch, setStudioSearch] = useState('');
-  const [studioError, setStudioError] = useState('');
-  const [savingStudios, setSavingStudios] = useState(false);
+  const [allPlatforms, setAllPlatforms] = useState([]);
+  const [editingPlatformsMovie, setEditingPlatformsMovie] = useState(null);
+  const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+  const [platformSearch, setPlatformSearch] = useState('');
+  const [platformError, setPlatformError] = useState('');
+  const [savingPlatforms, setSavingPlatforms] = useState(false);
   
   const [editingTitleLogo, setEditingTitleLogo] = useState(null);
   const [titleLogoUrl, setTitleLogoUrl] = useState('');
@@ -56,12 +56,12 @@ const ManageMovies = () => {
 
   useEffect(() => {
     loadMovies();
-    loadStudios();
+    loadPlatforms();
   }, []);
 
-  const loadStudios = async () => {
-    const { data } = await getStudios({ activeOnly: false });
-    setAllStudios(data || []);
+  const loadPlatforms = async () => {
+    const { data } = await getPlatforms({ activeOnly: false });
+    setAllPlatforms(data || []);
   };
 
   const loadMovies = async () => {
@@ -242,17 +242,17 @@ const ManageMovies = () => {
     setPlayerError('');
   };
 
-  const handleEditStudios = async (movie) => {
-    setEditingStudiosMovie(movie);
-    setStudioSearch('');
-    setStudioError('');
-    const { data, error } = await getStudiosByMovie(movie.id);
+  const handleEditPlatforms = async (movie) => {
+    setEditingPlatformsMovie(movie);
+    setPlatformSearch('');
+    setPlatformError('');
+    const { data, error } = await getPlatformsByMovie(movie.id);
     if (error) {
-      setStudioError('Failed to load linked studios');
-      setSelectedStudios([]);
+      setPlatformError('Failed to load linked platforms');
+      setSelectedPlatforms([]);
       return;
     }
-    setSelectedStudios((data || []).map((row) => row.studio_id).filter(Boolean));
+    setSelectedPlatforms((data || []).map((row) => row.platform_id).filter(Boolean));
   };
 
   const handleEditTitleLogo = (movie) => {
@@ -359,33 +359,33 @@ const ManageMovies = () => {
     }
   };
 
-  const toggleStudio = (studioId) => {
-    setSelectedStudios((prev) => (
-      prev.includes(studioId) ? prev.filter((id) => id !== studioId) : [...prev, studioId]
+  const togglePlatform = (platformId) => {
+    setSelectedPlatforms((prev) => (
+      prev.includes(platformId) ? prev.filter((id) => id !== platformId) : [...prev, platformId]
     ));
   };
 
-  const handleSaveStudios = async () => {
-    if (!editingStudiosMovie) return;
-    setStudioError('');
+  const handleSavePlatforms = async () => {
+    if (!editingPlatformsMovie) return;
+    setPlatformError('');
     try {
-      setSavingStudios(true);
-      const { error } = await setMovieStudios(editingStudiosMovie.id, selectedStudios);
+      setSavingPlatforms(true);
+      const { error } = await setMoviePlatforms(editingPlatformsMovie.id, selectedPlatforms);
       if (error) throw error;
-      showToast('Studios updated successfully', 'success');
-      setEditingStudiosMovie(null);
-      setSelectedStudios([]);
-      setStudioSearch('');
+      showToast('Platforms updated successfully', 'success');
+      setEditingPlatformsMovie(null);
+      setSelectedPlatforms([]);
+      setPlatformSearch('');
     } catch (error) {
-      console.error('Error updating movie studios:', error);
-      setStudioError(error.message || 'Failed to update studios');
+      console.error('Error updating movie platforms:', error);
+      setPlatformError(error.message || 'Failed to update platforms');
     } finally {
-      setSavingStudios(false);
+      setSavingPlatforms(false);
     }
   };
 
-  const filteredStudios = allStudios.filter((studio) =>
-    studio.name.toLowerCase().includes(studioSearch.toLowerCase())
+  const filteredPlatforms = allPlatforms.filter((platform) =>
+    platform.name.toLowerCase().includes(platformSearch.toLowerCase())
   );
 
   return (
@@ -456,10 +456,10 @@ const ManageMovies = () => {
                     Booking
                   </button>
                   <button
-                    onClick={() => handleEditStudios(movie)}
+                    onClick={() => handleEditPlatforms(movie)}
                     className="px-3 py-2 bg-amber-600/70 hover:bg-amber-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
-                    Studios
+                    Platforms
                   </button>
                   <button
                     onClick={() => handleEditPlayer(movie)}
@@ -808,49 +808,49 @@ const ManageMovies = () => {
           </div>
         )}
 
-        {/* Edit Studios Modal */}
-        {editingStudiosMovie && (
+        {/* Edit Platforms Modal */}
+        {editingPlatformsMovie && (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div className="glass-dark p-6 rounded-xl max-w-2xl w-full">
-              <h2 className="text-2xl font-bold mb-4">Edit Studios - {editingStudiosMovie.title}</h2>
+              <h2 className="text-2xl font-bold mb-4">Edit Platforms - {editingPlatformsMovie.title}</h2>
               <input
                 type="text"
-                value={studioSearch}
-                onChange={(e) => setStudioSearch(e.target.value)}
-                placeholder="Search studios..."
+                value={platformSearch}
+                onChange={(e) => setPlatformSearch(e.target.value)}
+                placeholder="Search platforms..."
                 className="w-full px-4 py-3 glass-input mb-3"
               />
               <div className="max-h-72 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.03] p-2 space-y-1">
-                {filteredStudios.map((studio) => (
-                  <label key={studio.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">
+                {filteredPlatforms.map((platform) => (
+                  <label key={platform.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={selectedStudios.includes(studio.id)}
-                      onChange={() => toggleStudio(studio.id)}
+                      checked={selectedPlatforms.includes(platform.id)}
+                      onChange={() => togglePlatform(platform.id)}
                       className="w-4 h-4"
                     />
-                    <span className="text-sm flex-1">{studio.name}</span>
-                    <span className="text-[11px] uppercase text-gray-400">{studio.type}</span>
+                    <span className="text-sm flex-1">{platform.name}</span>
+                    <span className="text-[11px] uppercase text-gray-400">{platform.type}</span>
                   </label>
                 ))}
               </div>
-              {studioError && <p className="text-red-400 text-sm mt-2">{studioError}</p>}
+              {platformError && <p className="text-red-400 text-sm mt-2">{platformError}</p>}
               <div className="flex gap-3 mt-6">
                 <button
-                  onClick={handleSaveStudios}
-                  disabled={savingStudios}
+                  onClick={handleSavePlatforms}
+                  disabled={savingPlatforms}
                   className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {savingStudios ? 'Saving...' : 'Save Studios'}
+                  {savingPlatforms ? 'Saving...' : 'Save Platforms'}
                 </button>
                 <button
                   onClick={() => {
-                    setEditingStudiosMovie(null);
-                    setSelectedStudios([]);
-                    setStudioSearch('');
-                    setStudioError('');
+                    setEditingPlatformsMovie(null);
+                    setSelectedPlatforms([]);
+                    setPlatformSearch('');
+                    setPlatformError('');
                   }}
-                  disabled={savingStudios}
+                  disabled={savingPlatforms}
                   className="flex-1 btn-ghost disabled:opacity-50"
                 >
                   Cancel

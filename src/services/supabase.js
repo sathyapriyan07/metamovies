@@ -4,7 +4,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const studioMovieCache = new Map();
+const platformMovieCache = new Map();
 
 // Auth functions
 export const signUp = async (email, password, username, avatarUrl = '') => {
@@ -76,7 +76,7 @@ export const getMovieById = async (id) => {
       cast:"cast"(*, person:persons(*)),
       crew:crew(*, person:persons(*)),
       external_links(*),
-      movie_studios(*, studio:studios(*))
+      movie_platforms(*, platform:platforms(*))
     `)
     .eq('id', id)
     .single();
@@ -392,9 +392,9 @@ export const deleteMovie = async (id) => {
   return { error };
 };
 
-export const getStudios = async ({ activeOnly = true } = {}) => {
+export const getPlatforms = async ({ activeOnly = true } = {}) => {
   let query = supabase
-    .from('studios')
+    .from('platforms')
     .select('*')
     .order('name', { ascending: true });
   if (activeOnly) query = query.eq('is_active', true);
@@ -402,65 +402,65 @@ export const getStudios = async ({ activeOnly = true } = {}) => {
   return { data, error };
 };
 
-export const getStudioById = async (id) => {
+export const getPlatformById = async (id) => {
   const { data, error } = await supabase
-    .from('studios')
+    .from('platforms')
     .select('*')
     .eq('id', id)
     .single();
   return { data, error };
 };
 
-export const getStudiosByMovie = async (movieId) => {
+export const getPlatformsByMovie = async (movieId) => {
   const { data, error } = await supabase
-    .from('movie_studios')
-    .select('studio_id, studio:studios(*)')
+    .from('movie_platforms')
+    .select('platform_id, platform:platforms(*)')
     .eq('movie_id', movieId)
-    .order('studio_id', { ascending: true });
+    .order('platform_id', { ascending: true });
   return { data, error };
 };
 
-export const getMoviesByStudio = async (studioId, limit = 20, offset = 0) => {
-  const cacheKey = `${studioId}:${limit}:${offset}`;
-  if (studioMovieCache.has(cacheKey)) return { data: studioMovieCache.get(cacheKey), error: null };
+export const getMoviesByPlatform = async (platformId, limit = 20, offset = 0) => {
+  const cacheKey = `${platformId}:${limit}:${offset}`;
+  if (platformMovieCache.has(cacheKey)) return { data: platformMovieCache.get(cacheKey), error: null };
 
   const { data, error } = await supabase
-    .from('movie_studios')
+    .from('movie_platforms')
     .select('movie:movies(*)')
-    .eq('studio_id', studioId)
+    .eq('platform_id', platformId)
     .order('id', { ascending: false })
     .range(offset, offset + limit - 1);
 
   const movies = (data || []).map((item) => item.movie).filter(Boolean);
-  if (!error) studioMovieCache.set(cacheKey, movies);
+  if (!error) platformMovieCache.set(cacheKey, movies);
   return { data: movies, error };
 };
 
-export const createStudio = async (studioData) => {
-  const { data, error } = await supabase.from('studios').insert(studioData).select().single();
+export const createPlatform = async (platformData) => {
+  const { data, error } = await supabase.from('platforms').insert(platformData).select().single();
   return { data, error };
 };
 
-export const updateStudio = async (id, studioData) => {
-  const { data, error } = await supabase.from('studios').update(studioData).eq('id', id).select().single();
+export const updatePlatform = async (id, platformData) => {
+  const { data, error } = await supabase.from('platforms').update(platformData).eq('id', id).select().single();
   return { data, error };
 };
 
-export const deleteStudio = async (id) => {
-  const { error } = await supabase.from('studios').delete().eq('id', id);
+export const deletePlatform = async (id) => {
+  const { error } = await supabase.from('platforms').delete().eq('id', id);
   return { error };
 };
 
-export const setMovieStudios = async (movieId, studioIds = []) => {
-  const { error: deleteError } = await supabase.from('movie_studios').delete().eq('movie_id', movieId);
+export const setMoviePlatforms = async (movieId, platformIds = []) => {
+  const { error: deleteError } = await supabase.from('movie_platforms').delete().eq('movie_id', movieId);
   if (deleteError) return { error: deleteError };
 
-  const cleanedIds = [...new Set((studioIds || []).map((s) => Number(s)).filter(Boolean))];
+  const cleanedIds = [...new Set((platformIds || []).map((s) => Number(s)).filter(Boolean))];
   if (cleanedIds.length === 0) return { data: [], error: null };
 
-  const rows = cleanedIds.map((studioId) => ({ movie_id: movieId, studio_id: studioId }));
-  const { data, error } = await supabase.from('movie_studios').insert(rows).select();
-  studioMovieCache.clear();
+  const rows = cleanedIds.map((platformId) => ({ movie_id: movieId, platform_id: platformId }));
+  const { data, error } = await supabase.from('movie_platforms').insert(rows).select();
+  platformMovieCache.clear();
   return { data, error };
 };
 
