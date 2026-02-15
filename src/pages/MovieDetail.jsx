@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieById } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
-import VideoPlayer from '../components/VideoPlayer';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -251,16 +250,15 @@ const MovieDetail = () => {
           </section>
         )}
 
-        {movie.tmdb_id && (
+        {movie.player_enabled && (movie.tmdb_id || movie.player_url_override) && (
           <section>
-            <h2 className="text-xl md:text-2xl font-semibold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              Watch Movie
-            </h2>
-            <VideoPlayer
-              tmdbId={movie.tmdb_id}
-              enabled={!!movie.player_enabled}
-              overrideUrl={movie.player_url_override || ''}
-            />
+            <button
+              type="button"
+              onClick={() => navigate(`/watch/${movie.id}`)}
+              className="w-full md:w-auto min-h-12 px-7 py-3 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#1d4ed8]/80 via-[#2563eb]/80 to-[#0ea5e9]/80 border border-white/20 shadow-[0_12px_32px_rgba(0,0,0,0.4)] backdrop-blur-[20px] hover:scale-[1.01] hover:brightness-110 transition-all duration-250"
+            >
+              Watch {movie.title}
+            </button>
           </section>
         )}
 
