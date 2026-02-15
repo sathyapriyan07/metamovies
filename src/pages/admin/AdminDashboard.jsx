@@ -115,6 +115,10 @@ const AdminDashboard = () => {
               <h3 className="text-lg font-semibold mb-2">Manage Crew</h3>
               <p className="text-gray-400 text-sm">Add directors and composers</p>
             </Link>
+            <Link to="/admin/manage-studios" className="glass-card p-5 rounded-2xl hover:bg-white/5 hover:scale-[1.02] transition">
+              <h3 className="text-lg font-semibold mb-2">Manage Studios</h3>
+              <p className="text-gray-400 text-sm">Manage studio and platform catalogs</p>
+            </Link>
             <Link to="/admin/manage-hero-banner" className="glass-card p-5 rounded-2xl hover:bg-white/5 hover:scale-[1.02] transition">
               <h3 className="text-lg font-semibold mb-2">Hero Banner</h3>
               <p className="text-gray-400 text-sm">Control homepage hero section</p>

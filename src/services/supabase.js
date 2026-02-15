@@ -4,6 +4,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const studioMovieCache = new Map();
 
 // Auth functions
 export const signUp = async (email, password, username, avatarUrl = '') => {
@@ -74,7 +75,8 @@ export const getMovieById = async (id) => {
       *,
       cast:"cast"(*, person:persons(*)),
       crew:crew(*, person:persons(*)),
-      external_links(*)
+      external_links(*),
+      movie_studios(*, studio:studios(*))
     `)
     .eq('id', id)
     .single();
@@ -388,6 +390,78 @@ export const updateMovie = async (id, movieData) => {
 export const deleteMovie = async (id) => {
   const { error } = await supabase.from('movies').delete().eq('id', id);
   return { error };
+};
+
+export const getStudios = async ({ activeOnly = true } = {}) => {
+  let query = supabase
+    .from('studios')
+    .select('*')
+    .order('name', { ascending: true });
+  if (activeOnly) query = query.eq('is_active', true);
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const getStudioById = async (id) => {
+  const { data, error } = await supabase
+    .from('studios')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
+export const getStudiosByMovie = async (movieId) => {
+  const { data, error } = await supabase
+    .from('movie_studios')
+    .select('studio_id, studio:studios(*)')
+    .eq('movie_id', movieId)
+    .order('studio_id', { ascending: true });
+  return { data, error };
+};
+
+export const getMoviesByStudio = async (studioId, limit = 20, offset = 0) => {
+  const cacheKey = `${studioId}:${limit}:${offset}`;
+  if (studioMovieCache.has(cacheKey)) return { data: studioMovieCache.get(cacheKey), error: null };
+
+  const { data, error } = await supabase
+    .from('movie_studios')
+    .select('movie:movies(*)')
+    .eq('studio_id', studioId)
+    .order('id', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  const movies = (data || []).map((item) => item.movie).filter(Boolean);
+  if (!error) studioMovieCache.set(cacheKey, movies);
+  return { data: movies, error };
+};
+
+export const createStudio = async (studioData) => {
+  const { data, error } = await supabase.from('studios').insert(studioData).select().single();
+  return { data, error };
+};
+
+export const updateStudio = async (id, studioData) => {
+  const { data, error } = await supabase.from('studios').update(studioData).eq('id', id).select().single();
+  return { data, error };
+};
+
+export const deleteStudio = async (id) => {
+  const { error } = await supabase.from('studios').delete().eq('id', id);
+  return { error };
+};
+
+export const setMovieStudios = async (movieId, studioIds = []) => {
+  const { error: deleteError } = await supabase.from('movie_studios').delete().eq('movie_id', movieId);
+  if (deleteError) return { error: deleteError };
+
+  const cleanedIds = [...new Set((studioIds || []).map((s) => Number(s)).filter(Boolean))];
+  if (cleanedIds.length === 0) return { data: [], error: null };
+
+  const rows = cleanedIds.map((studioId) => ({ movie_id: movieId, studio_id: studioId }));
+  const { data, error } = await supabase.from('movie_studios').insert(rows).select();
+  studioMovieCache.clear();
+  return { data, error };
 };
 
 export const createMusic = async (musicData) => {

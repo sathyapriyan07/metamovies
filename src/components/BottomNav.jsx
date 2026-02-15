@@ -5,7 +5,9 @@ const BottomNav = () => {
   const location = useLocation();
   const { user, isAdmin } = useAuth();
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path, startsWith = false) => (
+    startsWith ? location.pathname.startsWith(path) : location.pathname === path
+  );
 
   const navItems = [
     { 
@@ -17,6 +19,12 @@ const BottomNav = () => {
       to: '/movies', 
       label: 'Movies', 
       icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v12H4z" opacity="0.35" /><path d="M4 6l4 3V6m0 3l4-3m-4 3l4 3m-4-3l-4 3m12-3l4-3m-4 3l4 3m-4-3l-4 3" /></svg> 
+    },
+    {
+      to: '/studios',
+      label: 'Studios',
+      startsWith: true,
+      icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 20h16v-2H4v2zm1-3h4V7H5v10zm5 0h4V4h-4v13zm5 0h4V10h-4v7z" /></svg>
     },
     { 
       to: '/search', 
@@ -52,7 +60,7 @@ const BottomNav = () => {
       <div className="mx-auto max-w-md">
         <div className="flex items-center justify-center gap-3 h-16 px-4 rounded-full bg-[rgba(10,15,25,0.85)] backdrop-blur-[20px] shadow-[0_10px_40px_rgba(59,167,255,0.15)]">
           {navItems.map((item) => {
-            const active = isActive(item.to);
+            const active = isActive(item.to, item.startsWith);
             return (
               <Link
                 key={item.to}

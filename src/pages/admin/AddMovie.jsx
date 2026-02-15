@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { createMovie, uploadImage } from '../../services/supabase';
+import { useEffect, useState } from 'react';
+import { createMovie, getStudios, setMovieStudios, uploadImage } from '../../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 
@@ -23,6 +23,25 @@ const AddMovie = () => {
   });
   const [posterFile, setPosterFile] = useState(null);
   const [backdropFile, setBackdropFile] = useState(null);
+  const [studios, setStudios] = useState([]);
+  const [studioSearch, setStudioSearch] = useState('');
+  const [selectedStudios, setSelectedStudios] = useState([]);
+
+  useEffect(() => {
+    const loadStudios = async () => {
+      const { data } = await getStudios({ activeOnly: true });
+      setStudios(data || []);
+    };
+    loadStudios();
+  }, []);
+
+  const filteredStudios = studios.filter((studio) => studio.name.toLowerCase().includes(studioSearch.toLowerCase()));
+
+  const toggleStudio = (studioId) => {
+    setSelectedStudios((prev) => (
+      prev.includes(studioId) ? prev.filter((id) => id !== studioId) : [...prev, studioId]
+    ));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,7 +88,10 @@ const AddMovie = () => {
         backdrop_url: backdropUrl
       };
 
-      await createMovie(movieData);
+      const { data: createdMovie } = await createMovie(movieData);
+      if (createdMovie?.id) {
+        await setMovieStudios(createdMovie.id, selectedStudios);
+      }
       navigate('/admin');
     } catch (error) {
       alert('Failed to create movie');
@@ -199,6 +221,34 @@ const AddMovie = () => {
             onChange={(e) => setFormData({ ...formData, trailer_url: e.target.value })}
             className="w-full px-4 py-3 glass-input"
           />
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-sm font-medium">Studios / Platforms</label>
+          <input
+            type="text"
+            value={studioSearch}
+            onChange={(e) => setStudioSearch(e.target.value)}
+            placeholder="Search studios..."
+            className="w-full px-4 py-3 glass-input"
+          />
+          <div className="max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.03] p-2 space-y-1">
+            {filteredStudios.map((studio) => (
+              <label key={studio.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedStudios.includes(studio.id)}
+                  onChange={() => toggleStudio(studio.id)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm flex-1">{studio.name}</span>
+                <span className="text-[11px] uppercase text-gray-400">{studio.type}</span>
+              </label>
+            ))}
+          </div>
+          {selectedStudios.length > 0 && (
+            <p className="text-xs text-gray-400">{selectedStudios.length} studio(s) selected</p>
+          )}
         </div>
 
         <div className="glass-card/0">

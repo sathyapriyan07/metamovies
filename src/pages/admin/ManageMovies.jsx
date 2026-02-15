@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { getMovies, deleteMovie, updateMovie } from '../../services/supabase';
+import { getMovies, deleteMovie, getStudios, getStudiosByMovie, setMovieStudios, updateMovie } from '../../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 import Toast from '../../components/Toast';
@@ -35,6 +35,13 @@ const ManageMovies = () => {
   const [playerUrlOverride, setPlayerUrlOverride] = useState('');
   const [playerError, setPlayerError] = useState('');
   const [savingPlayer, setSavingPlayer] = useState(false);
+
+  const [allStudios, setAllStudios] = useState([]);
+  const [editingStudiosMovie, setEditingStudiosMovie] = useState(null);
+  const [selectedStudios, setSelectedStudios] = useState([]);
+  const [studioSearch, setStudioSearch] = useState('');
+  const [studioError, setStudioError] = useState('');
+  const [savingStudios, setSavingStudios] = useState(false);
   
   const [editingTitleLogo, setEditingTitleLogo] = useState(null);
   const [titleLogoUrl, setTitleLogoUrl] = useState('');
@@ -49,7 +56,13 @@ const ManageMovies = () => {
 
   useEffect(() => {
     loadMovies();
+    loadStudios();
   }, []);
+
+  const loadStudios = async () => {
+    const { data } = await getStudios({ activeOnly: false });
+    setAllStudios(data || []);
+  };
 
   const loadMovies = async () => {
     try {
@@ -229,6 +242,19 @@ const ManageMovies = () => {
     setPlayerError('');
   };
 
+  const handleEditStudios = async (movie) => {
+    setEditingStudiosMovie(movie);
+    setStudioSearch('');
+    setStudioError('');
+    const { data, error } = await getStudiosByMovie(movie.id);
+    if (error) {
+      setStudioError('Failed to load linked studios');
+      setSelectedStudios([]);
+      return;
+    }
+    setSelectedStudios((data || []).map((row) => row.studio_id).filter(Boolean));
+  };
+
   const handleEditTitleLogo = (movie) => {
     setEditingTitleLogo(movie);
     setTitleLogoUrl(movie.title_logo_url || '');
@@ -333,6 +359,35 @@ const ManageMovies = () => {
     }
   };
 
+  const toggleStudio = (studioId) => {
+    setSelectedStudios((prev) => (
+      prev.includes(studioId) ? prev.filter((id) => id !== studioId) : [...prev, studioId]
+    ));
+  };
+
+  const handleSaveStudios = async () => {
+    if (!editingStudiosMovie) return;
+    setStudioError('');
+    try {
+      setSavingStudios(true);
+      const { error } = await setMovieStudios(editingStudiosMovie.id, selectedStudios);
+      if (error) throw error;
+      showToast('Studios updated successfully', 'success');
+      setEditingStudiosMovie(null);
+      setSelectedStudios([]);
+      setStudioSearch('');
+    } catch (error) {
+      console.error('Error updating movie studios:', error);
+      setStudioError(error.message || 'Failed to update studios');
+    } finally {
+      setSavingStudios(false);
+    }
+  };
+
+  const filteredStudios = allStudios.filter((studio) =>
+    studio.name.toLowerCase().includes(studioSearch.toLowerCase())
+  );
+
   return (
     <AdminLayout title="Manage Movies" subtitle="Edit or remove existing movies.">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -399,6 +454,12 @@ const ManageMovies = () => {
                     className="px-3 py-2 bg-purple-600/70 hover:bg-purple-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
                     Booking
+                  </button>
+                  <button
+                    onClick={() => handleEditStudios(movie)}
+                    className="px-3 py-2 bg-amber-600/70 hover:bg-amber-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                  >
+                    Studios
                   </button>
                   <button
                     onClick={() => handleEditPlayer(movie)}
@@ -738,6 +799,58 @@ const ManageMovies = () => {
                     setPlayerError('');
                   }}
                   disabled={savingPlayer}
+                  className="flex-1 btn-ghost disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Studios Modal */}
+        {editingStudiosMovie && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-2xl w-full">
+              <h2 className="text-2xl font-bold mb-4">Edit Studios - {editingStudiosMovie.title}</h2>
+              <input
+                type="text"
+                value={studioSearch}
+                onChange={(e) => setStudioSearch(e.target.value)}
+                placeholder="Search studios..."
+                className="w-full px-4 py-3 glass-input mb-3"
+              />
+              <div className="max-h-72 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.03] p-2 space-y-1">
+                {filteredStudios.map((studio) => (
+                  <label key={studio.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedStudios.includes(studio.id)}
+                      onChange={() => toggleStudio(studio.id)}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm flex-1">{studio.name}</span>
+                    <span className="text-[11px] uppercase text-gray-400">{studio.type}</span>
+                  </label>
+                ))}
+              </div>
+              {studioError && <p className="text-red-400 text-sm mt-2">{studioError}</p>}
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSaveStudios}
+                  disabled={savingStudios}
+                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingStudios ? 'Saving...' : 'Save Studios'}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingStudiosMovie(null);
+                    setSelectedStudios([]);
+                    setStudioSearch('');
+                    setStudioError('');
+                  }}
+                  disabled={savingStudios}
                   className="flex-1 btn-ghost disabled:opacity-50"
                 >
                   Cancel

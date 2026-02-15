@@ -300,6 +300,35 @@ CREATE POLICY "Public read collection_items" ON collection_items FOR SELECT USIN
 CREATE POLICY "Admin manage collections" ON collections FOR ALL USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
 CREATE POLICY "Admin manage collection_items" ON collection_items FOR ALL USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
 
+-- Studios / Platforms
+CREATE TABLE studios (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  logo_url TEXT,
+  type TEXT NOT NULL CHECK (type IN ('studio', 'ott', 'production', 'distributor')),
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE movie_studios (
+  id BIGSERIAL PRIMARY KEY,
+  movie_id BIGINT REFERENCES movies(id) ON DELETE CASCADE,
+  studio_id BIGINT REFERENCES studios(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(movie_id, studio_id)
+);
+
+CREATE INDEX idx_movie_studios_movie_id ON movie_studios(movie_id);
+CREATE INDEX idx_movie_studios_studio_id ON movie_studios(studio_id);
+
+ALTER TABLE studios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE movie_studios ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read studios" ON studios FOR SELECT USING (true);
+CREATE POLICY "Public read movie_studios" ON movie_studios FOR SELECT USING (true);
+CREATE POLICY "Admin manage studios" ON studios FOR ALL USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+CREATE POLICY "Admin manage movie_studios" ON movie_studios FOR ALL USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+
 -- Add music links support to movies
 ALTER TABLE movies ADD COLUMN IF NOT EXISTS music_links JSONB;
 

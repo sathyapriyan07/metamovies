@@ -21,6 +21,7 @@ const AdminLayout = ({ title, subtitle, children }) => {
     { label: 'Manage Links', to: '/admin/manage-links' },
     { label: 'Manage Persons', to: '/admin/manage-persons' },
     { label: 'Manage Crew', to: '/admin/manage-crew' },
+    { label: 'Manage Studios', to: '/admin/manage-studios' },
     { label: 'Hero Banner', to: '/admin/manage-hero-banner' },
     { label: 'Manage Users', to: '/admin/manage-users' },
     { label: 'Manage Avatars', to: '/admin/manage-avatars' }

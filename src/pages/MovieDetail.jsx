@@ -106,6 +106,10 @@ const MovieDetail = () => {
 
   if (!movie) return <div className="min-h-screen flex items-center justify-center">Movie not found</div>;
 
+  const studios = (movie.movie_studios || [])
+    .map((entry) => entry.studio)
+    .filter(Boolean);
+
   return (
     <div className="min-h-screen pb-24 md:pb-12 animate-fade-in">
       {/* Hero Backdrop Section */}
@@ -303,6 +307,35 @@ const MovieDetail = () => {
                   <p className="text-xs font-semibold text-center line-clamp-2 w-[80px] md:w-[88px]">{c.person.name}</p>
                   <p className="text-[10px] text-gray-400 text-center line-clamp-1 w-[80px] md:w-[88px]">{c.character}</p>
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {studios.length > 0 && (
+          <section>
+            <h2 className="text-xl md:text-2xl font-semibold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Studios
+            </h2>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {studios.map((studio) => (
+                <button
+                  type="button"
+                  key={studio.id}
+                  onClick={() => navigate(`/studios/${studio.id}`)}
+                  className="flex-shrink-0 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-[18px] p-3 min-w-[120px] h-16 flex items-center justify-center hover:bg-white/15 hover:scale-[1.03] transition-all duration-250"
+                >
+                  {studio.logo_url ? (
+                    <img
+                      src={studio.logo_url}
+                      alt={studio.name}
+                      loading="lazy"
+                      className="max-h-8 w-auto object-contain"
+                    />
+                  ) : (
+                    <span className="text-xs font-medium">{studio.name}</span>
+                  )}
+                </button>
               ))}
             </div>
           </section>
