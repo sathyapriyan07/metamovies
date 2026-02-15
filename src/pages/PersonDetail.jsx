@@ -10,6 +10,7 @@ const PersonDetail = () => {
   const [loading, setLoading] = useState(true);
   const [videosLoading, setVideosLoading] = useState(true);
   const [featuredVideos, setFeaturedVideos] = useState([]);
+  const [videoImageErrors, setVideoImageErrors] = useState({});
   const [showFullBio, setShowFullBio] = useState(false);
 
   useEffect(() => {
@@ -49,8 +50,8 @@ const PersonDetail = () => {
 
   const getVideoThumbnail = (video) => {
     if (video?.thumbnail_url) return video.thumbnail_url;
-    if (video?.youtube_id) return `https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`;
-    return 'https://via.placeholder.com/600x900';
+    if (video?.youtube_id) return `https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`;
+    return null;
   };
 
   if (loading) {
@@ -178,8 +179,8 @@ const PersonDetail = () => {
           {videosLoading ? (
             <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
               {Array.from({ length: 6 }).map((_, index) => (
-                <div key={`video-skeleton-${index}`} className="flex-shrink-0 w-[120px]">
-                  <div className="aspect-[2/3] rounded-2xl bg-white/10 animate-pulse" />
+                <div key={`video-skeleton-${index}`} className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[420px]">
+                  <div className="aspect-video rounded-2xl bg-white/10 animate-pulse" />
                   <div className="h-3 mt-2 rounded bg-white/10 animate-pulse" />
                 </div>
               ))}
@@ -194,15 +195,31 @@ const PersonDetail = () => {
                 <button
                   key={video.id}
                   onClick={() => navigate(`/videos/${video.id}`)}
-                  className="flex-shrink-0 w-[120px] snap-start text-left group"
+                  className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[420px] snap-start text-left group"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-white/5 shadow-lg">
-                    <img
-                      src={getVideoThumbnail(video)}
-                      alt={video.title}
-                      className="w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.03]"
-                      loading="lazy"
-                    />
+                  <div className="relative aspect-video overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-black shadow-lg">
+                    {getVideoThumbnail(video) && !videoImageErrors[video.id] ? (
+                      <>
+                        <img
+                          src={getVideoThumbnail(video)}
+                          alt=""
+                          className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-35"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <img
+                          src={getVideoThumbnail(video)}
+                          alt={video.title}
+                          className="relative z-[1] w-full h-full object-contain"
+                          loading="lazy"
+                          onError={() => setVideoImageErrors((prev) => ({ ...prev, [video.id]: true }))}
+                        />
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-400">
+                        Thumbnail unavailable
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <FrostedPlayButton className="w-12 h-12 md:w-14 md:h-14" />
