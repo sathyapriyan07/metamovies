@@ -12,6 +12,9 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
   const [cacheByPlatform, setCacheByPlatform] = useState({});
   const [isSwitching, setIsSwitching] = useState(false);
   const cacheRef = useRef({});
+  const movieTrackRef = useRef(null);
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(false);
 
   useEffect(() => {
     const loadPlatforms = async () => {
@@ -77,6 +80,34 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
     [platforms, activePlatformId]
   );
 
+  const updateMovieFades = useCallback(() => {
+    const el = movieTrackRef.current;
+    if (!el) return;
+    const maxScrollLeft = el.scrollWidth - el.clientWidth;
+    const hasOverflow = maxScrollLeft > 4;
+    if (!hasOverflow) {
+      setShowLeftFade(false);
+      setShowRightFade(false);
+      return;
+    }
+    setShowLeftFade(el.scrollLeft > 6);
+    setShowRightFade(el.scrollLeft < maxScrollLeft - 6);
+  }, []);
+
+  useEffect(() => {
+    const el = movieTrackRef.current;
+    if (!el) return;
+    updateMovieFades();
+    const onScroll = () => updateMovieFades();
+    const onResize = () => updateMovieFades();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [activeMovies, loading, updateMovieFades]);
+
   if (platforms.length === 0 && !loading) return null;
 
   return (
@@ -120,7 +151,10 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
 
         <div className={`transition-opacity duration-200 ${isSwitching ? 'opacity-75' : 'opacity-100'}`}>
           <div className="relative">
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+            <div
+              ref={movieTrackRef}
+              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+            >
             {loading
               ? Array.from({ length: limit }).map((_, i) => (
                   <div key={`s-${i}`} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
@@ -133,8 +167,12 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
                   </div>
                 ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#04060b]/55 to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#04060b]/55 to-transparent" />
+            {showLeftFade && (
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-7 md:w-8 lg:w-10 bg-gradient-to-r from-[#04060b]/65 to-transparent" />
+            )}
+            {showRightFade && (
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-7 md:w-8 lg:w-10 bg-gradient-to-l from-[#04060b]/65 to-transparent" />
+            )}
           </div>
 
           {!loading && activeMovies.length === 0 && (
