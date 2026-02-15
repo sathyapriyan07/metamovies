@@ -116,7 +116,7 @@ const MovieDetail = () => {
     },
     apple_music: {
       label: 'Apple Music',
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/d/df/Apple_Music_icon.svg'
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/960px-Apple_Music_icon.svg.png'
     },
     youtube_music: {
       label: 'YouTube Music',
