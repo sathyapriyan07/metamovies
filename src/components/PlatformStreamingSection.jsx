@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getMoviesByPlatform, getPlatforms } from '../services/supabase';
 import MovieCard from './MovieCard';
+import PlatformButton from './PlatformButton';
 
 const STORAGE_KEY = 'home_active_platform_id';
 const DEFAULT_LIMIT = 10;
@@ -124,26 +125,12 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
           {platforms.map((platform) => {
             const active = String(activePlatformId) === String(platform.id);
             return (
-              <button
+              <PlatformButton
                 key={platform.id}
-                type="button"
+                platform={platform}
+                active={active}
                 onClick={() => handlePlatformSelect(platform.id)}
-                aria-label={platform.name}
-                className={`snap-start flex-shrink-0 px-4 rounded-full border backdrop-blur-md transition-all duration-300 flex items-center justify-center min-w-[76px] h-[46px] md:h-[50px] lg:h-[52px] ${
-                  active
-                    ? 'bg-white/14 border-white/40 scale-[1.03] shadow-[0_2px_10px_rgba(255,255,255,0.14)]'
-                    : 'bg-white/6 border-white/22 hover:bg-white/10 hover:border-white/30 hover:shadow-[0_1px_8px_rgba(255,255,255,0.10)]'
-                }`}
-              >
-                {platform.logo_url && (
-                  <img
-                    src={platform.logo_url}
-                    alt={platform.name}
-                    loading="lazy"
-                    className={`h-[22px] md:h-[24px] lg:h-[26px] w-auto max-w-[96px] object-contain transition-all duration-300 ${active ? 'grayscale-0 brightness-110 opacity-100' : 'grayscale opacity-85'}`}
-                  />
-                )}
-              </button>
+              />
             );
           })}
           </div>

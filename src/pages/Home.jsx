@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   getTrendingMovies,
   getCollections,
@@ -45,6 +46,19 @@ const Home = () => {
 
   return (
     <div className="min-h-screen pb-24 md:pb-12">
+      <div className="md:hidden relative z-30 px-4 pt-[max(env(safe-area-inset-top),12px)] pb-2">
+        <Link to="/" className="inline-flex items-center gap-2">
+          <img
+            src="/favicon.png"
+            alt="MetaMovies"
+            loading="lazy"
+            className="h-8 w-8 object-contain drop-shadow-[0_2px_10px_rgba(255,255,255,0.25)]"
+          />
+          <span className="text-base font-semibold tracking-tight text-white">
+            MetaMovies<span className="text-sky-400">+</span>
+          </span>
+        </Link>
+      </div>
       <HeroBanner />
 
       <div className="max-w-7xl mx-auto pt-4">
