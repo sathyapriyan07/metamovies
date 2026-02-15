@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getMoviesByPlatform, getPlatforms } from '../services/supabase';
 import MovieCard from './MovieCard';
 
@@ -11,6 +11,8 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
   const [loading, setLoading] = useState(true);
   const [cacheByPlatform, setCacheByPlatform] = useState({});
   const [isSwitching, setIsSwitching] = useState(false);
+  const tabRefs = useRef({});
+  const cacheRef = useRef({});
 
   useEffect(() => {
     const loadPlatforms = async () => {
@@ -36,7 +38,7 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
   const loadPlatformMovies = useCallback(async (platformId) => {
     if (!platformId) return;
 
-    if (cacheByPlatform[platformId]) {
+    if (cacheRef.current[platformId]) {
       return;
     }
 
@@ -49,9 +51,10 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
         return dateB - dateA;
       })
       .slice(0, limit);
+    cacheRef.current[platformId] = next;
     setCacheByPlatform((prev) => ({ ...prev, [platformId]: next }));
     setLoading(false);
-  }, [cacheByPlatform, limit]);
+  }, [limit]);
 
   useEffect(() => {
     loadPlatformMovies(activePlatformId);
@@ -67,8 +70,21 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
     setIsSwitching(true);
     setActivePlatformId(platformId);
     localStorage.setItem(STORAGE_KEY, String(platformId));
+    const tab = tabRefs.current[String(platformId)];
+    tab?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     setTimeout(() => setIsSwitching(false), 180);
   };
+
+  useEffect(() => {
+    if (!activePlatformId) return;
+    const tab = tabRefs.current[String(activePlatformId)];
+    tab?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, [activePlatformId]);
+
+  const activePlatformName = useMemo(
+    () => platforms.find((platform) => String(platform.id) === String(activePlatformId))?.name || 'Platform',
+    [platforms, activePlatformId]
+  );
 
   if (platforms.length === 0 && !loading) return null;
 
@@ -76,7 +92,9 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
     <section className="mb-12 fade-in px-4 md:px-8">
       <div className="rounded-2xl bg-white/12 backdrop-blur-xl border border-white/25 shadow-2xl p-4 md:p-5">
         <div className="mb-4">
-          <h2 className="text-lg md:text-2xl font-semibold text-white">Streaming Platforms</h2>
+          <h2 className="text-lg md:text-2xl font-semibold text-white">
+            Streaming on <span className="text-sky-300 drop-shadow-[0_0_10px_rgba(125,211,252,0.45)]">{activePlatformName}</span>
+          </h2>
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory mb-4">
@@ -85,6 +103,9 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
             return (
               <button
                 key={platform.id}
+                ref={(el) => {
+                  if (el) tabRefs.current[String(platform.id)] = el;
+                }}
                 type="button"
                 onClick={() => handlePlatformSelect(platform.id)}
                 aria-label={platform.name}
@@ -108,15 +129,15 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
         </div>
 
         <div className={`transition-opacity duration-200 ${isSwitching ? 'opacity-75' : 'opacity-100'}`}>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {loading
-              ? Array.from({ length: 12 }).map((_, i) => (
-                  <div key={`s-${i}`} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
+              ? Array.from({ length: limit }).map((_, i) => (
+                  <div key={`s-${i}`}>
                     <div className="aspect-[2/3] rounded-2xl bg-white/25 animate-pulse" />
                   </div>
                 ))
               : activeMovies.map((movie) => (
-                  <div key={movie.id} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
+                  <div key={movie.id}>
                     <div className="rounded-2xl transition-all duration-200 hover:scale-[1.03]">
                       <MovieCard movie={movie} />
                     </div>
