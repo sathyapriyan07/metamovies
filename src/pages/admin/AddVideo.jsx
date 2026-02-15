@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../services/supabase';
+import { supabase, setFeaturedVideoPersons } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 import Toast from '../../components/Toast';
 
@@ -33,7 +33,7 @@ const AddVideo = () => {
       try {
         const { data, error } = await supabase
           .from('persons')
-          .select('id, name, profile_path')
+          .select('id, name, profile_path, profile_url')
           .ilike('name', `%${personSearch}%`)
           .limit(10);
         
@@ -146,16 +146,7 @@ const AddVideo = () => {
       if (videoError) throw videoError;
       
       if (selectedPersons.length > 0) {
-        const personLinks = selectedPersons.map(p => ({
-          featured_video_id: video.id,
-          person_id: p.id,
-          role: p.role || null
-        }));
-        
-        const { error: linkError } = await supabase
-          .from('featured_video_persons')
-          .insert(personLinks);
-        
+        const { error: linkError } = await setFeaturedVideoPersons(video.id, selectedPersons);
         if (linkError) throw linkError;
       }
       
@@ -256,7 +247,7 @@ const AddVideo = () => {
                       className="w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors"
                     >
                       <img
-                        src={person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : '/placeholder-person.png'}
+                        src={person.profile_url || (person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : '/placeholder-person.png')}
                         alt={person.name}
                         className="w-10 h-10 rounded-full object-cover"
                       />
@@ -272,7 +263,7 @@ const AddVideo = () => {
                 {selectedPersons.map(person => (
                   <div key={person.id} className="flex items-center gap-3 glass-card p-3 rounded-lg">
                     <img
-                      src={person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : '/placeholder-person.png'}
+                      src={person.profile_url || (person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : '/placeholder-person.png')}
                       alt={person.name}
                       className="w-10 h-10 rounded-full object-cover"
                     />
@@ -289,7 +280,7 @@ const AddVideo = () => {
                       onClick={() => removePerson(person.id)}
                       className="text-red-400 hover:text-red-300 text-xl"
                     >
-                      ×
+                      x
                     </button>
                   </div>
                 ))}
@@ -322,3 +313,4 @@ const AddVideo = () => {
 };
 
 export default AddVideo;
+

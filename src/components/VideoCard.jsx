@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import FrostedPlayButton from './FrostedPlayButton';
 
 const VideoCard = ({ video }) => {
   const navigate = useNavigate();
@@ -21,11 +22,7 @@ const VideoCard = ({ video }) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
-            <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
+          <FrostedPlayButton />
         </div>
       </div>
       <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-sky-300 transition-colors">

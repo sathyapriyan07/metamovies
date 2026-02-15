@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
+import FrostedPlayButton from '../components/FrostedPlayButton';
 
 const VideoDetail = () => {
   const { id } = useParams();
@@ -32,7 +33,8 @@ const VideoDetail = () => {
           persons (
             id,
             name,
-            profile_path
+            profile_path,
+            profile_url
           )
         `)
         .eq('featured_video_id', id)
@@ -119,15 +121,11 @@ const VideoDetail = () => {
             alt={video.title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-20 h-20 rounded-full bg-red-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
-              <svg className="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-          </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <FrostedPlayButton size="lg" />
         </div>
+      </div>
 
         <div className="glass-card rounded-2xl p-6 md:p-8">
           <h1 className="text-2xl md:text-3xl font-bold mb-4">{video.title}</h1>
@@ -158,7 +156,7 @@ const VideoDetail = () => {
                 >
                   <div className="glass-card rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,167,255,0.3)]">
                     <img
-                      src={item.persons.profile_path ? `https://image.tmdb.org/t/p/w185${item.persons.profile_path}` : '/placeholder-person.png'}
+                      src={item.persons.profile_url || (item.persons.profile_path ? `https://image.tmdb.org/t/p/w185${item.persons.profile_path}` : '/placeholder-person.png')}
                       alt={item.persons.name}
                       loading="lazy"
                       className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-3 mx-auto"

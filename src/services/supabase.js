@@ -5,6 +5,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const platformMovieCache = new Map();
+const personVideoCache = new Map();
 
 // Auth functions
 export const signUp = async (email, password, username, avatarUrl = '') => {
@@ -382,6 +383,33 @@ export const createMovie = async (movieData) => {
   return { data, error };
 };
 
+export const getFeaturedVideosByPerson = async (personId, limit = 8) => {
+  const normalizedPersonId = Number(personId);
+  const queryPersonId = Number.isNaN(normalizedPersonId) ? personId : normalizedPersonId;
+  const cacheKey = `${queryPersonId}:${limit}`;
+  if (personVideoCache.has(cacheKey)) return { data: personVideoCache.get(cacheKey), error: null };
+
+  const { data, error } = await supabase
+    .from('featured_video_persons')
+    .select(`
+      role,
+      video:videos(*)
+    `)
+    .eq('person_id', queryPersonId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  const videos = (data || [])
+    .map((item) => ({
+      ...(item.video || {}),
+      person_role: item.role || null
+    }))
+    .filter((item) => item.id);
+
+  if (!error) personVideoCache.set(cacheKey, videos);
+  return { data: videos, error };
+};
+
 export const updateMovie = async (id, movieData) => {
   const { data, error } = await supabase.from('movies').update(movieData).eq('id', id).select().single();
   return { data, error };
@@ -390,6 +418,29 @@ export const updateMovie = async (id, movieData) => {
 export const deleteMovie = async (id) => {
   const { error } = await supabase.from('movies').delete().eq('id', id);
   return { error };
+};
+
+export const setFeaturedVideoPersons = async (videoId, persons = []) => {
+  const { error: deleteError } = await supabase
+    .from('featured_video_persons')
+    .delete()
+    .eq('featured_video_id', videoId);
+
+  if (deleteError) return { data: null, error: deleteError };
+
+  if (!persons.length) return { data: [], error: null };
+
+  const rows = persons.map((person) => ({
+    featured_video_id: videoId,
+    person_id: person.id,
+    role: person.role || null
+  }));
+
+  const { data, error } = await supabase.from('featured_video_persons').insert(rows).select();
+  if (!error) {
+    personVideoCache.clear();
+  }
+  return { data, error };
 };
 
 export const getPlatforms = async ({ activeOnly = true } = {}) => {
