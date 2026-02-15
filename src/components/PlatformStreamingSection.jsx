@@ -109,7 +109,7 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
                 type="button"
                 onClick={() => handlePlatformSelect(platform.id)}
                 aria-label={platform.name}
-                className={`snap-start flex-shrink-0 w-11 h-11 rounded-full border backdrop-blur-md transition-all duration-300 flex items-center justify-center ${
+                className={`snap-start flex-shrink-0 min-w-[54px] h-11 px-3 rounded-2xl border backdrop-blur-md transition-all duration-300 flex items-center justify-center ${
                   active
                     ? 'bg-white/15 border-white/35 scale-[1.05] shadow-[0_0_18px_rgba(255,255,255,0.32)]'
                     : 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_12px_rgba(255,255,255,0.18)]'
