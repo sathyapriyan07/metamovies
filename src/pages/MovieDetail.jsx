@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieById } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
+import VideoPlayer from '../components/VideoPlayer';
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -247,6 +248,19 @@ const MovieDetail = () => {
                 </div>
               </div>
             </div>
+          </section>
+        )}
+
+        {movie.tmdb_id && (
+          <section>
+            <h2 className="text-xl md:text-2xl font-semibold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Watch Movie
+            </h2>
+            <VideoPlayer
+              tmdbId={movie.tmdb_id}
+              enabled={!!movie.player_enabled}
+              overrideUrl={movie.player_url_override || ''}
+            />
           </section>
         )}
 

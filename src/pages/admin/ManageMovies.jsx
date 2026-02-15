@@ -29,6 +29,12 @@ const ManageMovies = () => {
   const [isNowShowing, setIsNowShowing] = useState(false);
   const [bookingError, setBookingError] = useState('');
   const [savingBooking, setSavingBooking] = useState(false);
+
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [playerEnabled, setPlayerEnabled] = useState(false);
+  const [playerUrlOverride, setPlayerUrlOverride] = useState('');
+  const [playerError, setPlayerError] = useState('');
+  const [savingPlayer, setSavingPlayer] = useState(false);
   
   const [editingTitleLogo, setEditingTitleLogo] = useState(null);
   const [titleLogoUrl, setTitleLogoUrl] = useState('');
@@ -82,6 +88,16 @@ const ManageMovies = () => {
     try {
       const urlObj = new URL(url);
       return urlObj.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
+  const validateEmbedUrl = (url) => {
+    if (!url) return true;
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:';
     } catch {
       return false;
     }
@@ -206,6 +222,13 @@ const ManageMovies = () => {
     setBookingError('');
   };
 
+  const handleEditPlayer = (movie) => {
+    setEditingPlayer(movie);
+    setPlayerEnabled(!!movie.player_enabled);
+    setPlayerUrlOverride(movie.player_url_override || '');
+    setPlayerError('');
+  };
+
   const handleEditTitleLogo = (movie) => {
     setEditingTitleLogo(movie);
     setTitleLogoUrl(movie.title_logo_url || '');
@@ -280,6 +303,36 @@ const ManageMovies = () => {
     }
   };
 
+  const handleSavePlayer = async () => {
+    if (!editingPlayer) return;
+    setPlayerError('');
+
+    if (playerUrlOverride && !validateEmbedUrl(playerUrlOverride)) {
+      setPlayerError('Custom embed URL must be a valid http(s) URL.');
+      return;
+    }
+
+    try {
+      setSavingPlayer(true);
+      const { error } = await updateMovie(editingPlayer.id, {
+        player_enabled: !!playerEnabled,
+        player_url_override: playerUrlOverride ? playerUrlOverride.trim() : null
+      });
+      if (error) throw error;
+
+      showToast('Player settings updated successfully', 'success');
+      setEditingPlayer(null);
+      setPlayerEnabled(false);
+      setPlayerUrlOverride('');
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating player settings:', error);
+      setPlayerError(error.message || 'Failed to update player settings');
+    } finally {
+      setSavingPlayer(false);
+    }
+  };
+
   return (
     <AdminLayout title="Manage Movies" subtitle="Edit or remove existing movies.">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -346,6 +399,12 @@ const ManageMovies = () => {
                     className="px-3 py-2 bg-purple-600/70 hover:bg-purple-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
                     Booking
+                  </button>
+                  <button
+                    onClick={() => handleEditPlayer(movie)}
+                    className="px-3 py-2 bg-violet-600/70 hover:bg-violet-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                  >
+                    Player
                   </button>
                   <button
                     onClick={() => handleToggleTrending(movie)}
@@ -622,6 +681,63 @@ const ManageMovies = () => {
                     setBookingError('');
                   }}
                   disabled={savingBooking}
+                  className="flex-1 btn-ghost disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Player Modal */}
+        {editingPlayer && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-xl w-full">
+              <h2 className="text-2xl font-bold mb-4">Edit Player - {editingPlayer.title}</h2>
+              <label className="flex items-center gap-2 text-sm font-medium mb-4">
+                <input
+                  type="checkbox"
+                  checked={playerEnabled}
+                  onChange={(e) => setPlayerEnabled(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                Enable Player
+              </label>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Custom Embed URL (Optional)</label>
+                <input
+                  type="url"
+                  value={playerUrlOverride}
+                  onChange={(e) => {
+                    setPlayerUrlOverride(e.target.value);
+                    setPlayerError('');
+                  }}
+                  placeholder="https://example.com/embed/movie/12345"
+                  className="w-full px-4 py-3 glass-input"
+                />
+                <p className="text-xs text-gray-400 mt-2">Leave empty to use default TMDB-based embed URL.</p>
+              </div>
+
+              {playerError && <p className="text-red-400 text-sm mt-2">{playerError}</p>}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSavePlayer}
+                  disabled={savingPlayer}
+                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingPlayer ? 'Saving...' : 'Save Player'}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingPlayer(null);
+                    setPlayerEnabled(false);
+                    setPlayerUrlOverride('');
+                    setPlayerError('');
+                  }}
+                  disabled={savingPlayer}
                   className="flex-1 btn-ghost disabled:opacity-50"
                 >
                   Cancel

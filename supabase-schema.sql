@@ -12,7 +12,7 @@ CREATE TABLE users (
 -- Movies table
 CREATE TABLE movies (
   id BIGSERIAL PRIMARY KEY,
-  tmdb_id INTEGER UNIQUE,
+  tmdb_id TEXT UNIQUE,
   title TEXT NOT NULL,
   overview TEXT,
   release_date DATE,
@@ -31,6 +31,8 @@ CREATE TABLE movies (
   booking_url TEXT,
   booking_label TEXT DEFAULT 'Book Tickets',
   booking_last_updated TIMESTAMP,
+  player_enabled BOOLEAN DEFAULT false,
+  player_url_override TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
