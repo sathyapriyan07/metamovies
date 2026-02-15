@@ -13,6 +13,7 @@ const ManageLinks = () => {
     spotify: '',
     apple_music: '',
     youtube_music: '',
+    amazon_music: '',
     telegram_link: '',
     netflix: '',
     prime: '',
@@ -56,6 +57,7 @@ const ManageLinks = () => {
       spotify: item.music_links?.spotify || '',
       apple_music: item.music_links?.apple_music || '',
       youtube_music: item.music_links?.youtube_music || '',
+      amazon_music: item.music_links?.amazon_music || '',
       telegram_link: item.telegram_link || '',
       netflix: item.watch_links?.netflix || '',
       prime: item.watch_links?.prime || '',
@@ -77,7 +79,8 @@ const ManageLinks = () => {
       music_links: {
         spotify: formData.spotify || null,
         apple_music: formData.apple_music || null,
-        youtube_music: formData.youtube_music || null
+        youtube_music: formData.youtube_music || null,
+        amazon_music: formData.amazon_music || null
       },
       telegram_link: formData.telegram_link || null,
       watch_links: {
@@ -186,6 +189,17 @@ const ManageLinks = () => {
                       value={formData.youtube_music}
                       onChange={(e) => setFormData({ ...formData, youtube_music: e.target.value })}
                       placeholder="https://music.youtube.com/..."
+                      className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Amazon Music Link</label>
+                    <input
+                      type="url"
+                      value={formData.amazon_music}
+                      onChange={(e) => setFormData({ ...formData, amazon_music: e.target.value })}
+                      placeholder="https://music.amazon.com/..."
                       className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
                     />
                   </div>
