@@ -33,12 +33,12 @@ const AddVideo = () => {
       try {
         const { data, error } = await supabase
           .from('persons')
-          .select('id, name, profile_path, profile_url')
+          .select('*')
           .ilike('name', `%${personSearch}%`)
           .limit(10);
         
         if (!error) {
-          setPersonResults(data || []);
+          setPersonResults((data || []).filter((person) => person?.id));
         }
       } catch (err) {
         console.error('Search error:', err);
@@ -97,11 +97,15 @@ const AddVideo = () => {
   };
 
   const addPerson = (person) => {
+    if (!person || person.id === null || person.id === undefined) {
+      setToast({ message: 'Invalid person selected', type: 'error' });
+      return;
+    }
     if (selectedPersons.length >= 15) {
       setToast({ message: 'Maximum 15 persons allowed', type: 'error' });
       return;
     }
-    if (selectedPersons.find(p => p.id === person.id)) {
+    if (selectedPersons.find(p => String(p.id) === String(person.id))) {
       setToast({ message: 'Person already added', type: 'error' });
       return;
     }
@@ -111,7 +115,7 @@ const AddVideo = () => {
   };
 
   const removePerson = (personId) => {
-    setSelectedPersons(selectedPersons.filter(p => p.id !== personId));
+    setSelectedPersons(selectedPersons.filter(p => String(p.id) !== String(personId)));
   };
 
   const updatePersonRole = (personId, role) => {
@@ -129,6 +133,11 @@ const AddVideo = () => {
       setSaving(true);
       const videoId = extractYouTubeId(youtubeUrl);
       const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      const validSelectedPersons = selectedPersons.filter((person) => person && person.id !== null && person.id !== undefined);
+
+      if (selectedPersons.length > 0 && validSelectedPersons.length === 0) {
+        throw new Error('Selected persons are invalid. Please reselect persons.');
+      }
       
       const { data: video, error: videoError } = await supabase
         .from('videos')
@@ -145,8 +154,8 @@ const AddVideo = () => {
       
       if (videoError) throw videoError;
       
-      if (selectedPersons.length > 0) {
-        const { error: linkError } = await setFeaturedVideoPersons(video.id, selectedPersons);
+      if (validSelectedPersons.length > 0) {
+        const { error: linkError } = await setFeaturedVideoPersons(video.id, validSelectedPersons);
         if (linkError) throw linkError;
       }
       
@@ -158,6 +167,13 @@ const AddVideo = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const getPersonImage = (person) => {
+    if (person?.profile_image) return person.profile_image;
+    if (person?.profile_url) return person.profile_url;
+    if (person?.profile_path) return `https://image.tmdb.org/t/p/w185${person.profile_path}`;
+    return '/placeholder-person.png';
   };
 
   return (
@@ -247,7 +263,7 @@ const AddVideo = () => {
                       className="w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors"
                     >
                       <img
-                        src={person.profile_url || (person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : '/placeholder-person.png')}
+                        src={getPersonImage(person)}
                         alt={person.name}
                         className="w-10 h-10 rounded-full object-cover"
                       />
@@ -263,7 +279,7 @@ const AddVideo = () => {
                 {selectedPersons.map(person => (
                   <div key={person.id} className="flex items-center gap-3 glass-card p-3 rounded-lg">
                     <img
-                      src={person.profile_url || (person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : '/placeholder-person.png')}
+                      src={getPersonImage(person)}
                       alt={person.name}
                       className="w-10 h-10 rounded-full object-cover"
                     />

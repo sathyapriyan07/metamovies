@@ -6,6 +6,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const platformMovieCache = new Map();
 const personVideoCache = new Map();
+let videoPersonRelationConfig = null;
 
 // Auth functions
 export const signUp = async (email, password, username, avatarUrl = '') => {
@@ -389,8 +390,13 @@ export const getFeaturedVideosByPerson = async (personId, limit = 8) => {
   const cacheKey = `${queryPersonId}:${limit}`;
   if (personVideoCache.has(cacheKey)) return { data: personVideoCache.get(cacheKey), error: null };
 
+  const relationConfig = await resolveVideoPersonRelationConfig();
+  if (!relationConfig) {
+    return { data: [], error: new Error('No video-person relation table found') };
+  }
+
   const { data, error } = await supabase
-    .from('featured_video_persons')
+    .from(relationConfig.table)
     .select(`
       role,
       video:videos(*)
@@ -410,6 +416,30 @@ export const getFeaturedVideosByPerson = async (personId, limit = 8) => {
   return { data: videos, error };
 };
 
+export const getPersonsByVideo = async (videoId) => {
+  const relationConfig = await resolveVideoPersonRelationConfig();
+  if (!relationConfig) {
+    return { data: [], error: new Error('No video-person relation table found') };
+  }
+
+  const { data, error } = await supabase
+    .from(relationConfig.table)
+    .select(`
+      role,
+      persons (
+        id,
+        name,
+        profile_url,
+        profile_path,
+        profile_image
+      )
+    `)
+    .eq(relationConfig.videoForeignKey, videoId)
+    .order('created_at', { ascending: true });
+
+  return { data: data || [], error };
+};
+
 export const updateMovie = async (id, movieData) => {
   const { data, error } = await supabase.from('movies').update(movieData).eq('id', id).select().single();
   return { data, error };
@@ -421,26 +451,56 @@ export const deleteMovie = async (id) => {
 };
 
 export const setFeaturedVideoPersons = async (videoId, persons = []) => {
+  const relationConfig = await resolveVideoPersonRelationConfig();
+  if (!relationConfig) {
+    return { data: null, error: new Error('No video-person relation table found') };
+  }
+
+  const cleanedPersons = [...new Map(
+    (persons || [])
+      .filter((person) => person && person.id !== null && person.id !== undefined)
+      .map((person) => [String(person.id), person])
+  ).values()];
+
   const { error: deleteError } = await supabase
-    .from('featured_video_persons')
+    .from(relationConfig.table)
     .delete()
-    .eq('featured_video_id', videoId);
+    .eq(relationConfig.videoForeignKey, videoId);
 
   if (deleteError) return { data: null, error: deleteError };
 
-  if (!persons.length) return { data: [], error: null };
+  if (!cleanedPersons.length) return { data: [], error: null };
 
-  const rows = persons.map((person) => ({
-    featured_video_id: videoId,
+  const rows = cleanedPersons.map((person) => ({
+    [relationConfig.videoForeignKey]: videoId,
     person_id: person.id,
     role: person.role || null
   }));
 
-  const { data, error } = await supabase.from('featured_video_persons').insert(rows).select();
+  const { data, error } = await supabase.from(relationConfig.table).insert(rows).select();
   if (!error) {
     personVideoCache.clear();
   }
   return { data, error };
+};
+
+const resolveVideoPersonRelationConfig = async () => {
+  if (videoPersonRelationConfig) return videoPersonRelationConfig;
+
+  const candidates = [
+    { table: 'video_persons', videoForeignKey: 'video_id' },
+    { table: 'featured_video_persons', videoForeignKey: 'featured_video_id' }
+  ];
+
+  for (const candidate of candidates) {
+    const { error } = await supabase.from(candidate.table).select('person_id').limit(1);
+    if (!error) {
+      videoPersonRelationConfig = candidate;
+      return candidate;
+    }
+  }
+
+  return null;
 };
 
 export const getPlatforms = async ({ activeOnly = true } = {}) => {

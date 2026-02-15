@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../services/supabase';
+import { supabase, getPersonsByVideo } from '../services/supabase';
 import FrostedPlayButton from '../components/FrostedPlayButton';
 
 const VideoDetail = () => {
@@ -26,20 +26,7 @@ const VideoDetail = () => {
       if (error) throw error;
       setVideo(data);
       
-      const { data: personsData } = await supabase
-        .from('featured_video_persons')
-        .select(`
-          role,
-          persons (
-            id,
-            name,
-            profile_path,
-            profile_url
-          )
-        `)
-        .eq('featured_video_id', id)
-        .order('created_at', { ascending: true });
-      
+      const { data: personsData } = await getPersonsByVideo(id);
       setPersons(personsData || []);
     } catch (error) {
       console.error('Error loading video:', error);
@@ -156,7 +143,7 @@ const VideoDetail = () => {
                 >
                   <div className="glass-card rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,167,255,0.3)]">
                     <img
-                      src={item.persons.profile_url || (item.persons.profile_path ? `https://image.tmdb.org/t/p/w185${item.persons.profile_path}` : '/placeholder-person.png')}
+                      src={getPersonImage(item.persons)}
                       alt={item.persons.name}
                       loading="lazy"
                       className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover mb-3 mx-auto"
@@ -175,3 +162,9 @@ const VideoDetail = () => {
 };
 
 export default VideoDetail;
+  const getPersonImage = (person) => {
+    if (person?.profile_image) return person.profile_image;
+    if (person?.profile_url) return person.profile_url;
+    if (person?.profile_path) return `https://image.tmdb.org/t/p/w185${person.profile_path}`;
+    return '/placeholder-person.png';
+  };
