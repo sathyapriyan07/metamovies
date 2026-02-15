@@ -54,6 +54,34 @@ const PersonDetail = () => {
     return null;
   };
 
+  const artistPlatformMeta = {
+    spotify: {
+      label: 'Spotify',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg'
+    },
+    apple_music: {
+      label: 'Apple Music',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/960px-Apple_Music_icon.svg.png'
+    },
+    youtube_music: {
+      label: 'YouTube Music',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Youtube_Music_icon.svg'
+    },
+    amazon_music: {
+      label: 'Amazon Music',
+      logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/Amazon_Music_logo.svg'
+    }
+  };
+
+  const artistMusicLinks = Object.entries(artistPlatformMeta)
+    .map(([key, meta]) => ({
+      key,
+      label: meta.label,
+      logo: meta.logo,
+      url: person?.music_links?.[key] || null
+    }))
+    .filter((item) => !!item.url);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -137,6 +165,35 @@ const PersonDetail = () => {
             )}
           </div>
         </div>
+
+        {/* Listen Artist */}
+        {artistMusicLinks.length > 0 && (
+          <section className="pt-1">
+            <div className="mb-3">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-sky-300/90">Official Profiles</p>
+              <h3 className="text-lg font-semibold mt-1">Listen Artist</h3>
+            </div>
+            <div className="flex gap-2.5 md:gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-1">
+              {artistMusicLinks.map((item) => (
+                <a
+                  key={item.key}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 snap-start h-11 md:h-12 px-4 md:px-5 rounded-full bg-white/[0.16] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_24px_rgba(0,0,0,0.3)] flex items-center justify-center transition-all duration-250 hover:bg-white/[0.24] hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.22)] focus-visible:outline-2 focus-visible:outline-white/60"
+                  aria-label={`Open ${item.label}`}
+                >
+                  <img
+                    src={item.logo}
+                    alt={item.label}
+                    loading="lazy"
+                    className="h-5 md:h-6 w-auto object-contain"
+                  />
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Filmography */}
         {movieCredits.length > 0 && (

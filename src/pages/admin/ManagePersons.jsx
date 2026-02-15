@@ -13,7 +13,8 @@ const ManagePersons = () => {
     biography: '',
     spotify: '',
     apple_music: '',
-    youtube_music: ''
+    youtube_music: '',
+    amazon_music: ''
   });
 
   useEffect(() => {
@@ -63,7 +64,8 @@ const ManagePersons = () => {
       biography: person.biography || '',
       spotify: person.music_links?.spotify || '',
       apple_music: person.music_links?.apple_music || '',
-      youtube_music: person.music_links?.youtube_music || ''
+      youtube_music: person.music_links?.youtube_music || '',
+      amazon_music: person.music_links?.amazon_music || ''
     });
   };
 
@@ -79,7 +81,8 @@ const ManagePersons = () => {
         music_links: {
           spotify: formData.spotify || null,
           apple_music: formData.apple_music || null,
-          youtube_music: formData.youtube_music || null
+          youtube_music: formData.youtube_music || null,
+          amazon_music: formData.amazon_music || null
         }
       })
       .eq('id', selectedPerson.id);
@@ -200,6 +203,17 @@ const ManagePersons = () => {
                           value={formData.youtube_music}
                           onChange={(e) => setFormData({ ...formData, youtube_music: e.target.value })}
                           placeholder="https://music.youtube.com/channel/..."
+                          className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Amazon Music Artist Link</label>
+                        <input
+                          type="url"
+                          value={formData.amazon_music}
+                          onChange={(e) => setFormData({ ...formData, amazon_music: e.target.value })}
+                          placeholder="https://music.amazon.com/artists/..."
                           className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
                         />
                       </div>
