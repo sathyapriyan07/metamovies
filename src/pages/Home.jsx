@@ -47,14 +47,8 @@ const Home = () => {
     setLoading(false);
   };
 
-  const preferredTabs = ['Netflix', 'Prime', 'Max', 'Disney+', 'Apple TV', 'Paramount'];
-  const platformTabs = preferredTabs
-    .map((name) => platforms.find((p) => p.name?.toLowerCase().includes(name.toLowerCase())))
-    .filter(Boolean);
-  const findPlatform = (keyword) => platforms.find((p) => p.name?.toLowerCase().includes(keyword.toLowerCase()));
-  const disneyPlatform = findPlatform('disney');
-  const netflixPlatform = findPlatform('netflix');
-  const primePlatform = findPlatform('prime');
+  const platformTabs = platforms;
+  const defaultPlatform = platforms.find((p) => p.name?.toLowerCase().includes('netflix')) || platforms[0];
 
   return (
     <div className="min-h-screen pb-24 md:pb-12">
@@ -63,33 +57,14 @@ const Home = () => {
       <div className="max-w-7xl mx-auto pt-4">
         <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} />
 
-        {disneyPlatform && (
+        {defaultPlatform && (
           <PlatformRow
-            platformId={disneyPlatform.id}
-            platformName={disneyPlatform.name}
-            type="series"
-            limit={12}
-            tabs={platformTabs}
-          />
-        )}
-
-        {netflixPlatform && (
-          <PlatformRow
-            platformId={netflixPlatform.id}
-            platformName={netflixPlatform.name}
+            platformId={defaultPlatform.id}
+            platformName={defaultPlatform.name}
             type="movie"
             limit={12}
             tabs={platformTabs}
-          />
-        )}
-
-        {primePlatform && (
-          <PlatformRow
-            platformId={primePlatform.id}
-            platformName={primePlatform.name}
-            type="both"
-            limit={12}
-            tabs={platformTabs}
+            title="Streaming Platforms"
           />
         )}
 
