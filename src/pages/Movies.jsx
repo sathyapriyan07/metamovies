@@ -49,13 +49,13 @@ const Movies = () => {
 
   return (
     <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12 page-fade">
-      <div className="max-w-[1320px] mx-auto px-4 md:px-8">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold">Movies</h1>
         </div>
 
         {/* Mobile Filter Chips */}
-        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 mb-6 scrollbar-hide">
+        <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 mb-5 scrollbar-hide">
           {genres.map((genre) => (
             <button
               key={genre}
@@ -99,9 +99,9 @@ const Movies = () => {
               <SkeletonGrid count={12} />
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 lg:gap-5">
                   {movies.map((movie) => (
-                    <PosterCard key={movie.id} item={movie} type="movie" />
+                    <PosterCard key={movie.id} item={movie} type="movie" compact />
                   ))}
                 </div>
 

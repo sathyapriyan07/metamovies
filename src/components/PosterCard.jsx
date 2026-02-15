@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-const PosterCard = ({ item, type = 'movie' }) => {
+const PosterCard = ({ item, type = 'movie', compact = false }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -17,9 +17,13 @@ const PosterCard = ({ item, type = 'movie' }) => {
           loading="lazy"
         />
       </div>
-      <div className="mt-2.5 min-h-[48px]">
-        <h3 className="font-semibold text-sm line-clamp-2 leading-tight text-white">{item.title || item.name}</h3>
-        <p className="text-xs text-[#8E8E93] mt-1">{item.release_date?.split('-')[0] || item.first_air_date?.split('-')[0]}</p>
+      <div className={`mt-2 ${compact ? 'min-h-[42px]' : 'min-h-[48px]'}`}>
+        <h3 className={`font-semibold line-clamp-2 leading-tight text-white ${compact ? 'text-xs' : 'text-sm'}`}>
+          {item.title || item.name}
+        </h3>
+        <p className={`${compact ? 'text-[10px]' : 'text-xs'} text-[#8E8E93] mt-1`}>
+          {item.release_date?.split('-')[0] || item.first_air_date?.split('-')[0]}
+        </p>
       </div>
     </div>
   );

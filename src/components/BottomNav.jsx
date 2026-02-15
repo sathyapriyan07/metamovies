@@ -21,15 +21,16 @@ const BottomNav = () => {
       icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v12H4z" opacity="0.35" /><path d="M4 6l4 3V6m0 3l4-3m-4 3l4 3m-4-3l-4 3m12-3l4-3m-4 3l4 3m-4-3l-4 3" /></svg> 
     },
     {
+      to: '/videos',
+      label: 'Videos',
+      startsWith: true,
+      icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h11a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2zm16 3l-4 2.5v1L20 15V9z" /></svg>
+    },
+    {
       to: '/platforms',
       label: 'Platforms',
       startsWith: true,
       icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 20h16v-2H4v2zm1-3h4V7H5v10zm5 0h4V4h-4v13zm5 0h4V10h-4v7z" /></svg>
-    },
-    { 
-      to: '/news', 
-      label: 'News', 
-      icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" /></svg> 
     },
     ...(user ? [{
       to: '/watchlist',
