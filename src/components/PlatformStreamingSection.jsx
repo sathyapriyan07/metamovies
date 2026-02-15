@@ -3,7 +3,7 @@ import { getMoviesByPlatform, getPlatforms } from '../services/supabase';
 import MovieCard from './MovieCard';
 
 const STORAGE_KEY = 'home_active_platform_id';
-const DEFAULT_LIMIT = 24;
+const DEFAULT_LIMIT = 10;
 
 const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
   const [platforms, setPlatforms] = useState([]);
@@ -119,18 +119,22 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
         </div>
 
         <div className={`transition-opacity duration-200 ${isSwitching ? 'opacity-75' : 'opacity-100'}`}>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="relative">
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
             {loading
               ? Array.from({ length: limit }).map((_, i) => (
-                  <div key={`s-${i}`}>
+                  <div key={`s-${i}`} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
                     <div className="aspect-[2/3] rounded-2xl bg-white/25 animate-pulse" />
                   </div>
                 ))
               : activeMovies.map((movie) => (
-                  <div key={movie.id}>
+                  <div key={movie.id} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
                     <MovieCard movie={movie} />
                   </div>
                 ))}
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#04060b]/55 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#04060b]/55 to-transparent" />
           </div>
 
           {!loading && activeMovies.length === 0 && (
