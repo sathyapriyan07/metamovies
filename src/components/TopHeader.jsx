@@ -7,7 +7,7 @@ const TopHeader = () => {
   const { user, isAdmin } = useAuth();
 
   return (
-    <header className="md:hidden sticky top-0 z-40 px-4 pt-[max(env(safe-area-inset-top),10px)] pb-1 bg-gradient-to-b from-[#060a12]/95 to-[#060a12]/65 backdrop-blur-md border-b border-white/10">
+    <header className="md:hidden sticky top-0 z-40 px-4 pt-[max(env(safe-area-inset-top),10px)] pb-2 bg-gradient-to-b from-[#060a12]/95 to-[#060a12]/65 backdrop-blur-md border-b border-white/10">
       <div className="flex items-center justify-between gap-3">
         <Link to="/" className="inline-flex items-center gap-2 min-w-0">
           <img

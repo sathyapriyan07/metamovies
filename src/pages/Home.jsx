@@ -6,6 +6,7 @@ import {
 } from '../services/supabase';
 import CarouselRow from '../components/CarouselRow';
 import PlatformStreamingSection from '../components/PlatformStreamingSection';
+import HeroBanner from '../components/HeroBanner';
 import TopHeader from '../components/TopHeader';
 import HomeSearchBar from '../components/HomeSearchBar';
 
@@ -47,13 +48,14 @@ const Home = () => {
   return (
     <div className="min-h-screen pb-[88px] md:pb-12">
       <TopHeader />
+      <HeroBanner />
 
-      <main className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pt-2 md:pt-3">
-        <div>
+      <main className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pt-4">
+        <div className="mt-4">
           <HomeSearchBar />
         </div>
 
-        <div className="mt-6 md:mt-6">
+        <div className="mt-6">
           <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} padded={false} />
         </div>
 
