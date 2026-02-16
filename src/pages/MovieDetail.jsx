@@ -56,13 +56,16 @@ const buildYouTubeEmbedUrl = (videoId, autoplay, loop, startSeconds, preferLiteQ
     modestbranding: '1',
     playsinline: '1',
     iv_load_policy: '3',
-    enablejsapi: '1'
+    enablejsapi: '1',
+    fs: '0',
+    disablekb: '1',
+    cc_load_policy: '0'
   });
   if (loop) params.set('loop', '1');
   if (loop) params.set('playlist', videoId);
   if (startSeconds > 0) params.set('start', String(startSeconds));
   if (preferLiteQuality) params.set('vq', 'hd720');
-  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+  return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
 };
 
 const buildVimeoEmbedUrl = (videoId, autoplay, loop, startSeconds, preferLiteQuality) => {
@@ -74,7 +77,11 @@ const buildVimeoEmbedUrl = (videoId, autoplay, loop, startSeconds, preferLiteQua
     background: '1',
     byline: '0',
     portrait: '0',
-    title: '0'
+    title: '0',
+    badge: '0',
+    dnt: '1',
+    autopause: '0',
+    api: '1'
   });
   if (preferLiteQuality) params.set('quality', '720p');
   const startFragment = startSeconds > 0 ? `#t=${startSeconds}s` : '';
@@ -97,11 +104,20 @@ const MovieDetail = () => {
   const [isHeroInView, setIsHeroInView] = useState(true);
   const [isTabVisible, setIsTabVisible] = useState(true);
   const [manualPause, setManualPause] = useState(false);
+  const [isHeroMuted, setIsHeroMuted] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('hero_video_muted');
+      return saved === null ? true : saved === 'true';
+    } catch {
+      return true;
+    }
+  });
   const [videoReady, setVideoReady] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
   const heroRef = useRef(null);
   const heroVideoRef = useRef(null);
   const youtubeIframeRef = useRef(null);
+  const vimeoIframeRef = useRef(null);
 
   const formatRuntime = (mins) => {
     if (!mins || mins <= 0) return null;
@@ -225,6 +241,14 @@ const MovieDetail = () => {
   };
 
   useEffect(() => {
+    try {
+      sessionStorage.setItem('hero_video_muted', String(isHeroMuted));
+    } catch {
+      // Ignore storage errors (private mode, restricted env).
+    }
+  }, [isHeroMuted]);
+
+  useEffect(() => {
     setManualPause(!autoplayEnabled);
     setVideoReady(false);
     setVideoFailed(false);
@@ -235,12 +259,12 @@ const MovieDetail = () => {
     if (!videoEl || heroVideoSource?.type !== 'file') return;
 
     if (shouldPlayHeroVideo) {
-      videoEl.muted = true;
+      videoEl.muted = isHeroMuted;
       videoEl.play().catch(() => setVideoFailed(true));
     } else {
       videoEl.pause();
     }
-  }, [shouldPlayHeroVideo, heroVideoSource?.type]);
+  }, [shouldPlayHeroVideo, heroVideoSource?.type, isHeroMuted]);
 
   useEffect(() => {
     const frame = youtubeIframeRef.current;
@@ -251,6 +275,37 @@ const MovieDetail = () => {
       '*'
     );
   }, [shouldPlayHeroVideo, heroVideoSource?.type]);
+
+  useEffect(() => {
+    if (!videoReady) return;
+
+    if (heroVideoSource?.type === 'file') {
+      if (heroVideoRef.current) heroVideoRef.current.muted = isHeroMuted;
+      return;
+    }
+
+    if (heroVideoSource?.type === 'youtube') {
+      const frame = youtubeIframeRef.current;
+      const command = isHeroMuted ? 'mute' : 'unMute';
+      frame?.contentWindow?.postMessage(
+        JSON.stringify({ event: 'command', func: command, args: [] }),
+        '*'
+      );
+      return;
+    }
+
+    if (heroVideoSource?.type === 'vimeo') {
+      const frame = vimeoIframeRef.current;
+      frame?.contentWindow?.postMessage(
+        JSON.stringify({ method: 'setVolume', value: isHeroMuted ? 0 : 1 }),
+        '*'
+      );
+      frame?.contentWindow?.postMessage(
+        JSON.stringify({ method: 'setMuted', value: isHeroMuted }),
+        '*'
+      );
+    }
+  }, [heroVideoSource?.type, isHeroMuted, videoReady]);
 
   useEffect(() => {
     if (!shouldLoadHeroVideo) return undefined;
@@ -360,7 +415,7 @@ const MovieDetail = () => {
             className={`absolute inset-0 z-[5] w-full h-full object-cover object-center transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             style={{ filter: 'brightness(0.88)' }}
             autoPlay={autoplayEnabled}
-            muted
+            muted={isHeroMuted}
             loop={loopEnabled}
             playsInline
             preload="metadata"
@@ -380,7 +435,7 @@ const MovieDetail = () => {
         {shouldLoadHeroVideo && heroVideoSource?.type === 'youtube' && (
           <iframe
             ref={youtubeIframeRef}
-            src={buildYouTubeEmbedUrl(heroVideoSource.id, shouldPlayHeroVideo, loopEnabled, startSeconds, preferLiteQuality)}
+            src={buildYouTubeEmbedUrl(heroVideoSource.id, autoplayEnabled, loopEnabled, startSeconds, preferLiteQuality)}
             title={`${movie.title} background trailer`}
             className={`absolute left-1/2 top-1/2 z-[5] pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             style={iframeCoverStyle}
@@ -394,7 +449,8 @@ const MovieDetail = () => {
 
         {shouldLoadHeroVideo && heroVideoSource?.type === 'vimeo' && (
           <iframe
-            src={buildVimeoEmbedUrl(heroVideoSource.id, shouldPlayHeroVideo, loopEnabled, startSeconds, preferLiteQuality)}
+            ref={vimeoIframeRef}
+            src={buildVimeoEmbedUrl(heroVideoSource.id, autoplayEnabled, loopEnabled, startSeconds, preferLiteQuality)}
             title={`${movie.title} background trailer`}
             className={`absolute left-1/2 top-1/2 z-[5] pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             style={iframeCoverStyle}
@@ -450,7 +506,7 @@ const MovieDetail = () => {
             </div>
 
             <div className="flex items-center gap-3 md:gap-4 flex-wrap">
-              {shouldLoadHeroVideo && (
+              {shouldLoadHeroVideo && heroVideoSource?.type === 'file' && (
                 <button
                   type="button"
                   onClick={() => setManualPause((prev) => !prev)}
@@ -465,6 +521,29 @@ const MovieDetail = () => {
                   ) : (
                     <svg className="w-5 h-5 md:w-[22px] md:h-[22px] text-white/92" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                       <path d="M7 5h4v14H7zm6 0h4v14h-4z" />
+                    </svg>
+                  )}
+                </button>
+              )}
+              {shouldLoadHeroVideo && (
+                <button
+                  type="button"
+                  onClick={() => setIsHeroMuted((prev) => !prev)}
+                  className="w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center bg-white/[0.14] backdrop-blur-[22px] border border-white/28 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.22] hover:border-white/45 hover:scale-[1.05] hover:shadow-[0_0_18px_rgba(255,255,255,0.2)] focus-visible:outline-2 focus-visible:outline-white/60"
+                  aria-label={isHeroMuted ? 'Unmute hero video' : 'Mute hero video'}
+                  aria-pressed={!isHeroMuted}
+                >
+                  {isHeroMuted ? (
+                    <svg className="w-5 h-5 md:w-[22px] md:h-[22px] text-white/92" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6 9H3v6h3l5 4V5Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m22 9-6 6" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m16 9 6 6" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 md:w-[22px] md:h-[22px] text-white/92" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6 9H3v6h3l5 4V5Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.5 8.5a5 5 0 0 1 0 7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.5 6a9 9 0 0 1 0 12" />
                     </svg>
                   )}
                 </button>
