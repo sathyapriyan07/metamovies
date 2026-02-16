@@ -59,7 +59,9 @@ const buildYouTubeEmbedUrl = (videoId, autoplay, loop, startSeconds, preferLiteQ
     enablejsapi: '1',
     fs: '0',
     disablekb: '1',
-    cc_load_policy: '0'
+    cc_load_policy: '0',
+    showinfo: '0',
+    color: 'white'
   });
   if (loop) params.set('loop', '1');
   if (loop) params.set('playlist', videoId);
@@ -235,7 +237,7 @@ const MovieDetail = () => {
     height: '56.25vw',
     minWidth: '100%',
     minHeight: '100%',
-    transform: 'translate(-50%, -50%) scale(1.03)',
+    transform: 'translate(-50%, -52%) scale(1.15)',
     transformOrigin: 'center center',
     willChange: 'transform'
   };
@@ -462,7 +464,7 @@ const MovieDetail = () => {
           />
         )}
 
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#04060b] via-[#04060b]/80 to-transparent" />
+        <div className="absolute inset-0 z-10 bg-[linear-gradient(to_bottom,rgba(4,6,11,0.28)_0%,rgba(4,6,11,0.12)_22%,rgba(4,6,11,0.04)_52%,rgba(4,6,11,0.50)_100%)] lg:bg-[linear-gradient(to_bottom,rgba(4,6,11,0.22)_0%,rgba(4,6,11,0.08)_24%,rgba(4,6,11,0.03)_56%,rgba(4,6,11,0.42)_100%)]" />
         
         <div className="relative z-20 h-full flex items-end pb-6 px-5 md:px-8 lg:px-0 lg:pb-10">
           <div className="w-full max-w-4xl lg:max-w-[1280px] lg:mx-auto lg:px-10">
