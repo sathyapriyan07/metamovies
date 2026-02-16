@@ -112,9 +112,9 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
   if (platforms.length === 0 && !loading) return null;
 
   return (
-    <section className="mb-8 fade-in">
-      <div className="w-full rounded-2xl bg-white/12 backdrop-blur-xl border border-white/25 shadow-xl p-4 md:p-5">
-        <div className="mb-4">
+    <section className="mb-8 lg:mb-12 fade-in">
+      <div className="w-full rounded-2xl bg-white/12 backdrop-blur-xl border border-white/25 shadow-xl p-4 md:p-5 lg:p-6">
+        <div className="mb-4 lg:mb-5">
           <h2 className="text-lg md:text-2xl font-semibold text-white">
             Streaming on <span className="text-sky-300 drop-shadow-[0_0_10px_rgba(125,211,252,0.45)]">{activePlatformName}</span>
           </h2>
@@ -155,10 +155,10 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
                 ))}
             </div>
             {showLeftFade && (
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-7 md:w-8 lg:w-10 bg-gradient-to-r from-[#04060b]/65 to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-7 md:w-8 lg:w-12 bg-gradient-to-r from-[#04060b]/70 to-transparent" />
             )}
             {showRightFade && (
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-7 md:w-8 lg:w-10 bg-gradient-to-l from-[#04060b]/65 to-transparent" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-7 md:w-8 lg:w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
             )}
           </div>
 

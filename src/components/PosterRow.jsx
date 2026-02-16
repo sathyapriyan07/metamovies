@@ -38,14 +38,14 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, pa
   }, [items, loading, updateFades]);
 
   if (loading) return (
-    <div className="mb-8">
+    <div className="mb-8 lg:mb-12">
       <div className={`${edgePaddingClass} flex items-end justify-between`}>
         <div>
           <h2 className="section-title">{title}</h2>
           {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
         </div>
       </div>
-      <div className={`${edgePaddingClass} mt-4`}>
+      <div className={`${edgePaddingClass} mt-4 lg:mt-5`}>
         <SkeletonRow />
       </div>
     </div>
@@ -54,14 +54,14 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, pa
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="mb-8 fade-in">
+    <div className="mb-8 lg:mb-12 fade-in">
       <div className={`${edgePaddingClass} flex items-end justify-between`}>
         <div>
           <h2 className="section-title">{title}</h2>
           {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
         </div>
       </div>
-      <div className={`${edgePaddingClass} mt-4`}>
+      <div className={`${edgePaddingClass} mt-4 lg:mt-5`}>
         <div className="relative">
           <div ref={trackRef} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {items.map((item) => (
@@ -71,10 +71,10 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, pa
             ))}
           </div>
           {showLeftFade && (
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-7 md:w-8 lg:w-10 bg-gradient-to-r from-[#04060b]/65 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-7 md:w-8 lg:w-12 bg-gradient-to-r from-[#04060b]/70 to-transparent" />
           )}
           {showRightFade && (
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-7 md:w-8 lg:w-10 bg-gradient-to-l from-[#04060b]/65 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-7 md:w-8 lg:w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
           )}
         </div>
       </div>

@@ -40,14 +40,14 @@ const HeroBanner = () => {
   };
 
   if (loading || banners.length === 0) {
-    return <div className="w-full h-[55vh] md:h-[70vh] bg-[#1C1C1E] animate-pulse" />;
+    return <div className="w-full h-[55vh] md:h-[70vh] lg:h-[64vh] bg-[#1C1C1E] animate-pulse" />;
   }
 
   const featured = banners[currentIndex];
 
   return (
     <div
-      className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden"
+      className="relative w-full h-[50vh] md:h-[60vh] lg:h-[64vh] overflow-hidden"
       onTouchStart={(e) => touchStartX.current = e.touches[0].clientX}
       onTouchMove={(e) => touchEndX.current = e.touches[0].clientX}
       onTouchEnd={handleSwipe}
@@ -59,14 +59,14 @@ const HeroBanner = () => {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
-      <div className="relative h-full max-w-[1320px] mx-auto px-4 md:px-8 flex items-end pb-12 md:pb-16">
-        <div className="max-w-3xl animate-fade-in">
+      <div className="relative h-full max-w-[1320px] lg:max-w-[1280px] mx-auto px-4 md:px-8 lg:px-10 flex items-end pb-12 md:pb-16 lg:pb-14">
+        <div className="max-w-3xl lg:max-w-[700px] animate-fade-in">
           {/* Title Logo or Text */}
           {featured.title_logo_url && !featured.use_text_title ? (
             <img
               src={featured.title_logo_url}
               alt={featured.title || featured.name}
-              className="hero-logo mb-2"
+              className="hero-logo title-logo-glow mb-2"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextElementSibling.style.display = 'block';
@@ -88,7 +88,7 @@ const HeroBanner = () => {
           </div>
 
           {featured.overview && (
-            <p className="text-[#C7C7CC] text-base mb-6 line-clamp-3 leading-relaxed">
+            <p className="text-[#C7C7CC] text-base mb-6 lg:mb-4 line-clamp-3 leading-relaxed">
               {featured.overview}
             </p>
           )}

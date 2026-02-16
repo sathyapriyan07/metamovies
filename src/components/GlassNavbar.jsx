@@ -20,7 +20,7 @@ const GlassNavbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 hidden md:block">
       <div className="glass-nav backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center gap-6">
+        <div className="max-w-7xl lg:max-w-[1280px] mx-auto px-6 lg:px-10 h-16 flex items-center gap-6 lg:gap-7">
           <Link to="/" className="text-2xl font-semibold tracking-tight text-white">
             MetaMovies
             <span className="text-sky-400">+</span>

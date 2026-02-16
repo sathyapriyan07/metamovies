@@ -703,7 +703,7 @@ const ManageMovies = () => {
                   <img
                     src={titleLogoUrl}
                     alt="Logo Preview"
-                    className="max-h-24 object-contain mx-auto drop-shadow-[0_0_20px_rgba(59,167,255,0.35)]"
+                    className="title-logo-glow max-h-24 object-contain mx-auto"
                     onError={(e) => e.target.src = 'https://via.placeholder.com/300x100?text=Invalid+Logo'}
                   />
                 </div>

@@ -46,16 +46,16 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen pb-[88px] md:pb-12">
+    <div className="min-h-screen pb-[88px] md:pb-12 lg:overflow-x-hidden">
       <TopHeader />
       <HeroBanner />
 
-      <main className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pt-4">
-        <div className="mt-4">
+      <main className="max-w-7xl lg:max-w-[1280px] mx-auto px-4 md:px-6 lg:px-10 pt-4 lg:pt-8">
+        <div className="mt-4 lg:mt-0">
           <HomeSearchBar />
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 lg:mt-12">
           <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} padded={false} />
         </div>
 

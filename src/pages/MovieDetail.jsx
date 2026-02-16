@@ -329,9 +329,9 @@ const MovieDetail = () => {
     .filter((item) => !!item.url);
 
   return (
-    <div className="min-h-screen pb-24 md:pb-12 animate-fade-in">
+    <div className="min-h-screen pb-24 md:pb-12 lg:overflow-x-hidden animate-fade-in">
       {/* Hero Backdrop Section */}
-      <div ref={heroRef} className="relative w-full h-[50vh] md:h-[55vh] overflow-hidden">
+      <div ref={heroRef} className="relative w-full h-[50vh] md:h-[55vh] lg:h-[64vh] overflow-hidden">
         {heroPoster ? (
           <img
             src={heroPoster}
@@ -405,15 +405,16 @@ const MovieDetail = () => {
 
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#04060b] via-[#04060b]/80 to-transparent" />
         
-        <div className="relative z-20 h-full flex items-end pb-6 px-5 md:px-8">
-          <div className="w-full max-w-4xl">
+        <div className="relative z-20 h-full flex items-end pb-6 px-5 md:px-8 lg:px-0 lg:pb-10">
+          <div className="w-full max-w-4xl lg:max-w-[1280px] lg:mx-auto lg:px-10">
+            <div className="lg:max-w-[700px]">
             {/* Title Logo or Text */}
             {movie.title_logo_url && !movie.use_text_title ? (
               <div className="mb-3 md:mb-4">
                 <img
                   src={movie.title_logo_url}
                   alt={`${movie.title} logo`}
-                  className="max-h-16 md:max-h-20 lg:max-h-28 object-contain self-start drop-shadow-[0_0_20px_rgba(59,167,255,0.35)]"
+                  className="title-logo-glow max-h-16 md:max-h-20 lg:max-h-28 object-contain self-start"
                   onError={(e) => {
                     e.target.style.display = 'none';
                     e.target.nextElementSibling.style.display = 'block';
@@ -429,7 +430,7 @@ const MovieDetail = () => {
               </h1>
             )}
             
-            <div className="flex items-center gap-2 text-xs md:text-sm text-gray-300 flex-wrap mb-4">
+            <div className="flex items-center gap-2 text-xs md:text-sm text-gray-300 flex-wrap mb-4 lg:mb-5">
               {movie.release_date && <span>{movie.release_date.split('-')[0]}</span>}
               {movie.runtime > 0 && (
                 <>
@@ -500,15 +501,16 @@ const MovieDetail = () => {
                 </svg>
               </button>
             </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-5 md:px-8 space-y-6 mt-6">
+      <div className="max-w-7xl lg:max-w-[1280px] mx-auto px-5 md:px-8 lg:px-10 space-y-6 lg:space-y-12 mt-6 lg:mt-12">
         {/* Trailers Section */}
         {movie.trailer_url && (
           <section>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 lg:mb-5">
               <h2 className="text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Trailers</h2>
               <div className="glass-icon w-8 h-8 flex items-center justify-center">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -516,9 +518,10 @@ const MovieDetail = () => {
                 </svg>
               </div>
             </div>
-            <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory px-4 md:px-8 -mx-4 md:-mx-8">
-              <div className="flex-shrink-0 snap-start group cursor-pointer">
-                <div className="relative w-[280px] md:w-[320px] aspect-video rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_25px_rgba(59,167,255,0.3)] hover:scale-[1.03]">
+            <div className="relative overflow-hidden lg:overflow-visible">
+              <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory px-4 md:px-8 -mx-4 md:-mx-8 lg:px-0 lg:mx-0">
+                <div className="flex-shrink-0 snap-start group cursor-pointer">
+                  <div className="relative w-[280px] md:w-[320px] lg:w-[360px] aspect-video rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_25px_rgba(59,167,255,0.3)] hover:scale-[1.03]">
                   <img
                     src={getYouTubeThumbnail(movie.trailer_url) || movie.backdrop_url}
                     alt="Official Trailer"
@@ -553,6 +556,8 @@ const MovieDetail = () => {
                   />
                 </div>
               </div>
+              </div>
+              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
             </div>
           </section>
         )}
@@ -572,30 +577,33 @@ const MovieDetail = () => {
         {/* Soundtrack Section */}
         {soundtrackLinks.length > 0 && (
           <section>
-            <div className="mb-3">
+            <div className="mb-3 lg:mb-5">
               <p className="text-[11px] uppercase tracking-[0.25em] text-sky-300/90">Original Score & Songs</p>
               <h3 className="text-lg font-semibold mt-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 Soundtrack
               </h3>
             </div>
-            <div className="flex gap-2.5 md:gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-1">
-              {soundtrackLinks.map((item) => (
-                <a
-                  key={item.key}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-shrink-0 snap-start h-11 md:h-12 px-4 md:px-5 rounded-full bg-white/[0.16] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_24px_rgba(0,0,0,0.3)] flex items-center justify-center transition-all duration-250 hover:bg-white/[0.24] hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.22)] focus-visible:outline-2 focus-visible:outline-white/60"
-                  aria-label={`Open ${item.label}`}
-                >
-                  <img
-                    src={item.logo}
-                    alt={item.label}
-                    loading="lazy"
-                    className="h-5 md:h-6 w-auto object-contain"
-                  />
-                </a>
-              ))}
+            <div className="relative overflow-hidden lg:overflow-visible">
+              <div className="flex gap-2.5 md:gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-1">
+                {soundtrackLinks.map((item) => (
+                  <a
+                    key={item.key}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 snap-start h-11 md:h-12 px-4 md:px-5 rounded-full bg-white/[0.16] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_24px_rgba(0,0,0,0.3)] flex items-center justify-center transition-all duration-250 hover:bg-white/[0.24] hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.22)] focus-visible:outline-2 focus-visible:outline-white/60"
+                    aria-label={`Open ${item.label}`}
+                  >
+                    <img
+                      src={item.logo}
+                      alt={item.label}
+                      loading="lazy"
+                      className="h-5 md:h-6 w-auto object-contain"
+                    />
+                  </a>
+                ))}
+              </div>
+              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
             </div>
           </section>
         )}
@@ -603,7 +611,7 @@ const MovieDetail = () => {
         {/* Cast & Crew Section */}
         {movie.cast?.length > 0 && (
           <section>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 lg:mb-5">
               <h2 className="text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Cast & Crew</h2>
               <button
                 onClick={() => navigate(`/movie/${movie.id}/cast-crew`)}
@@ -615,13 +623,14 @@ const MovieDetail = () => {
                 </svg>
               </button>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-              {movie.cast.slice(0, 15).map((c) => (
-                <div
-                  key={c.id}
-                  onClick={() => navigate(`/person/${c.person.id}`)}
-                  className="flex-shrink-0 snap-start cursor-pointer group"
-                >
+            <div className="relative overflow-hidden lg:overflow-visible">
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                {movie.cast.slice(0, 15).map((c) => (
+                  <div
+                    key={c.id}
+                    onClick={() => navigate(`/person/${c.person.id}`)}
+                    className="flex-shrink-0 snap-start cursor-pointer group"
+                  >
                   <div className="w-[80px] md:w-[88px] h-[80px] md:h-[88px] rounded-full overflow-hidden glass-icon mb-2 transition-all duration-200 group-hover:scale-105">
                     {c.person.profile_url ? (
                       <img
@@ -640,25 +649,28 @@ const MovieDetail = () => {
                   </div>
                   <p className="text-xs font-semibold text-center line-clamp-2 w-[80px] md:w-[88px]">{c.person.name}</p>
                   <p className="text-[10px] text-gray-400 text-center line-clamp-1 w-[80px] md:w-[88px]">{c.character}</p>
-                </div>
-              ))}
+                  </div>
+                ))}
+              </div>
+              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
             </div>
           </section>
         )}
 
         {platforms.length > 0 && (
           <section>
-            <h2 className="text-xl md:text-2xl font-semibold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <h2 className="text-xl md:text-2xl font-semibold mb-4 lg:mb-5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
               Platforms
             </h2>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-              {platforms.map((platform) => (
-                <button
-                  type="button"
-                  key={platform.id}
-                  onClick={() => navigate(`/platforms/${platform.id}`)}
-                  className="flex-shrink-0 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-[18px] p-3 min-w-[120px] h-16 flex items-center justify-center hover:bg-white/15 hover:scale-[1.03] transition-all duration-250"
-                >
+            <div className="relative overflow-hidden lg:overflow-visible">
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {platforms.map((platform) => (
+                  <button
+                    type="button"
+                    key={platform.id}
+                    onClick={() => navigate(`/platforms/${platform.id}`)}
+                    className="flex-shrink-0 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-[18px] p-3 min-w-[120px] h-16 flex items-center justify-center hover:bg-white/15 hover:scale-[1.03] transition-all duration-250"
+                  >
                   {platform.logo_url ? (
                     <img
                       src={platform.logo_url}
@@ -669,8 +681,10 @@ const MovieDetail = () => {
                   ) : (
                     <span className="text-xs font-medium">{platform.name}</span>
                   )}
-                </button>
-              ))}
+                  </button>
+                ))}
+              </div>
+              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
             </div>
           </section>
         )}
@@ -766,7 +780,7 @@ const MovieDetail = () => {
         {/* Streaming Platforms */}
         {movie.watch_links && (movie.watch_links.netflix || movie.watch_links.prime || movie.watch_links.hotstar) && (
           <section>
-            <h3 className="text-lg font-semibold mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Watch Now</h3>
+            <h3 className="text-lg font-semibold mb-3 lg:mb-5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Watch Now</h3>
             <div className="flex flex-wrap gap-3">
               {movie.watch_links.netflix && (
                 <a
