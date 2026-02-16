@@ -36,6 +36,14 @@ const ManageMovies = () => {
   const [bookingError, setBookingError] = useState('');
   const [savingBooking, setSavingBooking] = useState(false);
 
+  const [editingHeroVideo, setEditingHeroVideo] = useState(null);
+  const [heroTrailerUrl, setHeroTrailerUrl] = useState('');
+  const [heroVideoStartTime, setHeroVideoStartTime] = useState('0');
+  const [heroAutoplayToggle, setHeroAutoplayToggle] = useState(true);
+  const [heroLoopToggle, setHeroLoopToggle] = useState(true);
+  const [heroVideoError, setHeroVideoError] = useState('');
+  const [savingHeroVideo, setSavingHeroVideo] = useState(false);
+
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [playerEnabled, setPlayerEnabled] = useState(false);
   const [playerUrlOverride, setPlayerUrlOverride] = useState('');
@@ -330,6 +338,15 @@ const ManageMovies = () => {
     setTitleLogoError('');
   };
 
+  const handleEditHeroVideo = (movie) => {
+    setEditingHeroVideo(movie);
+    setHeroTrailerUrl(movie.trailer_url || '');
+    setHeroVideoStartTime(String(Number.isFinite(movie.video_start_time) ? movie.video_start_time : 0));
+    setHeroAutoplayToggle(movie.autoplay_toggle !== false);
+    setHeroLoopToggle(movie.loop_toggle !== false);
+    setHeroVideoError('');
+  };
+
   const handleSaveTitleLogo = async () => {
     if (!editingTitleLogo) return;
     
@@ -394,6 +411,49 @@ const ManageMovies = () => {
       setBookingError(error.message || 'Failed to update booking');
     } finally {
       setSavingBooking(false);
+    }
+  };
+
+  const handleSaveHeroVideo = async () => {
+    if (!editingHeroVideo) return;
+
+    const trimmedTrailerUrl = heroTrailerUrl.trim();
+    const parsedStartTime = Number.parseInt(heroVideoStartTime, 10);
+
+    setHeroVideoError('');
+
+    if (trimmedTrailerUrl && !validateEmbedUrl(trimmedTrailerUrl)) {
+      setHeroVideoError('Trailer URL must be a valid http(s) URL.');
+      return;
+    }
+
+    if (!Number.isFinite(parsedStartTime) || parsedStartTime < 0) {
+      setHeroVideoError('Video start time must be 0 or greater.');
+      return;
+    }
+
+    try {
+      setSavingHeroVideo(true);
+      const { error } = await updateMovie(editingHeroVideo.id, {
+        trailer_url: trimmedTrailerUrl || null,
+        video_start_time: parsedStartTime,
+        autoplay_toggle: !!heroAutoplayToggle,
+        loop_toggle: !!heroLoopToggle
+      });
+      if (error) throw error;
+
+      showToast('Hero video settings updated successfully', 'success');
+      setEditingHeroVideo(null);
+      setHeroTrailerUrl('');
+      setHeroVideoStartTime('0');
+      setHeroAutoplayToggle(true);
+      setHeroLoopToggle(true);
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating hero video settings:', error);
+      setHeroVideoError(error.message || 'Failed to update hero video settings');
+    } finally {
+      setSavingHeroVideo(false);
     }
   };
 
@@ -516,6 +576,12 @@ const ManageMovies = () => {
                     className="px-3 py-2 bg-blue-600/70 hover:bg-blue-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
                     Backdrop
+                  </button>
+                  <button
+                    onClick={() => handleEditHeroVideo(movie)}
+                    className="px-3 py-2 bg-emerald-600/70 hover:bg-emerald-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                  >
+                    Hero Video
                   </button>
                   <button
                     onClick={() => handleEditRatings(movie)}
@@ -882,6 +948,91 @@ const ManageMovies = () => {
                     setBookingError('');
                   }}
                   disabled={savingBooking}
+                  className="flex-1 btn-ghost disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Hero Video Modal */}
+        {editingHeroVideo && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-xl w-full">
+              <h2 className="text-2xl font-bold mb-4">Edit Hero Video - {editingHeroVideo.title}</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Trailer URL</label>
+                  <input
+                    type="url"
+                    value={heroTrailerUrl}
+                    onChange={(e) => {
+                      setHeroTrailerUrl(e.target.value);
+                      setHeroVideoError('');
+                    }}
+                    placeholder="https://youtube.com/watch?v=... or https://cdn.example.com/trailer-720p.mp4"
+                    className="w-full px-4 py-3 glass-input"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Video Start Time (seconds)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={heroVideoStartTime}
+                    onChange={(e) => {
+                      setHeroVideoStartTime(e.target.value);
+                      setHeroVideoError('');
+                    }}
+                    className="w-full px-4 py-3 glass-input"
+                  />
+                </div>
+
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input
+                    type="checkbox"
+                    checked={heroAutoplayToggle}
+                    onChange={(e) => setHeroAutoplayToggle(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  Autoplay hero video
+                </label>
+
+                <label className="flex items-center gap-2 text-sm font-medium">
+                  <input
+                    type="checkbox"
+                    checked={heroLoopToggle}
+                    onChange={(e) => setHeroLoopToggle(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  Loop hero video
+                </label>
+              </div>
+
+              {heroVideoError && <p className="text-red-400 text-sm mt-3">{heroVideoError}</p>}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSaveHeroVideo}
+                  disabled={savingHeroVideo}
+                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingHeroVideo ? 'Saving...' : 'Save Hero Video'}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingHeroVideo(null);
+                    setHeroTrailerUrl('');
+                    setHeroVideoStartTime('0');
+                    setHeroAutoplayToggle(true);
+                    setHeroLoopToggle(true);
+                    setHeroVideoError('');
+                  }}
+                  disabled={savingHeroVideo}
                   className="flex-1 btn-ghost disabled:opacity-50"
                 >
                   Cancel

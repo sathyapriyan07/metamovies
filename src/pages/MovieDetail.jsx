@@ -1,8 +1,85 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieById } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
+
+const VIDEO_EXT_RE = /\.(mp4|webm|ogg|m3u8)(\?|#|$)/i;
+
+const parseStartSeconds = (value) => {
+  const n = Number.parseInt(value, 10);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+};
+
+const resolveHeroVideoSource = (url) => {
+  if (!url || typeof url !== 'string') return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  let parsed;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return null;
+  }
+
+  const host = parsed.hostname.toLowerCase();
+  const path = parsed.pathname || '';
+
+  const ytMatch = trimmed.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/i);
+  if (ytMatch?.[1]) {
+    return { type: 'youtube', id: ytMatch[1] };
+  }
+
+  const vimeoMatch = trimmed.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+  if (vimeoMatch?.[1]) {
+    return { type: 'vimeo', id: vimeoMatch[1] };
+  }
+
+  if (VIDEO_EXT_RE.test(path) || VIDEO_EXT_RE.test(trimmed)) {
+    return { type: 'file', src: trimmed };
+  }
+
+  if (host.includes('storage.googleapis.com') || host.includes('supabase.co')) {
+    return { type: 'file', src: trimmed };
+  }
+
+  return null;
+};
+
+const buildYouTubeEmbedUrl = (videoId, autoplay, loop, startSeconds, preferLiteQuality) => {
+  const params = new URLSearchParams({
+    autoplay: autoplay ? '1' : '0',
+    mute: '1',
+    controls: '0',
+    rel: '0',
+    modestbranding: '1',
+    playsinline: '1',
+    iv_load_policy: '3',
+    enablejsapi: '1'
+  });
+  if (loop) params.set('loop', '1');
+  if (loop) params.set('playlist', videoId);
+  if (startSeconds > 0) params.set('start', String(startSeconds));
+  if (preferLiteQuality) params.set('vq', 'hd720');
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+};
+
+const buildVimeoEmbedUrl = (videoId, autoplay, loop, startSeconds, preferLiteQuality) => {
+  const params = new URLSearchParams({
+    autoplay: autoplay ? '1' : '0',
+    muted: '1',
+    loop: loop ? '1' : '0',
+    controls: '0',
+    background: '1',
+    byline: '0',
+    portrait: '0',
+    title: '0'
+  });
+  if (preferLiteQuality) params.set('quality', '720p');
+  const startFragment = startSeconds > 0 ? `#t=${startSeconds}s` : '';
+  return `https://player.vimeo.com/video/${videoId}?${params.toString()}${startFragment}`;
+};
 
 const MovieDetail = () => {
   const { id } = useParams();
@@ -14,6 +91,17 @@ const MovieDetail = () => {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
   const [trailerDuration, setTrailerDuration] = useState(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [prefersReducedData, setPrefersReducedData] = useState(false);
+  const [isHeroInView, setIsHeroInView] = useState(true);
+  const [isTabVisible, setIsTabVisible] = useState(true);
+  const [manualPause, setManualPause] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const heroRef = useRef(null);
+  const heroVideoRef = useRef(null);
+  const youtubeIframeRef = useRef(null);
 
   const formatRuntime = (mins) => {
     if (!mins || mins <= 0) return null;
@@ -69,6 +157,109 @@ const MovieDetail = () => {
   useEffect(() => {
     loadMovie();
   }, [id]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches);
+    handleChange();
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  useEffect(() => {
+    const viewportQuery = window.matchMedia('(max-width: 768px)');
+    const handleViewport = () => setIsMobileViewport(viewportQuery.matches);
+    handleViewport();
+    viewportQuery.addEventListener('change', handleViewport);
+    return () => viewportQuery.removeEventListener('change', handleViewport);
+  }, []);
+
+  useEffect(() => {
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!connection) return undefined;
+    const handleConnectionChange = () => setPrefersReducedData(!!connection.saveData);
+    handleConnectionChange();
+    connection.addEventListener?.('change', handleConnectionChange);
+    return () => connection.removeEventListener?.('change', handleConnectionChange);
+  }, []);
+
+  useEffect(() => {
+    const heroNode = heroRef.current;
+    if (!heroNode) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsHeroInView(entry.isIntersecting),
+      { threshold: 0.25 }
+    );
+
+    observer.observe(heroNode);
+    return () => observer.disconnect();
+  }, [movie?.id]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsTabVisible(document.visibilityState === 'visible');
+    };
+    handleVisibility();
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  const heroVideoSource = useMemo(() => resolveHeroVideoSource(movie?.trailer_url), [movie?.trailer_url]);
+  const autoplayEnabled = movie?.autoplay_toggle !== false;
+  const loopEnabled = movie?.loop_toggle !== false;
+  const startSeconds = parseStartSeconds(movie?.video_start_time);
+  const heroPoster = movie?.backdrop_url || movie?.poster_url || null;
+  const shouldLoadHeroVideo = !!heroVideoSource && !prefersReducedMotion && isHeroInView && !videoFailed;
+  const shouldPlayHeroVideo = shouldLoadHeroVideo && autoplayEnabled && isTabVisible && !manualPause;
+  const preferLiteQuality = isMobileViewport || prefersReducedData;
+  const iframeCoverStyle = {
+    filter: 'brightness(0.88)',
+    width: '100%',
+    height: '100%',
+    transform: 'scale(1.22)',
+    transformOrigin: 'center center'
+  };
+
+  useEffect(() => {
+    setManualPause(!autoplayEnabled);
+    setVideoReady(false);
+    setVideoFailed(false);
+  }, [movie?.id, movie?.trailer_url, autoplayEnabled]);
+
+  useEffect(() => {
+    const videoEl = heroVideoRef.current;
+    if (!videoEl || heroVideoSource?.type !== 'file') return;
+
+    if (shouldPlayHeroVideo) {
+      videoEl.muted = true;
+      videoEl.play().catch(() => setVideoFailed(true));
+    } else {
+      videoEl.pause();
+    }
+  }, [shouldPlayHeroVideo, heroVideoSource?.type]);
+
+  useEffect(() => {
+    const frame = youtubeIframeRef.current;
+    if (!frame || heroVideoSource?.type !== 'youtube') return;
+    const command = shouldPlayHeroVideo ? 'playVideo' : 'pauseVideo';
+    frame.contentWindow?.postMessage(
+      JSON.stringify({ event: 'command', func: command, args: [] }),
+      '*'
+    );
+  }, [shouldPlayHeroVideo, heroVideoSource?.type]);
+
+  useEffect(() => {
+    if (!shouldLoadHeroVideo) return undefined;
+    if (heroVideoSource?.type !== 'youtube' && heroVideoSource?.type !== 'vimeo') return undefined;
+    if (videoReady) return undefined;
+
+    const timeout = window.setTimeout(() => {
+      setVideoFailed(true);
+    }, 15000);
+
+    return () => window.clearTimeout(timeout);
+  }, [shouldLoadHeroVideo, heroVideoSource?.type, videoReady]);
 
   const loadMovie = async () => {
     setLoading(true);
@@ -140,15 +331,81 @@ const MovieDetail = () => {
   return (
     <div className="min-h-screen pb-24 md:pb-12 animate-fade-in">
       {/* Hero Backdrop Section */}
-      <div className="relative w-full h-[50vh] md:h-[55vh] overflow-hidden">
-        <img
-          src={movie.backdrop_url || movie.poster_url}
-          alt={movie.title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#04060b] via-[#04060b]/80 to-transparent" />
+      <div ref={heroRef} className="relative w-full h-[50vh] md:h-[55vh] overflow-hidden">
+        {heroPoster ? (
+          <img
+            src={heroPoster}
+            alt={movie.title}
+            className="absolute inset-0 z-0 w-full h-full object-cover scale-105 blur-2xl opacity-35"
+          />
+        ) : (
+          <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#05080f] via-[#0a1324] to-[#04060b]" />
+        )}
+
+        {heroPoster && (
+          <img
+            src={heroPoster}
+            alt={movie.title}
+            className={`absolute inset-0 z-[5] w-full h-full object-cover transition-opacity duration-500 ${shouldLoadHeroVideo && videoReady ? 'opacity-0' : 'opacity-100'}`}
+          />
+        )}
+
+        {shouldLoadHeroVideo && heroVideoSource?.type === 'file' && (
+          <video
+            ref={heroVideoRef}
+            src={heroVideoSource.src}
+            className={`absolute inset-0 z-[5] w-full h-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            style={{ filter: 'brightness(0.88)' }}
+            autoPlay={autoplayEnabled}
+            muted
+            loop={loopEnabled}
+            playsInline
+            preload="metadata"
+            controls={false}
+            disablePictureInPicture
+            onLoadedData={(event) => {
+              const videoEl = event.currentTarget;
+              if (startSeconds > 0 && Number.isFinite(videoEl.duration)) {
+                videoEl.currentTime = Math.min(startSeconds, Math.max(videoEl.duration - 0.25, 0));
+              }
+              setVideoReady(true);
+            }}
+            onError={() => setVideoFailed(true)}
+          />
+        )}
+
+        {shouldLoadHeroVideo && heroVideoSource?.type === 'youtube' && (
+          <iframe
+            ref={youtubeIframeRef}
+            src={buildYouTubeEmbedUrl(heroVideoSource.id, shouldPlayHeroVideo, loopEnabled, startSeconds, preferLiteQuality)}
+            title={`${movie.title} background trailer`}
+            className={`absolute inset-0 z-[5] w-full h-full pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            style={iframeCoverStyle}
+            loading="lazy"
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen={false}
+            onLoad={() => setVideoReady(true)}
+            onError={() => setVideoFailed(true)}
+          />
+        )}
+
+        {shouldLoadHeroVideo && heroVideoSource?.type === 'vimeo' && (
+          <iframe
+            src={buildVimeoEmbedUrl(heroVideoSource.id, shouldPlayHeroVideo, loopEnabled, startSeconds, preferLiteQuality)}
+            title={`${movie.title} background trailer`}
+            className={`absolute inset-0 z-[5] w-full h-full pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            style={iframeCoverStyle}
+            loading="lazy"
+            allow="autoplay; fullscreen"
+            allowFullScreen={false}
+            onLoad={() => setVideoReady(true)}
+            onError={() => setVideoFailed(true)}
+          />
+        )}
+
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#04060b] via-[#04060b]/80 to-transparent" />
         
-        <div className="relative h-full flex items-end pb-6 px-5 md:px-8">
+        <div className="relative z-20 h-full flex items-end pb-6 px-5 md:px-8">
           <div className="w-full max-w-4xl">
             {/* Title Logo or Text */}
             {movie.title_logo_url && !movie.use_text_title ? (
@@ -189,6 +446,25 @@ const MovieDetail = () => {
             </div>
 
             <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+              {shouldLoadHeroVideo && (
+                <button
+                  type="button"
+                  onClick={() => setManualPause((prev) => !prev)}
+                  className="w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center bg-white/[0.14] backdrop-blur-[22px] border border-white/28 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.22] hover:border-white/45 hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] focus-visible:outline-2 focus-visible:outline-white/60"
+                  aria-label={manualPause ? 'Play hero video' : 'Pause hero video'}
+                  aria-pressed={manualPause}
+                >
+                  {manualPause ? (
+                    <svg className="w-5 h-5 md:w-[22px] md:h-[22px] text-white/92" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M8 5v14l11-7-11-7z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 md:w-[22px] md:h-[22px] text-white/92" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M7 5h4v14H7zm6 0h4v14h-4z" />
+                    </svg>
+                  )}
+                </button>
+              )}
               {movie.is_now_showing && movie.booking_url && (
                 <button
                   onClick={() => window.open(movie.booking_url, '_blank')}
