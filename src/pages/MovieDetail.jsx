@@ -215,10 +215,13 @@ const MovieDetail = () => {
   const preferLiteQuality = isMobileViewport || prefersReducedData;
   const iframeCoverStyle = {
     filter: 'brightness(0.88)',
-    width: '100%',
-    height: '100%',
-    transform: 'scale(1.22)',
-    transformOrigin: 'center center'
+    width: '177.78vh',
+    height: '56.25vw',
+    minWidth: '100%',
+    minHeight: '100%',
+    transform: 'translate(-50%, -50%) scale(1.03)',
+    transformOrigin: 'center center',
+    willChange: 'transform'
   };
 
   useEffect(() => {
@@ -354,7 +357,7 @@ const MovieDetail = () => {
           <video
             ref={heroVideoRef}
             src={heroVideoSource.src}
-            className={`absolute inset-0 z-[5] w-full h-full object-cover transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 z-[5] w-full h-full object-cover object-center transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             style={{ filter: 'brightness(0.88)' }}
             autoPlay={autoplayEnabled}
             muted
@@ -379,7 +382,7 @@ const MovieDetail = () => {
             ref={youtubeIframeRef}
             src={buildYouTubeEmbedUrl(heroVideoSource.id, shouldPlayHeroVideo, loopEnabled, startSeconds, preferLiteQuality)}
             title={`${movie.title} background trailer`}
-            className={`absolute inset-0 z-[5] w-full h-full pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute left-1/2 top-1/2 z-[5] pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             style={iframeCoverStyle}
             loading="lazy"
             allow="autoplay; encrypted-media; fullscreen"
@@ -393,7 +396,7 @@ const MovieDetail = () => {
           <iframe
             src={buildVimeoEmbedUrl(heroVideoSource.id, shouldPlayHeroVideo, loopEnabled, startSeconds, preferLiteQuality)}
             title={`${movie.title} background trailer`}
-            className={`absolute inset-0 z-[5] w-full h-full pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute left-1/2 top-1/2 z-[5] pointer-events-none transition-opacity duration-700 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             style={iframeCoverStyle}
             loading="lazy"
             allow="autoplay; fullscreen"
