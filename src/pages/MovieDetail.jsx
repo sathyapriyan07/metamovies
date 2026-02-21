@@ -118,30 +118,28 @@ const MovieDetail = () => {
         </div>
 
         <div>
-          <div className="detail-title-block">
+          <div className="detail-title-block detail-content">
             {movie.title_logo_url ? (
               <img className="hero-logo" src={movie.title_logo_url} alt={movie.title} />
             ) : (
-              <h1>{movie.title}</h1>
+              <h1 className="detail-title">{movie.title}</h1>
             )}
-            <div className="hero-meta">
-              <p>
-                {year}
-                {runtime ? (
-                  <>
-                    <span className="meta-sep" aria-hidden="true">
-                      <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
-                        <circle cx="3" cy="3" r="3" />
-                      </svg>
-                    </span>
-                    {runtime}
-                  </>
-                ) : null}
-              </p>
-              {movie.genres?.length > 0 && (
-                <p className="genre-line">{movie.genres.join(' | ')}</p>
-              )}
+            <div className="detail-meta">
+              {year}
+              {runtime ? (
+                <>
+                  <span className="meta-sep" aria-hidden="true">
+                    <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
+                      <circle cx="3" cy="3" r="3" />
+                    </svg>
+                  </span>
+                  {runtime}
+                </>
+              ) : null}
             </div>
+            {movie.genres?.length > 0 && (
+              <div className="detail-genres">{movie.genres.join(' | ')}</div>
+            )}
             <div className="detail-actions">
               {movie.trailer_url && (
                 <button className="button-primary" onClick={() => window.open(movie.trailer_url, '_blank')}>Watch Trailer</button>
