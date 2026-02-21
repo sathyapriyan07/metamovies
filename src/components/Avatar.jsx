@@ -13,7 +13,7 @@ const Avatar = ({ src, name, size = 'md', className = '' }) => {
 
   return (
     <div 
-      className={`${sizeClasses[size]} rounded-full overflow-hidden border border-white/10 bg-red-600 flex items-center justify-center transition-transform duration-200 hover:scale-105 ${className}`}
+      className={`${sizeClasses[size]} rounded-full overflow-hidden border border-white/10 bg-red-600 flex items-center justify-center transition-transform duration-200 hover:scale-[1.02] will-change-transform ${className}`}
       aria-label="Profile"
     >
       {src && !imageError ? (
@@ -31,3 +31,5 @@ const Avatar = ({ src, name, size = 'md', className = '' }) => {
 };
 
 export default Avatar;
+
+

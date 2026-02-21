@@ -46,8 +46,8 @@ const PlatformDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12">
-        <div className="max-w-[1320px] mx-auto px-4 md:px-8">
+      <div className="min-h-screen pt-6 md:pt-8 lg:pt-10 pb-24 md:pb-12">
+        <div className="container-desktop">
           <SkeletonGrid count={12} />
         </div>
       </div>
@@ -63,8 +63,8 @@ const PlatformDetail = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12">
-      <div className="max-w-[1320px] mx-auto px-4 md:px-8">
+    <div className="min-h-screen pt-6 md:pt-8 lg:pt-10 pb-24 md:pb-12">
+      <div className="container-desktop">
         <div className="glass-card rounded-3xl p-6 md:p-8 mb-8 flex items-center gap-4 md:gap-6">
           {platform.logo_url ? (
             <img
@@ -106,3 +106,7 @@ const PlatformDetail = () => {
 };
 
 export default PlatformDetail;
+
+
+
+

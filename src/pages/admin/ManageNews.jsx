@@ -90,7 +90,7 @@ const ManageNews = () => {
 
         {loading ? (
           <div className="text-center py-8">
-            <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="inline-block w-8 h-8 border-4 border-white/40 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : news.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
@@ -99,7 +99,7 @@ const ManageNews = () => {
         ) : (
           <div className="grid gap-3">
             {news.map((article) => (
-              <div key={article.id} className="glass-card rounded-2xl border border-white/10 backdrop-blur-md hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-250">
+              <div key={article.id} className="glass-card rounded-2xl border border-white/10  hover:shadow-lg  transition-all duration-250">
                 <div className="flex gap-3 items-center p-4">
                   {article.image_url && (
                     <img
@@ -119,19 +119,19 @@ const ManageNews = () => {
                 <div className="px-4 pb-4 flex flex-wrap gap-2">
                   <button
                     onClick={() => navigate(`/news/${article.id}`)}
-                    className="px-3 py-2 bg-blue-600/70 hover:bg-blue-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                    className="px-3 py-2 bg-white/12 hover:bg-white/18 border border-white/16 hover:scale-[1.02] will-change-transform rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
                     View
                   </button>
                   <button
                     onClick={() => handleToggleFeatured(article)}
-                    className={`px-3 py-2 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200 ${article.is_featured ? 'bg-green-600/70 hover:bg-green-600' : 'bg-gray-600/60 hover:bg-gray-600'}`}
+                    className={`px-3 py-2 hover:scale-[1.02] will-change-transform rounded-lg text-xs font-medium shadow-md transition-all duration-200 ${article.is_featured ? 'bg-white/12 hover:bg-white/18 border border-white/16' : 'bg-white/10 hover:bg-white/16 border border-white/14'}`}
                   >
                     {article.is_featured ? '⭐ Featured' : 'Feature'}
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(article)}
-                    className="px-3 py-2 bg-red-600/80 hover:bg-red-600 hover:scale-105 rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                    className="px-3 py-2 bg-red-600/80 hover:bg-red-600 hover:scale-[1.02] will-change-transform rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
                     Delete
                   </button>
@@ -160,7 +160,7 @@ const ManageNews = () => {
                 <button
                   onClick={() => setDeleteConfirm(null)}
                   disabled={deleting}
-                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold disabled:opacity-50"
+                  className="flex-1 px-6 py-3 bg-white/10 hover:bg-white/16 border border-white/14 rounded-lg font-semibold disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -174,3 +174,7 @@ const ManageNews = () => {
 };
 
 export default ManageNews;
+
+
+
+

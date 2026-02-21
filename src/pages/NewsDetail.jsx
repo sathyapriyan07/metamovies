@@ -72,7 +72,7 @@ const NewsDetail = () => {
       <div className="max-w-4xl mx-auto px-4">
         <button 
           onClick={() => navigate('/news')}
-          className="text-sky-300 hover:text-white mb-6 flex items-center gap-2 text-sm"
+          className="text-white/75 hover:text-white mb-6 flex items-center gap-2 text-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -91,7 +91,7 @@ const NewsDetail = () => {
         )}
 
         <div className="glass-card rounded-2xl p-6 md:p-8">
-          <p className="text-sm text-sky-300 mb-4">{formatDate(article.created_at)}</p>
+          <p className="text-sm text-white/75 mb-4">{formatDate(article.created_at)}</p>
           <h1 className="text-3xl md:text-4xl font-bold mb-6">{article.title}</h1>
           <div className="prose prose-invert max-w-none">
             <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{article.content}</p>
@@ -114,11 +114,11 @@ const NewsDetail = () => {
                     <img
                       src={np.person.profile_image_url || 'https://via.placeholder.com/100'}
                       alt={np.person.name}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform group-hover:scale-[1.02]"
                       loading="lazy"
                     />
                   </div>
-                  <p className="text-sm font-medium line-clamp-1 group-hover:text-sky-300 transition-colors">
+                  <p className="text-sm font-medium line-clamp-1 group-hover:text-white/75 transition-colors">
                     {np.person.name}
                   </p>
                   {np.role && (
@@ -135,3 +135,5 @@ const NewsDetail = () => {
 };
 
 export default NewsDetail;
+
+

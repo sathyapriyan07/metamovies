@@ -45,7 +45,7 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16">
       <div className="glass-card rounded-2xl w-full max-w-md p-8">
-        <p className="text-sky-300 text-xs uppercase tracking-[0.3em] text-center">Get Started</p>
+        <p className="text-white/75 text-xs uppercase tracking-[0.3em] text-center">Get Started</p>
         <h1 className="text-3xl font-semibold text-center mt-3 mb-8">Join MetaMovies+</h1>
 
         {error && (
@@ -103,7 +103,7 @@ const Signup = () => {
                     }}
                     className={`p-2 rounded-xl border-2 transition ${
                       avatarUrl === option.url
-                        ? 'border-sky-300/70 bg-sky-400/20'
+                        ? 'border-white/20 bg-white/12'
                         : 'border-white/10 hover:border-white/30'
                     }`}
                   >
@@ -115,7 +115,7 @@ const Signup = () => {
             <button
               type="button"
               onClick={() => setShowCustomUrl(!showCustomUrl)}
-              className="text-sm text-sky-300 hover:text-white mb-2"
+              className="text-sm text-white/75 hover:text-white mb-2"
             >
               {showCustomUrl ? 'Hide' : 'Use'} custom URL
             </button>
@@ -137,7 +137,7 @@ const Signup = () => {
 
         <p className="text-center mt-6 text-gray-400">
           Already have an account?{' '}
-          <Link to="/login" className="text-sky-300 hover:text-white">
+          <Link to="/login" className="text-white/75 hover:text-white">
             Login
           </Link>
         </p>
@@ -147,3 +147,5 @@ const Signup = () => {
 };
 
 export default Signup;
+
+

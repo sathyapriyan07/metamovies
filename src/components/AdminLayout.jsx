@@ -29,23 +29,24 @@ const AdminLayout = ({ title, subtitle, children }) => {
 
   return (
     <div className="min-h-screen pb-24 md:pb-12">
-      <div className="sticky top-0 z-40 glass-nav">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between">
+      <div className="mx-auto px-4 md:px-8 pt-6">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <p className="text-sky-300 text-[11px] uppercase tracking-[0.3em]">Admin</p>
-            <h1 className="text-base md:text-lg font-semibold text-white">{title}</h1>
+            <p className="text-white/60 text-[11px] uppercase tracking-[0.3em]">Admin</p>
+            <h1 className="text-2xl font-semibold text-white">{title}</h1>
+            {subtitle && <p className="text-muted mt-2">{subtitle}</p>}
           </div>
           <div className="relative">
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="px-3 py-2 rounded-full text-sm font-medium bg-white/10 hover:bg-white/20 transition border border-white/10"
+              className="px-3 py-2 rounded-full text-sm font-medium btn-ghost"
               aria-label="Admin menu"
             >
               Admin Menu
             </button>
             {menuOpen && (
-              <div className="absolute right-0 mt-2 w-56 glass-card rounded-2xl p-2 shadow-xl">
+              <div className="absolute right-0 mt-2 w-56 glass-card rounded-2xl p-2">
                 {items.map((item) => (
                   <Link
                     key={item.to}
@@ -53,8 +54,8 @@ const AdminLayout = ({ title, subtitle, children }) => {
                     onClick={() => setMenuOpen(false)}
                     className={`block px-3 py-2 rounded-xl text-sm font-medium transition ${
                       location.pathname === item.to
-                        ? 'bg-sky-400/20 text-sky-200'
-                        : 'text-gray-300 hover:bg-white/5'
+                        ? 'bg-white/12 text-white'
+                        : 'text-gray-300 hover:bg-white/8'
                     }`}
                   >
                     {item.label}
@@ -64,10 +65,6 @@ const AdminLayout = ({ title, subtitle, children }) => {
             )}
           </div>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6">
-        {subtitle && <p className="text-gray-400 mb-6">{subtitle}</p>}
         <section className="space-y-6">{children}</section>
       </div>
     </div>
@@ -75,3 +72,5 @@ const AdminLayout = ({ title, subtitle, children }) => {
 };
 
 export default AdminLayout;
+
+

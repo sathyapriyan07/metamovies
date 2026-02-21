@@ -5,10 +5,9 @@ import {
   getCollectionWithItems
 } from '../services/supabase';
 import CarouselRow from '../components/CarouselRow';
+import PosterCard from '../components/PosterCard';
 import PlatformStreamingSection from '../components/PlatformStreamingSection';
 import HeroBanner from '../components/HeroBanner';
-import TopHeader from '../components/TopHeader';
-import HomeSearchBar from '../components/HomeSearchBar';
 
 const Home = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -46,17 +45,26 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen pb-[88px] md:pb-12 lg:overflow-x-hidden">
-      <TopHeader />
+    <div className="min-h-screen pb-[88px] md:pb-12">
       <HeroBanner />
 
-      <main className="max-w-7xl lg:max-w-[1280px] mx-auto px-4 md:px-6 lg:px-10 pt-4 lg:pt-8">
-        <div className="mt-4 lg:mt-0">
-          <HomeSearchBar />
+      <main className="home-desktop-wrapper pt-6 lg:pt-10">
+        <div className="lg:hidden">
+          <CarouselRow title="Trending Now" items={trendingMovies} type="movie" loading={loading} padded={false} />
         </div>
-
-        <div className="mt-6 lg:mt-12">
-          <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={loading} padded={false} />
+        <div className="hidden lg:block section-block">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-6">Trending Now</h2>
+          <div className="desktop-poster-grid">
+            {loading
+              ? Array.from({ length: 12 }).map((_, i) => (
+                  <div key={`t-${i}`} className="aspect-[2/3] rounded-2xl bg-white/10 animate-pulse" />
+                ))
+              : trendingMovies.map((movie) => (
+                  <div key={movie.id}>
+                    <PosterCard item={movie} type="movie" />
+                  </div>
+                ))}
+          </div>
         </div>
 
         <PlatformStreamingSection limit={12} />
@@ -77,3 +85,7 @@ const Home = () => {
 };
 
 export default Home;
+
+
+
+

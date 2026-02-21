@@ -112,3 +112,5 @@ const ManageAvatars = () => {
 };
 
 export default ManageAvatars;
+
+

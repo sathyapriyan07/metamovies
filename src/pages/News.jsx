@@ -28,11 +28,11 @@ const News = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12">
-      <div className="max-w-[1320px] mx-auto px-4">
+    <div className="min-h-screen pt-6 md:pt-8 lg:pt-10 pb-24 md:pb-12">
+      <div className="container-desktop">
         <div className="mb-8">
-          <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Featured</p>
-          <h1 className="text-3xl md:text-5xl font-semibold mt-2">News Highlights</h1>
+          <p className="text-white/75 text-xs uppercase tracking-[0.3em]">Featured</p>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold mt-2">News Highlights</h1>
         </div>
 
         {loading ? (
@@ -57,3 +57,7 @@ const News = () => {
 };
 
 export default News;
+
+
+
+

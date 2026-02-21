@@ -26,7 +26,7 @@ const Watchlist = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
           <div>
-            <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Library</p>
+            <p className="text-white/75 text-xs uppercase tracking-[0.3em]">Library</p>
             <h1 className="text-3xl md:text-5xl font-semibold mt-2">My Watchlist</h1>
           </div>
         </div>
@@ -62,3 +62,5 @@ const Watchlist = () => {
 };
 
 export default Watchlist;
+
+

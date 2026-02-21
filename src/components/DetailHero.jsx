@@ -14,7 +14,7 @@ const DetailHero = ({ backdrop, poster, title }) => {
         <img
           src={poster || 'https://via.placeholder.com/300x450'}
           alt={`${title} poster`}
-          className="w-full h-auto aspect-[2/3] object-contain rounded-2xl neon-ring border border-white/10 hover:scale-105 transition-transform duration-200"
+          className="w-full h-auto aspect-[2/3] object-contain rounded-2xl neon-ring border border-white/10 hover:scale-[1.02] will-change-transform transition-transform duration-200"
         />
       </div>
     </div>
@@ -22,3 +22,5 @@ const DetailHero = ({ backdrop, poster, title }) => {
 };
 
 export default DetailHero;
+
+

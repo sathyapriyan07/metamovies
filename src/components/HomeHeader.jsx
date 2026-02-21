@@ -7,12 +7,11 @@ const HomeHeader = () => {
   const { user } = useAuth();
 
   return (
-    <div className="w-full bg-black sticky top-0 z-40 px-4 md:px-8 py-3">
+    <div className="w-full glass-nav sticky top-0 z-40 px-4 md:px-8 py-3">
       <div className="max-w-7xl mx-auto flex items-center gap-3">
-        {/* Search Bar */}
-        <div 
+        <div
           onClick={() => navigate('/search')}
-          className="flex-1 max-w-2xl bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-all duration-200 focus-within:ring-1 focus-within:ring-red-600"
+          className="flex-1 max-w-2xl glass-search py-2"
           role="button"
           tabIndex={0}
           aria-label="Search Movies"
@@ -34,7 +33,7 @@ const HomeHeader = () => {
           <div className="relative">
             <button 
               onClick={() => navigate('/profile')} 
-              className="focus:outline-none focus:ring-2 focus:ring-red-600 rounded-full"
+            className="focus:outline-none focus:ring-2 focus:ring-white/40 rounded-full"
               aria-label="Profile"
             >
               <Avatar 
@@ -46,7 +45,7 @@ const HomeHeader = () => {
         ) : (
           <button 
             onClick={() => navigate('/login')}
-            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-all duration-200 whitespace-nowrap"
+            className="px-4 py-2 rounded-full btn-primary text-sm font-medium whitespace-nowrap"
             aria-label="Login"
           >
             Login
@@ -58,3 +57,5 @@ const HomeHeader = () => {
 };
 
 export default HomeHeader;
+
+

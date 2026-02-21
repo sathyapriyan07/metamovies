@@ -15,10 +15,12 @@ const SkeletonGridCard = () => (
 );
 
 export const SkeletonRow = ({ count = 10 }) => (
-  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-    {Array.from({ length: count }).map((_, i) => (
-      <SkeletonCard key={i} />
-    ))}
+  <div className="carousel-shell">
+    <div className="carousel-track flex gap-4 scrollbar-hide">
+      {Array.from({ length: count }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
   </div>
 );
 
@@ -31,3 +33,5 @@ export const SkeletonGrid = ({ count = 12 }) => (
 );
 
 export default SkeletonCard;
+
+

@@ -58,7 +58,7 @@ const Profile = () => {
     <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12">
       <div className="max-w-3xl mx-auto px-4">
         <div className="mb-8">
-          <p className="text-sky-300 text-xs uppercase tracking-[0.3em]">Account</p>
+          <p className="text-white/75 text-xs uppercase tracking-[0.3em]">Account</p>
           <h1 className="text-3xl md:text-5xl font-semibold mt-2">My Profile</h1>
         </div>
 
@@ -92,7 +92,7 @@ const Profile = () => {
                   }}
                   className={`p-2 rounded-xl border-2 transition ${
                     selectedAvatar === option.url && !showCustomUrl
-                      ? 'border-sky-300/70 bg-sky-400/20'
+                      ? 'border-white/20 bg-white/12'
                       : 'border-white/10 hover:border-white/30'
                   }`}
                 >
@@ -105,7 +105,7 @@ const Profile = () => {
           <button
             type="button"
             onClick={() => setShowCustomUrl(!showCustomUrl)}
-            className="text-sm text-sky-300 hover:text-white mb-3"
+            className="text-sm text-white/75 hover:text-white mb-3"
           >
             {showCustomUrl ? 'Hide' : 'Use'} custom URL
           </button>
@@ -147,3 +147,5 @@ const Profile = () => {
 };
 
 export default Profile;
+
+

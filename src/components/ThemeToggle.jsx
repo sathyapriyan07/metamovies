@@ -7,10 +7,10 @@ const ThemeToggle = () => {
   const dropdownRef = useRef(null);
 
   const themes = [
-    { id: 'dark', name: 'Dark', icon: '🌙' },
-    { id: 'amoled', name: 'AMOLED', icon: '⚫' },
-    { id: 'blue', name: 'Dark Blue', icon: '💙' },
-    { id: 'light', name: 'Light', icon: '☀️' }
+    { id: 'dark', name: 'Dark', icon: 'D' },
+    { id: 'amoled', name: 'AMOLED', icon: 'A' },
+    { id: 'blue', name: 'Dark Blue', icon: 'B' },
+    { id: 'light', name: 'Light', icon: 'L' }
   ];
 
   useEffect(() => {
@@ -23,21 +23,21 @@ const ThemeToggle = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentTheme = themes.find(t => t.id === theme);
+  const currentTheme = themes.find((t) => t.id === theme);
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+        className="flex items-center gap-2 px-3 py-2 rounded-xl glass-pill"
         aria-label="Toggle theme"
       >
-        <span className="text-lg">{currentTheme?.icon}</span>
+        <span className="text-sm font-semibold">{currentTheme?.icon}</span>
         <span className="hidden md:inline text-sm">{currentTheme?.name}</span>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 glass-card rounded-xl border border-white/10 shadow-xl z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-40 glass-card rounded-xl z-50 overflow-hidden">
           {themes.map((t) => (
             <button
               key={t.id}
@@ -46,12 +46,12 @@ const ThemeToggle = () => {
                 setIsOpen(false);
               }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-white/10 transition-all ${
-                theme === t.id ? 'bg-white/5 text-accent' : ''
+                theme === t.id ? 'bg-white/12 text-white' : ''
               }`}
             >
-              <span className="text-lg">{t.icon}</span>
+              <span className="text-sm font-semibold">{t.icon}</span>
               <span>{t.name}</span>
-              {theme === t.id && <span className="ml-auto text-accent">✓</span>}
+              {theme === t.id && <span className="ml-auto text-white/90">?</span>}
             </button>
           ))}
         </div>
@@ -61,3 +61,5 @@ const ThemeToggle = () => {
 };
 
 export default ThemeToggle;
+
+

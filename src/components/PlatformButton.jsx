@@ -1,15 +1,22 @@
+import { memo } from 'react';
+
 const PlatformButton = ({ platform, active = false, onClick }) => {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={platform.name}
-      className={`snap-start flex-shrink-0 px-4 rounded-full border backdrop-blur-sm transition-all duration-250 flex items-center justify-center min-w-[78px] h-[48px] md:h-[50px] lg:h-[52px] ${
+      className={`snap-start flex-shrink-0 px-4 rounded-full border transition-all duration-250 flex items-center justify-center min-w-[78px] h-[48px] md:h-[50px] lg:h-[52px] relative overflow-hidden ${
         active
-          ? 'bg-white/14 border-white/35 scale-[1.03] shadow-[0_2px_10px_rgba(180,210,255,0.18)]'
-          : 'bg-white/6 border-white/22 hover:bg-white/10 hover:border-white/28 hover:brightness-110'
+          ? 'glass-pill glass-pill-active scale-[1.02]'
+          : 'glass-pill'
       }`}
     >
+      <span
+        className={`absolute left-3 right-3 bottom-[6px] h-[2px] rounded-full transition-all duration-250 ${
+          active ? 'bg-white/85 opacity-100' : 'bg-white/40 opacity-0'
+        }`}
+      />
       {platform.logo_url && (
         <img
           src={platform.logo_url}
@@ -24,4 +31,6 @@ const PlatformButton = ({ platform, active = false, onClick }) => {
   );
 };
 
-export default PlatformButton;
+export default memo(PlatformButton);
+
+

@@ -7,7 +7,7 @@ const FrostedPlayButton = ({ size = 'md', className = '' }) => {
 
   return (
     <div
-      className={`inline-flex ${sizeClass} items-center justify-center rounded-full border border-white/35 bg-white/20 backdrop-blur-xl shadow-[0_8px_24px_rgba(125,211,252,0.28)] transition-all duration-300 group-hover:bg-white/28 group-hover:scale-[1.05] group-active:scale-[0.98] ${className}`}
+      className={`inline-flex ${sizeClass} items-center justify-center rounded-full border border-white/24 bg-white/14 backdrop-blur-[14px] shadow-[0_8px_22px_rgba(0,0,0,0.34)] transition-all duration-300 group-hover:bg-white/20 group-hover:scale-[1.02] group-active:scale-[0.98] ${className}`}
     >
       <svg className={`${iconClass} text-white ml-0.5`} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M8 5v14l11-7z" />
@@ -17,3 +17,5 @@ const FrostedPlayButton = ({ size = 'md', className = '' }) => {
 };
 
 export default FrostedPlayButton;
+
+

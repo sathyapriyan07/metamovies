@@ -6,7 +6,7 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, pa
   const trackRef = useRef(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
-  const edgePaddingClass = padded ? 'px-4 md:px-8' : '';
+  const edgePaddingClass = padded ? 'container-desktop' : 'w-full';
 
   const updateFades = useCallback(() => {
     const el = trackRef.current;
@@ -38,10 +38,10 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, pa
   }, [items, loading, updateFades]);
 
   if (loading) return (
-    <div className="mb-8 lg:mb-12">
+    <div className="section-block">
       <div className={`${edgePaddingClass} flex items-end justify-between`}>
         <div>
-          <h2 className="section-title">{title}</h2>
+          <h2 className="section-title text-2xl md:text-3xl">{title}</h2>
           {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
         </div>
       </div>
@@ -54,18 +54,18 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, pa
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="mb-8 lg:mb-12 fade-in">
+    <div className="section-block fade-in">
       <div className={`${edgePaddingClass} flex items-end justify-between`}>
         <div>
-          <h2 className="section-title">{title}</h2>
+          <h2 className="section-title text-2xl md:text-3xl">{title}</h2>
           {subtitle && <p className="text-secondary text-sm">{subtitle}</p>}
         </div>
       </div>
       <div className={`${edgePaddingClass} mt-4 lg:mt-5`}>
-        <div className="relative">
-          <div ref={trackRef} className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+        <div className="carousel-shell">
+          <div ref={trackRef} className="carousel-track flex gap-4 lg:gap-5 scrollbar-hide">
             {items.map((item) => (
-              <div key={item.id} className="flex-shrink-0 w-[125px] md:w-[185px]">
+              <div key={item.id} className="flex-shrink-0 w-[140px] md:w-[185px] lg:w-[200px]">
                 <PosterCard item={item} type={type} />
               </div>
             ))}
@@ -83,3 +83,5 @@ const PosterRow = ({ title, items, type = 'movie', loading = false, subtitle, pa
 };
 
 export default PosterRow;
+
+

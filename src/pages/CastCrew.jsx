@@ -21,7 +21,7 @@ const CastCrew = () => {
 
   const groupCrewByJob = (crew) => {
     const groups = {};
-    crew?.forEach(member => {
+    crew?.forEach((member) => {
       const job = member.job || 'Other';
       if (!groups[job]) groups[job] = [];
       groups[job].push(member);
@@ -32,7 +32,7 @@ const CastCrew = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#04060b] to-[#0a0f1a]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#3ba7ff]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-white/40"></div>
       </div>
     );
   }
@@ -43,39 +43,34 @@ const CastCrew = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#04060b] to-[#0a0f1a] pb-24 md:pb-12">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-black/60 backdrop-blur-lg border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="w-10 h-10 rounded-xl bg-white/[0.18] backdrop-blur-[18px] border border-white/35 flex items-center justify-center transition-all duration-250 hover:bg-white/[0.28] hover:border-white/50"
-              aria-label="Go back"
-            >
-              <svg className="w-5 h-5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <h1 className="text-xl md:text-2xl font-semibold text-white text-center flex-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              {movie.title} – Cast & Crew
-            </h1>
-          </div>
+      <div className="desktop-container">
+        <div className="flex items-center gap-4 mb-6 lg:mb-10">
+          <button
+            onClick={() => navigate(-1)}
+            className="btn-icon"
+            aria-label="Go back"
+          >
+            <svg className="w-5 h-5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white">
+            {movie.title} | Cast and Crew
+          </h1>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 pb-28 space-y-8">
-        {/* Cast Section */}
         {movie.cast?.length > 0 && (
-          <section className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-6 text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Cast</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+          <section className="section-wide">
+            <h2 className="text-2xl md:text-3xl font-semibold mb-8">Cast</h2>
+            <div className="cast-grid">
               {movie.cast.map((c) => (
-                <div
+                <button
                   key={c.id}
+                  type="button"
                   onClick={() => navigate(`/person/${c.person.id}`)}
-                  className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 cursor-pointer group text-center transition-all duration-300 hover:scale-105 hover:border-white/20"
+                  className="cast-card"
                 >
-                  <div className="w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] lg:w-[160px] lg:h-[160px] rounded-full overflow-hidden mx-auto mb-3 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
+                  <div className="cast-avatar">
                     {c.person.profile_url ? (
                       <img
                         src={c.person.profile_url}
@@ -91,30 +86,30 @@ const CastCrew = () => {
                       </div>
                     )}
                   </div>
-                  <p className="text-base font-semibold text-white line-clamp-1">{c.person.name}</p>
+                  <p className="text-lg font-semibold text-white line-clamp-1">{c.person.name}</p>
                   <p className="text-sm text-white/70 line-clamp-2 mt-1">{c.character}</p>
-                </div>
+                </button>
               ))}
             </div>
           </section>
         )}
 
-        {/* Crew Section */}
         {Object.keys(crewGroups).length > 0 && (
-          <section className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-            <h2 className="text-xl font-semibold mb-6 text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Crew</h2>
-            <div className="space-y-8">
+          <section className="section-wide">
+            <h2 className="text-2xl md:text-3xl font-semibold mb-8">Crew</h2>
+            <div className="space-y-6">
               {Object.entries(crewGroups).map(([job, members]) => (
-                <div key={job}>
-                  <h3 className="text-lg font-medium text-white mb-4">{job}</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+                <div key={job} className="role-group">
+                  <h3 className="text-xl font-semibold mb-6">{job}</h3>
+                  <div className="cast-grid">
                     {members.map((member) => (
-                      <div
+                      <button
                         key={member.id}
+                        type="button"
                         onClick={() => navigate(`/person/${member.person.id}`)}
-                        className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 cursor-pointer group text-center transition-all duration-300 hover:scale-105 hover:border-white/20"
+                        className="cast-card"
                       >
-                        <div className="w-[120px] h-[120px] sm:w-[140px] sm:h-[140px] lg:w-[160px] lg:h-[160px] rounded-full overflow-hidden mx-auto mb-3 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
+                        <div className="cast-avatar">
                           {member.person.profile_url ? (
                             <img
                               src={member.person.profile_url}
@@ -130,8 +125,9 @@ const CastCrew = () => {
                             </div>
                           )}
                         </div>
-                        <p className="text-base font-semibold text-white line-clamp-1">{member.person.name}</p>
-                      </div>
+                        <p className="text-lg font-semibold text-white line-clamp-1">{member.person.name}</p>
+                        <p className="text-sm text-white/70 line-clamp-2 mt-1">{member.job}</p>
+                      </button>
                     ))}
                   </div>
                 </div>

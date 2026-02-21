@@ -192,11 +192,11 @@ const ManagePlatforms = () => {
                 <button
                   type="button"
                   onClick={() => handleToggle(platform)}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition ${platform.is_active ? 'bg-emerald-600/70' : 'bg-gray-600/70'}`}
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition ${platform.is_active ? 'bg-white/14 border border-white/18' : 'bg-gray-600/70'}`}
                 >
                   {platform.is_active ? 'Active' : 'Inactive'}
                 </button>
-                <button type="button" onClick={() => handleEdit(platform)} className="px-3 py-2 rounded-lg text-xs bg-sky-600/70">
+                <button type="button" onClick={() => handleEdit(platform)} className="px-3 py-2 rounded-lg text-xs bg-white/12 border border-white/16 hover:bg-white/18">
                   Edit
                 </button>
                 <button type="button" onClick={() => handleDelete(platform)} className="px-3 py-2 rounded-lg text-xs bg-red-600/70">
@@ -212,3 +212,7 @@ const ManagePlatforms = () => {
 };
 
 export default ManagePlatforms;
+
+
+
+

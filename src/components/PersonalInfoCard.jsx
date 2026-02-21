@@ -28,3 +28,5 @@ const PersonalInfoCard = ({ person, creditsCount }) => {
 };
 
 export default PersonalInfoCard;
+
+

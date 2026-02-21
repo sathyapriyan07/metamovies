@@ -4,9 +4,9 @@ const HomeSearchBar = () => {
   const navigate = useNavigate();
 
   return (
-    <div 
+    <div
       onClick={() => navigate('/search')}
-      className="w-full bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-white/10 transition-all duration-200 focus-within:ring-1 focus-within:ring-white/25"
+      className="w-full glass-search"
       role="button"
       tabIndex={0}
       aria-label="Search Movies and People"
@@ -26,3 +26,5 @@ const HomeSearchBar = () => {
 };
 
 export default HomeSearchBar;
+
+

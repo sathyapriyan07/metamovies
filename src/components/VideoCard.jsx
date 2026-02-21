@@ -18,44 +18,35 @@ const VideoCard = ({ video }) => {
 
   return (
     <div className="group">
-      <div 
+      <div
         onClick={openVideo}
-        className="relative aspect-video overflow-hidden rounded-2xl mb-2 cursor-pointer bg-gradient-to-br from-slate-900 via-slate-800 to-black"
+        className="glass-card relative aspect-video overflow-hidden rounded-[14px] mb-2 cursor-pointer card-hover"
       >
         {thumbnailSrc && !imageError ? (
-          <>
-            <img
-              src={thumbnailSrc}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-35"
-              loading="lazy"
-              aria-hidden="true"
-            />
-            <img
-              src={thumbnailSrc}
-              alt={video.title}
-              className="relative z-[1] w-full h-full object-contain"
-              loading="lazy"
-              onError={() => setImageError(true)}
-            />
-          </>
+          <img
+            src={thumbnailSrc}
+            alt={video.title}
+            className="relative z-[1] w-full h-full object-cover"
+            loading="lazy"
+            onError={() => setImageError(true)}
+          />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-400">
             Thumbnail unavailable
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity duration-250" />
         <div className="absolute inset-0 flex items-center justify-center">
           <FrostedPlayButton />
         </div>
       </div>
-      <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-sky-300 transition-colors">
+      <h3 className="font-semibold text-sm line-clamp-2 text-white/95 transition-colors group-hover:text-white">
         {video.title}
       </h3>
       {video.description && (
         <button
           onClick={() => navigate(`/videos/${video.id}`)}
-          className="text-xs text-sky-400 hover:text-sky-300 mt-2 transition"
+          className="text-xs text-white/70 hover:text-white mt-2 transition"
         >
           View Description
         </button>
@@ -65,3 +56,5 @@ const VideoCard = ({ video }) => {
 };
 
 export default VideoCard;
+
+

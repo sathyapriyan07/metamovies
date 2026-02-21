@@ -27,7 +27,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16">
       <div className="glass-card rounded-2xl w-full max-w-md p-8">
-        <p className="text-sky-300 text-xs uppercase tracking-[0.3em] text-center">Welcome Back</p>
+        <p className="text-white/75 text-xs uppercase tracking-[0.3em] text-center">Welcome Back</p>
         <h1 className="text-3xl font-semibold text-center mt-3 mb-8">Login to MetaMovies+</h1>
 
         {error && (
@@ -66,7 +66,7 @@ const Login = () => {
 
         <p className="text-center mt-6 text-gray-400">
           Don&apos;t have an account?{' '}
-          <Link to="/signup" className="text-sky-300 hover:text-white">
+          <Link to="/signup" className="text-white/75 hover:text-white">
             Sign Up
           </Link>
         </p>
@@ -76,3 +76,5 @@ const Login = () => {
 };
 
 export default Login;
+
+

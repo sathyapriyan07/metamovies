@@ -348,7 +348,7 @@ const MovieDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#3ba7ff]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-white/40"></div>
       </div>
     );
   }
@@ -464,9 +464,9 @@ const MovieDetail = () => {
 
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#04060b] via-[#04060b]/80 to-transparent" />
         
-        <div className="relative z-20 h-full flex items-end pb-6 px-5 md:px-8 lg:px-0 lg:pb-10">
-          <div className="w-full max-w-4xl lg:max-w-[1280px] lg:mx-auto lg:px-10">
-            <div className="lg:max-w-[700px]">
+        <div className="relative z-20 h-full flex items-end pb-6 lg:pb-10">
+          <div className="container-desktop">
+            <div className="max-w-[700px]">
             {/* Title Logo or Text */}
             {movie.title_logo_url && !movie.use_text_title ? (
               <div className="mb-3 md:mb-4">
@@ -479,12 +479,12 @@ const MovieDetail = () => {
                     e.target.nextElementSibling.style.display = 'block';
                   }}
                 />
-                <h1 className="text-3xl md:text-5xl font-bold leading-tight hidden" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] hidden">
                   {movie.title || 'Untitled'}
                 </h1>
               </div>
             ) : (
-              <h1 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4 leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 md:mb-4 leading-[1.1]">
                 {movie.title || 'Untitled'}
               </h1>
             )}
@@ -493,13 +493,13 @@ const MovieDetail = () => {
               {movie.release_date && <span>{movie.release_date.split('-')[0]}</span>}
               {movie.runtime > 0 && (
                 <>
-                  <span>•</span>
+                  <span>|</span>
                   <span>{formatRuntime(movie.runtime)}</span>
                 </>
               )}
               {movie.genres?.length > 0 && (
                 <>
-                  <span>•</span>
+                  <span>|</span>
                   <span>{movie.genres.slice(0, 2).join(', ')}</span>
                 </>
               )}
@@ -510,7 +510,7 @@ const MovieDetail = () => {
                 <button
                   type="button"
                   onClick={() => setManualPause((prev) => !prev)}
-                  className="w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center bg-white/[0.14] backdrop-blur-[22px] border border-white/28 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.22] hover:border-white/45 hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] focus-visible:outline-2 focus-visible:outline-white/60"
+                  className="btn-icon"
                   aria-label={manualPause ? 'Play hero video' : 'Pause hero video'}
                   aria-pressed={manualPause}
                 >
@@ -529,7 +529,7 @@ const MovieDetail = () => {
                 <button
                   type="button"
                   onClick={() => setIsHeroMuted((prev) => !prev)}
-                  className="w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center bg-white/[0.14] backdrop-blur-[22px] border border-white/28 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.22] hover:border-white/45 hover:scale-[1.05] hover:shadow-[0_0_18px_rgba(255,255,255,0.2)] focus-visible:outline-2 focus-visible:outline-white/60"
+                  className="btn-icon"
                   aria-label={isHeroMuted ? 'Unmute hero video' : 'Mute hero video'}
                   aria-pressed={!isHeroMuted}
                 >
@@ -551,7 +551,7 @@ const MovieDetail = () => {
               {movie.is_now_showing && movie.booking_url && (
                 <button
                   onClick={() => window.open(movie.booking_url, '_blank')}
-                  className="h-12 md:h-[52px] px-6 md:px-8 rounded-2xl font-semibold text-white bg-white/[0.18] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.28] hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)] focus-visible:outline-2 focus-visible:outline-white/60" style={{ letterSpacing: '0.3px' }}
+                  className="btn-primary"
                 >
                   Book Tickets
                 </button>
@@ -559,14 +559,14 @@ const MovieDetail = () => {
               {movie.trailer_url && (
                 <button
                   onClick={() => window.open(movie.trailer_url, '_blank')}
-                  className="h-12 md:h-[52px] px-6 md:px-8 rounded-2xl font-semibold text-white bg-white/[0.18] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.28] hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(255,255,255,0.25)] focus-visible:outline-2 focus-visible:outline-white/60" style={{ letterSpacing: '0.3px' }}
+                  className="btn-ghost"
                 >
                   Watch Trailer
                 </button>
               )}
               <button
                 onClick={toggleWatchlist}
-                className={`w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center backdrop-blur-[22px] border transition-all duration-250 ease-out hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-white/60 ${inWatchlist ? 'bg-white/[0.28] border-white/45 shadow-[0_0_24px_rgba(255,255,255,0.25)]' : 'bg-white/[0.14] border-white/28 hover:bg-white/[0.22] hover:border-white/45 hover:shadow-[0_0_18px_rgba(255,255,255,0.18)]'}`}
+                className={`btn-icon ${inWatchlist ? 'bg-white/12' : ''}`}
                 aria-label={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
               >
                 <svg className={`w-5 h-5 md:w-[22px] md:h-[22px] ${inWatchlist ? 'text-white' : 'text-white/92'}`} fill={inWatchlist ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
@@ -575,7 +575,7 @@ const MovieDetail = () => {
               </button>
               <button
                 onClick={() => navigator.share?.({ title: movie.title, url: window.location.href })}
-                className="w-12 h-12 md:w-[52px] md:h-[52px] rounded-2xl flex items-center justify-center bg-white/[0.14] backdrop-blur-[22px] border border-white/28 shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all duration-250 ease-out hover:bg-white/[0.22] hover:border-white/45 hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.18)] focus-visible:outline-2 focus-visible:outline-white/60"
+                className="btn-icon"
                 aria-label="Share movie"
               >
                 <svg className="w-5 h-5 md:w-[22px] md:h-[22px] text-white/92" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -588,318 +588,285 @@ const MovieDetail = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl lg:max-w-[1280px] mx-auto px-5 md:px-8 lg:px-10 space-y-6 lg:space-y-12 mt-6 lg:mt-12">
-        {/* Trailers Section */}
-        {movie.trailer_url && (
-          <section>
-            <div className="flex items-center justify-between mb-4 lg:mb-5">
-              <h2 className="text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Trailers</h2>
-              <div className="glass-icon w-8 h-8 flex items-center justify-center">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+      <div className="movie-detail-wrapper">
+        <aside>
+            <div className="sidebar-card bg-[#0f1626] border border-white/8 rounded-xl p-4">
+              <div className="aspect-[2/3] w-full overflow-hidden rounded-xl bg-black/40">
+                <img
+                  src={movie.poster_url || movie.backdrop_url || 'https://via.placeholder.com/300x450'}
+                  alt={movie.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
             </div>
-            <div className="relative overflow-hidden lg:overflow-visible">
-              <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory px-4 md:px-8 -mx-4 md:-mx-8 lg:px-0 lg:mx-0">
-                <div className="flex-shrink-0 snap-start group cursor-pointer">
-                  <div className="relative w-[280px] md:w-[320px] lg:w-[360px] aspect-video rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden transition-all duration-300 ease-out hover:bg-white/10 hover:border-white/20 hover:shadow-[0_0_25px_rgba(59,167,255,0.3)] hover:scale-[1.03]">
-                  <img
-                    src={getYouTubeThumbnail(movie.trailer_url) || movie.backdrop_url}
-                    alt="Official Trailer"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  
-                  {/* Play Button */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/30 group-hover:shadow-[0_0_15px_rgba(59,167,255,0.4)]">
-                      <svg className="w-7 h-7 ml-1 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </div>
-                  </div>
-                  
-                  {/* Bottom Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <div className="flex items-end justify-between">
-                      <div className="flex-1">
-                        <h3 className="text-sm md:text-base font-semibold text-white mb-1">Official Trailer</h3>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Click Handler */}
-                  <a
-                    href={movie.trailer_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute inset-0 z-10"
-                  />
-                </div>
-              </div>
-              </div>
-              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
-            </div>
-          </section>
-        )}
 
-        {movie.player_enabled && (movie.tmdb_id || movie.player_url_override) && (
-          <section>
-            <button
-              type="button"
-              onClick={() => navigate(`/watch/${movie.id}`)}
-              className="w-full md:w-auto min-h-12 px-7 py-3 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#1d4ed8]/80 via-[#2563eb]/80 to-[#0ea5e9]/80 border border-white/20 shadow-[0_12px_32px_rgba(0,0,0,0.4)] backdrop-blur-[20px] hover:scale-[1.01] hover:brightness-110 transition-all duration-250"
-            >
-              Watch {movie.title}
-            </button>
-          </section>
-        )}
-
-        {/* Soundtrack Section */}
-        {soundtrackLinks.length > 0 && (
-          <section>
-            <div className="mb-3 lg:mb-5">
-              <p className="text-[11px] uppercase tracking-[0.25em] text-sky-300/90">Original Score & Songs</p>
-              <h3 className="text-lg font-semibold mt-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Soundtrack
-              </h3>
-            </div>
-            <div className="relative overflow-hidden lg:overflow-visible">
-              <div className="flex gap-2.5 md:gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-1">
-                {soundtrackLinks.map((item) => (
-                  <a
-                    key={item.key}
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-shrink-0 snap-start h-11 md:h-12 px-4 md:px-5 rounded-full bg-white/[0.16] backdrop-blur-[22px] border border-white/35 shadow-[0_10px_24px_rgba(0,0,0,0.3)] flex items-center justify-center transition-all duration-250 hover:bg-white/[0.24] hover:scale-[1.03] hover:shadow-[0_0_18px_rgba(255,255,255,0.22)] focus-visible:outline-2 focus-visible:outline-white/60"
-                    aria-label={`Open ${item.label}`}
-                  >
-                    <img
-                      src={item.logo}
-                      alt={item.label}
-                      loading="lazy"
-                      className="h-5 md:h-6 w-auto object-contain"
-                    />
-                  </a>
-                ))}
-              </div>
-              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
-            </div>
-          </section>
-        )}
-
-        {/* Cast & Crew Section */}
-        {movie.cast?.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-4 lg:mb-5">
-              <h2 className="text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Cast & Crew</h2>
-              <button
-                onClick={() => navigate(`/movie/${movie.id}/cast-crew`)}
-                className="w-8 h-8 rounded-xl bg-white/[0.18] backdrop-blur-[18px] border border-white/35 flex items-center justify-center transition-all duration-250 hover:bg-white/[0.28] hover:border-white/50 hover:shadow-[0_0_24px_rgba(255,255,255,0.3)] focus-visible:outline-2 focus-visible:outline-white/60"
-                aria-label="View full cast and crew"
-              >
-                <svg className="w-4 h-4 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-            <div className="relative overflow-hidden lg:overflow-visible">
-              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-                {movie.cast.slice(0, 15).map((c) => (
-                  <div
-                    key={c.id}
-                    onClick={() => navigate(`/person/${c.person.id}`)}
-                    className="flex-shrink-0 snap-start cursor-pointer group"
-                  >
-                  <div className="w-[80px] md:w-[88px] h-[80px] md:h-[88px] rounded-full overflow-hidden glass-icon mb-2 transition-all duration-200 group-hover:scale-105">
-                    {c.person.profile_url ? (
-                      <img
-                        src={c.person.profile_url}
-                        alt={c.person.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <svg className="w-10 h-10 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                        </svg>
-                      </div>
-                    )}
+            {movie.overview && (
+              <section className="sidebar-card bg-[#0f1626] border border-white/8 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-muted mb-2">About</h3>
+                <h4 className="text-lg font-semibold mb-2">{movie.title}</h4>
+                {movie.genres?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {movie.genres.slice(0, 3).map((genre, i) => (
+                      <span key={i} className="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10">
+                        {genre}
+                      </span>
+                    ))}
                   </div>
-                  <p className="text-xs font-semibold text-center line-clamp-2 w-[80px] md:w-[88px]">{c.person.name}</p>
-                  <p className="text-[10px] text-gray-400 text-center line-clamp-1 w-[80px] md:w-[88px]">{c.character}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
-            </div>
-          </section>
-        )}
-
-        {platforms.length > 0 && (
-          <section>
-            <h2 className="text-xl md:text-2xl font-semibold mb-4 lg:mb-5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              Platforms
-            </h2>
-            <div className="relative overflow-hidden lg:overflow-visible">
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {platforms.map((platform) => (
+                )}
+                <p className={`text-sm text-secondary leading-relaxed ${!showFullOverview ? 'line-clamp-5' : ''}`}>
+                  {movie.overview}
+                </p>
+                {movie.overview.length > 200 && (
                   <button
-                    type="button"
-                    key={platform.id}
-                    onClick={() => navigate(`/platforms/${platform.id}`)}
-                    className="flex-shrink-0 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-[18px] p-3 min-w-[120px] h-16 flex items-center justify-center hover:bg-white/15 hover:scale-[1.03] transition-all duration-250"
+                    onClick={() => setShowFullOverview(!showFullOverview)}
+                    className="text-sm mt-3 font-medium text-white/80 hover:text-white transition"
                   >
-                  {platform.logo_url ? (
-                    <img
-                      src={platform.logo_url}
-                      alt={platform.name}
-                      loading="lazy"
-                      className="max-h-8 w-auto object-contain"
-                    />
-                  ) : (
-                    <span className="text-xs font-medium">{platform.name}</span>
-                  )}
+                    {showFullOverview ? 'Less' : 'More'}
                   </button>
-                ))}
-              </div>
-              <div className="hidden lg:block pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
-            </div>
-          </section>
-        )}
-
-        {/* About Card */}
-        {movie.overview && (
-          <section className="glass-card p-4 md:p-6 rounded-2xl">
-            <h3 className="text-sm font-semibold text-gray-400 mb-2">About</h3>
-            <h4 className="text-lg font-semibold mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{movie.title}</h4>
-            {movie.genres?.length > 0 && (
-              <div className="flex gap-2 mb-3">
-                {movie.genres.slice(0, 3).map((genre, i) => (
-                  <span key={i} className="px-3 py-1 rounded-full text-xs bg-white/10 border border-white/15">
-                    {genre}
-                  </span>
-                ))}
-              </div>
+                )}
+              </section>
             )}
-            <p className={`text-sm text-gray-300 leading-relaxed ${!showFullOverview ? 'line-clamp-4' : ''}`}>
-              {movie.overview}
-            </p>
-            {movie.overview.length > 200 && (
-              <button
-                onClick={() => setShowFullOverview(!showFullOverview)}
-                className="text-[#3ba7ff] hover:text-[#5dd1ff] text-sm mt-3 font-medium transition"
-              >
-                {showFullOverview ? 'Less' : 'More'}
-              </button>
-            )}
-          </section>
-        )}
 
-        {/* Ratings Card */}
-        {(typeof movie.rating === 'number' || typeof movie.imdb_rating === 'number') && (
-          <section className="glass-card p-4 md:p-6 rounded-2xl">
-            <h3 className="text-sm font-semibold text-gray-400 mb-3">Ratings</h3>
-            <div className="space-y-3">
-              {typeof movie.rating === 'number' && (
-                <div className="flex items-center gap-3">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/3840px-Tmdb.new.logo.svg.png"
-                    alt="TMDB"
-                    className="h-5 w-auto"
-                  />
-                  <span className="text-lg font-semibold">{movie.rating.toFixed(1)}</span>
+            {(typeof movie.rating === 'number' || typeof movie.imdb_rating === 'number') && (
+              <section className="sidebar-card bg-[#0f1626] border border-white/8 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-muted mb-3">Ratings</h3>
+                <div className="space-y-3">
+                  {typeof movie.rating === 'number' && (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/3840px-Tmdb.new.logo.svg.png"
+                        alt="TMDB"
+                        className="h-5 w-auto"
+                      />
+                      <span className="text-lg font-semibold">{movie.rating.toFixed(1)}</span>
+                    </div>
+                  )}
+                  {typeof movie.imdb_rating === 'number' && (
+                    <div className="flex items-center gap-3">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/960px-IMDB_Logo_2016.svg.png"
+                        alt="IMDb"
+                        className="h-4 w-auto"
+                      />
+                      <span className="text-lg font-semibold">{movie.imdb_rating.toFixed(1)}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-              {typeof movie.imdb_rating === 'number' && (
-                <div className="flex items-center gap-3">
-                  <img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/960px-IMDB_Logo_2016.svg.png"
-                    alt="IMDb"
-                    className="h-4 w-auto"
-                  />
-                  <span className="text-lg font-semibold">{movie.imdb_rating.toFixed(1)}</span>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
+              </section>
+            )}
 
-        {/* Information Section */}
-        <section className="glass-card p-4 md:p-6 rounded-2xl">
-          <h3 className="text-sm font-semibold text-gray-400 mb-4">Information</h3>
-          <div className="space-y-3 text-sm">
-            {movie.release_date && (
-              <div className="flex justify-between">
-                <span className="text-gray-400">Release Year</span>
-                <span className="text-white font-medium">{movie.release_date.split('-')[0]}</span>
+            <section className="sidebar-card bg-[#0f1626] border border-white/8 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-muted mb-4">Information</h3>
+              <div className="space-y-3 text-sm">
+                {movie.release_date && (
+                  <div className="flex justify-between">
+                    <span className="text-muted">Release Year</span>
+                    <span className="text-white font-medium">{movie.release_date.split('-')[0]}</span>
+                  </div>
+                )}
+                {movie.runtime > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted">Runtime</span>
+                    <span className="text-white font-medium">{formatRuntime(movie.runtime)}</span>
+                  </div>
+                )}
+                {typeof movie.rating === 'number' && (
+                  <div className="flex justify-between">
+                    <span className="text-muted">Rating</span>
+                    <span className="text-white font-medium">{movie.rating.toFixed(1)}/10</span>
+                  </div>
+                )}
+                {movie.genres?.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-muted">Genres</span>
+                    <span className="text-white font-medium text-right">{movie.genres.join(', ')}</span>
+                  </div>
+                )}
               </div>
+            </section>
+
+            {movie.watch_links && (movie.watch_links.netflix || movie.watch_links.prime || movie.watch_links.hotstar) && (
+              <section className="sidebar-card bg-[#0f1626] border border-white/8 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-muted mb-3">Watch Now</h3>
+                <div className="flex flex-wrap gap-3">
+                  {movie.watch_links.netflix && (
+                    <a
+                      href={movie.watch_links.netflix}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="h-11 px-4 rounded-full bg-white/8 border border-white/12 flex items-center justify-center hover:bg-white/12 transition"
+                    >
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png" alt="Netflix" className="h-5 w-auto" />
+                    </a>
+                  )}
+                  {movie.watch_links.prime && (
+                    <a
+                      href={movie.watch_links.prime}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="h-11 px-4 rounded-full bg-white/8 border border-white/12 flex items-center justify-center hover:bg-white/12 transition"
+                    >
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_Prime_Video_logo.svg/960px-Amazon_Prime_Video_logo.svg.png" alt="Prime" className="h-5 w-auto" />
+                    </a>
+                  )}
+                  {movie.watch_links.hotstar && (
+                    <a
+                      href={movie.watch_links.hotstar}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="h-11 px-4 rounded-full bg-white/8 border border-white/12 flex items-center justify-center hover:bg-white/12 transition"
+                    >
+                      <img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/jiohotstar.png" alt="JioHotstar" className="h-6 w-auto" />
+                    </a>
+                  )}
+                </div>
+              </section>
             )}
-            {movie.runtime > 0 && (
-              <div className="flex justify-between">
-                <span className="text-gray-400">Runtime</span>
-                <span className="text-white font-medium">{formatRuntime(movie.runtime)}</span>
-              </div>
+
+            {platforms.length > 0 && (
+              <section className="sidebar-card bg-[#0f1626] border border-white/8 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-muted mb-3">Platforms</h3>
+                <div className="flex flex-wrap gap-2">
+                  {platforms.map((platform) => (
+                    <button
+                      type="button"
+                      key={platform.id}
+                      onClick={() => navigate(`/platforms/${platform.id}`)}
+                      className="rounded-full border border-white/10 bg-white/6 px-3 py-2 text-xs text-white hover:bg-white/10 transition"
+                    >
+                      {platform.name}
+                    </button>
+                  ))}
+                </div>
+              </section>
             )}
-            {typeof movie.rating === 'number' && (
-              <div className="flex justify-between">
-                <span className="text-gray-400">Rating</span>
-                <span className="text-white font-medium">{movie.rating.toFixed(1)}/10</span>
-              </div>
+        </aside>
+
+          <div className="movie-main space-y-10 lg:space-y-16">
+            {movie.trailer_url && (
+              <section>
+                <div className="section-header mb-4">
+                  <h2 className="text-2xl md:text-3xl font-semibold">Trailers</h2>
+                </div>
+                <div className="carousel-shell">
+                  <div className="carousel-track flex gap-4 scrollbar-hide">
+                    <div className="flex-shrink-0 w-[280px] md:w-[360px] snap-start group cursor-pointer">
+                      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#111827] border border-white/10 card-hover">
+                        <img
+                          src={getYouTubeThumbnail(movie.trailer_url) || movie.backdrop_url}
+                          alt="Official Trailer"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-14 h-14 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
+                            <svg className="w-6 h-6 ml-1 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <a
+                          href={movie.trailer_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute inset-0 z-10"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
             )}
-            {movie.genres?.length > 0 && (
-              <div className="flex justify-between">
-                <span className="text-gray-400">Genres</span>
-                <span className="text-white font-medium text-right">{movie.genres.join(', ')}</span>
-              </div>
+
+            {movie.player_enabled && (movie.tmdb_id || movie.player_url_override) && (
+              <section>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/watch/${movie.id}`)}
+                  className="btn-primary"
+                >
+                  Watch {movie.title}
+                </button>
+              </section>
+            )}
+
+            {soundtrackLinks.length > 0 && (
+              <section>
+                <div className="mb-3">
+                  <p className="text-[11px] uppercase tracking-[0.25em] text-muted">Original Score and Songs</p>
+                  <h3 className="text-2xl font-semibold mt-1">Soundtrack</h3>
+                </div>
+                <div className="carousel-shell">
+                  <div className="carousel-track flex gap-3 scrollbar-hide">
+                    {soundtrackLinks.map((item) => (
+                      <a
+                        key={item.key}
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-shrink-0 snap-start h-11 px-4 rounded-full bg-white/8 border border-white/12 flex items-center justify-center hover:bg-white/12 transition"
+                        aria-label={`Open ${item.label}`}
+                      >
+                        <img
+                          src={item.logo}
+                          alt={item.label}
+                          loading="lazy"
+                          className="h-5 md:h-6 w-auto object-contain"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {movie.cast?.length > 0 && (
+              <section>
+                <div className="section-header mb-4">
+                  <h2 className="text-2xl md:text-3xl font-semibold">Cast and Crew</h2>
+                  <button
+                    onClick={() => navigate(`/movie/${movie.id}/cast-crew`)}
+                    className="text-sm text-white/70 hover:text-white transition"
+                  >
+                    View All
+                  </button>
+                </div>
+                <div className="cast-row scrollbar-hide">
+                  {movie.cast.slice(0, 15).map((c) => (
+                    <div
+                      key={c.id}
+                      onClick={() => navigate(`/person/${c.person.id}`)}
+                      className="flex-shrink-0 cursor-pointer group w-[110px] lg:w-[120px] xl:w-[130px]"
+                    >
+                      <div className="w-[110px] h-[110px] lg:w-[120px] lg:h-[120px] xl:w-[130px] xl:h-[130px] rounded-full overflow-hidden bg-[#101827] border border-white/10">
+                        {c.person.profile_url ? (
+                          <img
+                            src={c.person.profile_url}
+                            alt={c.person.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-muted">N/A</div>
+                        )}
+                      </div>
+                      <p className="text-sm font-semibold text-center line-clamp-2 mt-3">{c.person.name}</p>
+                      <p className="text-xs text-muted text-center line-clamp-1">{c.character}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
           </div>
-        </section>
-
-        {/* Streaming Platforms */}
-        {movie.watch_links && (movie.watch_links.netflix || movie.watch_links.prime || movie.watch_links.hotstar) && (
-          <section>
-            <h3 className="text-lg font-semibold mb-3 lg:mb-5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Watch Now</h3>
-            <div className="flex flex-wrap gap-3">
-              {movie.watch_links.netflix && (
-                <a
-                  href={movie.watch_links.netflix}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
-                >
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png" alt="Netflix" className="h-5 w-auto" style={{ filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))' }} />
-                </a>
-              )}
-              {movie.watch_links.prime && (
-                <a
-                  href={movie.watch_links.prime}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
-                >
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Amazon_Prime_Video_logo.svg/960px-Amazon_Prime_Video_logo.svg.png" alt="Prime" className="h-5 w-auto" />
-                </a>
-              )}
-              {movie.watch_links.hotstar && (
-                <a
-                  href={movie.watch_links.hotstar}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-12 px-5 rounded-[20px] bg-white/[0.18] backdrop-blur-[24px] border border-white/35 shadow-[0_12px_32px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:bg-white/[0.28] hover:border-white/50 hover:scale-[1.04] hover:shadow-[0_0_28px_rgba(255,255,255,0.25)]"
-                >
-                  <img src="https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/jiohotstar.png" alt="JioHotstar" className="h-6 w-auto" />
-                </a>
-              )}
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );
 };
 
 export default MovieDetail;
+
+
+
+
+

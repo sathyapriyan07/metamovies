@@ -42,7 +42,7 @@ const BottomNav = () => {
   return (
     <nav className="fixed bottom-4 left-0 right-0 z-50 md:hidden px-[5%]">
       <div className="mx-auto max-w-md">
-        <div className="flex items-center justify-center gap-3 h-16 px-4 rounded-full bg-[rgba(10,15,25,0.85)] backdrop-blur-[20px] shadow-[0_10px_40px_rgba(59,167,255,0.15)]">
+        <div className="rounded-2xl bg-[#111827] border border-white/10 h-16 px-3 flex items-center justify-between gap-2 shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
           {navItems.map((item) => {
             const active = isActive(item.to, item.startsWith);
             return (
@@ -50,20 +50,14 @@ const BottomNav = () => {
                 key={item.to}
                 to={item.to}
                 aria-label={item.label}
-                className={`flex items-center justify-center rounded-full transition-all duration-300 ease-out ${
-                  active
-                    ? 'w-[120px] h-10 px-4 bg-gradient-to-br from-[rgba(59,167,255,0.25)] to-[rgba(59,167,255,0.08)]'
-                    : 'w-10 h-10 bg-white/[0.06] hover:bg-white/[0.12]'
+                className={`flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-2 transition-all duration-200 ${
+                  active ? 'bg-white/10 text-white' : 'text-white/60'
                 }`}
               >
                 <span className={`flex-shrink-0 ${active ? 'text-white' : 'text-slate-300'}`}>
                   {item.icon}
                 </span>
-                {active && (
-                  <span className="ml-2 text-sm font-medium text-white whitespace-nowrap animate-in slide-in-from-left-2 fade-in duration-200">
-                    {item.label}
-                  </span>
-                )}
+                <span className="text-[10px] font-medium whitespace-nowrap">{item.label}</span>
               </Link>
             );
           })}
@@ -74,3 +68,5 @@ const BottomNav = () => {
 };
 
 export default BottomNav;
+
+

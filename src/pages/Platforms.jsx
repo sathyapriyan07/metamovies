@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPlatforms } from '../services/supabase';
 
 const PlatformSkeleton = () => (
-  <div className="rounded-2xl md:rounded-3xl border border-white/25 bg-white/15 backdrop-blur-xl p-4 animate-pulse h-28 md:h-32" />
+  <div className="glass-card rounded-[20px] p-4 animate-pulse h-28 md:h-32" />
 );
 
 const Platforms = () => {
@@ -23,9 +23,9 @@ const Platforms = () => {
   }, []);
 
   return (
-    <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12 bg-gradient-to-b from-[#070b14] via-[#04060b] to-[#02040a]">
-      <div className="max-w-[1360px] mx-auto px-4 md:px-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-8" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+    <div className="min-h-screen pt-6 md:pt-8 lg:pt-10 pb-24 md:pb-12 bg-gradient-to-b from-[#070b14] via-[#04060b] to-[#02040a]">
+      <div className="container-desktop">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-8">
           Platforms
         </h1>
 
@@ -43,7 +43,7 @@ const Platforms = () => {
                 type="button"
                 onClick={() => navigate(`/platforms/${platform.id}`)}
                 aria-label={`Open ${platform.name}`}
-                className="rounded-2xl md:rounded-3xl border border-white/30 bg-white/20 backdrop-blur-[24px] p-4 min-h-28 md:min-h-32 flex items-center justify-center transition-all duration-250 hover:scale-[1.05] hover:shadow-[0_0_24px_rgba(255,255,255,0.28)]"
+                className="glass-card rounded-[20px] p-4 min-h-28 md:min-h-32 flex items-center justify-center card-hover"
               >
                 {platform.logo_url ? (
                   <img
@@ -65,3 +65,7 @@ const Platforms = () => {
 };
 
 export default Platforms;
+
+
+
+

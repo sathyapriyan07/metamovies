@@ -8,7 +8,7 @@ const KnownForCard = ({ work }) => {
       onClick={() => navigate(`/${work.type}/${work.id}`)}
       className="cursor-pointer group"
     >
-      <div className="glass rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+      <div className="glass rounded-lg overflow-hidden hover:scale-[1.02] will-change-transform transition-transform duration-300">
         <img
           src={work.poster_url || 'https://via.placeholder.com/150x225'}
           alt={work.title}
@@ -22,3 +22,5 @@ const KnownForCard = ({ work }) => {
 };
 
 export default KnownForCard;
+
+

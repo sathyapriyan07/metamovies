@@ -19,44 +19,44 @@ const GlassNavbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 hidden md:block">
-      <div className="glass-nav backdrop-blur-2xl">
-        <div className="max-w-7xl lg:max-w-[1280px] mx-auto px-6 lg:px-10 h-16 flex items-center gap-6 lg:gap-7">
-          <Link to="/" className="text-2xl font-semibold tracking-tight text-white">
+      <div className="glass-nav surface-line">
+        <div className="container-desktop h-16 flex items-center">
+          <Link to="/" className="text-2xl font-semibold tracking-tight text-white flex-shrink-0">
             MetaMovies
-            <span className="text-sky-400">+</span>
+            <span className="text-white/90">+</span>
           </Link>
 
-          <div className="flex items-center gap-5 text-sm font-medium text-gray-300">
-            <Link to="/" className={`transition-colors ${isActive('/') ? 'text-white' : 'hover:text-white'}`}>
+          <div className="flex-1 flex items-center justify-center gap-5 text-sm font-medium text-gray-300">
+            <Link to="/" className={`glass-nav-item ${isActive('/') ? 'glass-nav-item-active' : ''}`}>
               Home
             </Link>
-            <Link to="/movies" className={`transition-colors ${isActive('/movies') ? 'text-white' : 'hover:text-white'}`}>
+            <Link to="/movies" className={`glass-nav-item ${isActive('/movies') ? 'glass-nav-item-active' : ''}`}>
               Movies
             </Link>
-            <Link to="/platforms" className={`transition-colors ${location.pathname.startsWith('/platforms') ? 'text-white' : 'hover:text-white'}`}>
+            <Link to="/platforms" className={`glass-nav-item ${location.pathname.startsWith('/platforms') ? 'glass-nav-item-active' : ''}`}>
               Platforms
             </Link>
-            <Link to="/videos" className={`transition-colors ${isActive('/videos') ? 'text-white' : 'hover:text-white'}`}>
+            <Link to="/videos" className={`glass-nav-item ${isActive('/videos') ? 'glass-nav-item-active' : ''}`}>
               Videos
             </Link>
-            <Link to="/news" className={`transition-colors ${isActive('/news') ? 'text-white' : 'hover:text-white'}`}>
+            <Link to="/news" className={`glass-nav-item ${isActive('/news') ? 'glass-nav-item-active' : ''}`}>
               News
             </Link>
             {user && (
-              <Link to="/watchlist" className={`transition-colors ${isActive('/watchlist') ? 'text-white' : 'hover:text-white'}`}>
+              <Link to="/watchlist" className={`glass-nav-item ${isActive('/watchlist') ? 'glass-nav-item-active' : ''}`}>
                 Watchlist
               </Link>
             )}
             {isAdmin && (
-              <Link to="/admin" className={`transition-colors ${location.pathname.startsWith('/admin') ? 'text-white' : 'hover:text-white'}`}>
+              <Link to="/admin" className={`glass-nav-item ${location.pathname.startsWith('/admin') ? 'glass-nav-item-active' : ''}`}>
                 Admin
               </Link>
             )}
           </div>
 
-          <form onSubmit={handleSubmit} className="flex-1 flex justify-center">
-            <div className="w-full max-w-md relative">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <form onSubmit={handleSubmit} className="hidden lg:flex justify-center">
+            <div className="w-[460px] relative">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -74,7 +74,7 @@ const GlassNavbar = () => {
             {user ? (
               <button
                 onClick={() => navigate('/profile')}
-                className="focus:outline-none focus:ring-2 focus:ring-sky-400 rounded-full"
+                className="focus:outline-none focus:ring-2 focus:ring-white/40 rounded-full"
                 aria-label="Profile"
               >
                 <Avatar
@@ -101,3 +101,5 @@ const GlassNavbar = () => {
 };
 
 export default GlassNavbar;
+
+

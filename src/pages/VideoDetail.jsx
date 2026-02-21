@@ -55,7 +55,7 @@ const VideoDetail = () => {
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sky-400 hover:text-sky-300 underline break-all"
+            className="text-white/80 hover:text-white/75 underline break-all"
           >
             {part}
           </a>
@@ -91,7 +91,7 @@ const VideoDetail = () => {
       <div className="max-w-4xl mx-auto px-4">
         <button 
           onClick={() => navigate('/videos')}
-          className="text-sky-300 hover:text-white mb-6 flex items-center gap-2 text-sm"
+          className="text-white/75 hover:text-white mb-6 flex items-center gap-2 text-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -106,7 +106,7 @@ const VideoDetail = () => {
           <img
             src={video.thumbnail_url || `https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`}
             alt={video.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02] will-change-transform"
           />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -168,3 +168,5 @@ export default VideoDetail;
     if (person?.profile_path) return `https://image.tmdb.org/t/p/w185${person.profile_path}`;
     return '/placeholder-person.png';
   };
+
+

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getMoviesByPlatform, getPlatforms } from '../services/supabase';
 import MovieCard from './MovieCard';
 import PlatformButton from './PlatformButton';
@@ -112,63 +112,75 @@ const PlatformStreamingSection = ({ limit = DEFAULT_LIMIT }) => {
   if (platforms.length === 0 && !loading) return null;
 
   return (
-    <section className="mb-8 lg:mb-12 fade-in">
-      <div className="w-full rounded-2xl bg-white/12 backdrop-blur-xl border border-white/25 shadow-xl p-4 md:p-5 lg:p-6">
-        <div className="mb-4 lg:mb-5">
-          <h2 className="text-lg md:text-2xl font-semibold text-white">
-            Streaming on <span className="text-sky-300 drop-shadow-[0_0_10px_rgba(125,211,252,0.45)]">{activePlatformName}</span>
+    <section className="section-block fade-in">
+      <div className="w-full bg-[#0f1626] border border-white/8 rounded-2xl p-4 md:p-6 lg:p-8">
+        <div className="mb-4 lg:mb-6">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">
+            Streaming on <span className="text-white/85">{activePlatformName}</span>
           </h2>
         </div>
 
-        <div className="w-full mb-4">
-          <div className="flex items-center gap-3 overflow-x-auto px-0 py-2 scrollbar-hide snap-x snap-mandatory">
-          {platforms.map((platform) => {
-            const active = String(activePlatformId) === String(platform.id);
-            return (
-              <PlatformButton
-                key={platform.id}
-                platform={platform}
-                active={active}
-                onClick={() => handlePlatformSelect(platform.id)}
-              />
-            );
-          })}
+        <div className="w-full">
+          <div className="platform-tabs scrollbar-hide">
+            {platforms.map((platform) => {
+              const active = String(activePlatformId) === String(platform.id);
+              return (
+                <PlatformButton
+                  key={platform.id}
+                  platform={platform}
+                  active={active}
+                  onClick={() => handlePlatformSelect(platform.id)}
+                />
+              );
+            })}
           </div>
         </div>
 
         <div className={`transition-opacity duration-200 ${isSwitching ? 'opacity-75' : 'opacity-100'}`}>
-          <div className="relative">
-            <div
-              ref={movieTrackRef}
-              className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
-            >
+          <div className="hidden lg:grid desktop-poster-grid">
             {loading
               ? Array.from({ length: limit }).map((_, i) => (
-                  <div key={`s-${i}`} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
-                    <div className="aspect-[2/3] rounded-2xl bg-white/25 animate-pulse" />
-                  </div>
+                  <div key={`s-${i}`} className="aspect-[2/3] rounded-2xl bg-white/10 animate-pulse" />
                 ))
               : activeMovies.map((movie) => (
-                  <div key={movie.id} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
-                    <MovieCard movie={movie} />
-                  </div>
+                  <MovieCard key={movie.id} movie={movie} />
                 ))}
-            </div>
-            {showLeftFade && (
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-7 md:w-8 lg:w-12 bg-gradient-to-r from-[#04060b]/70 to-transparent" />
-            )}
-            {showRightFade && (
-              <div className="pointer-events-none absolute inset-y-0 right-0 w-7 md:w-8 lg:w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
-            )}
           </div>
 
-          {!loading && activeMovies.length === 0 && (
-            <p className="text-sm text-slate-200/90 py-2">No content available for this platform.</p>
-          )}
+          <div className="lg:hidden">
+            <div className="carousel-shell">
+              <div
+                ref={movieTrackRef}
+                className="carousel-track flex gap-4 scrollbar-hide snap-x snap-mandatory"
+              >
+                {loading
+                  ? Array.from({ length: limit }).map((_, i) => (
+                      <div key={`s-${i}`} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
+                        <div className="aspect-[2/3] rounded-2xl bg-white/25 animate-pulse" />
+                      </div>
+                    ))
+                  : activeMovies.map((movie) => (
+                      <div key={movie.id} className="snap-start flex-shrink-0 w-[125px] md:w-[185px]">
+                        <MovieCard movie={movie} />
+                      </div>
+                    ))}
+              </div>
+              {showLeftFade && (
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-7 md:w-8 lg:w-12 bg-gradient-to-r from-[#04060b]/70 to-transparent" />
+              )}
+              {showRightFade && (
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-7 md:w-8 lg:w-12 bg-gradient-to-l from-[#04060b]/70 to-transparent" />
+              )}
+            </div>
+          </div>
+
+          {!loading && activeMovies.length === 0 && <p className="text-sm text-slate-200/90 py-2">No content available for this platform.</p>}
         </div>
       </div>
     </section>
   );
 };
 
-export default PlatformStreamingSection;
+export default memo(PlatformStreamingSection);
+
+
