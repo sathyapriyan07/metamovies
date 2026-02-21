@@ -216,16 +216,6 @@
     max-width: 1100px;
   }
 
-  .movie-detail-poster {
-    width: 100%;
-  }
-
-  @media (max-width: 768px) {
-    .movie-detail-poster {
-      width: 100px;
-    }
-  }
-
   .section-header {
     display: flex;
     align-items: center;

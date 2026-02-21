@@ -591,7 +591,7 @@ const MovieDetail = () => {
       <div className="movie-detail-wrapper">
         <aside>
             <div className="sidebar-card bg-[#0f1626] border border-white/8 rounded-xl p-4">
-              <div className="movie-detail-poster aspect-[2/3] w-full overflow-hidden rounded-xl bg-black/40">
+              <div className="aspect-[2/3] w-full overflow-hidden rounded-xl bg-black/40">
                 <img
                   src={movie.poster_url || movie.backdrop_url || 'https://via.placeholder.com/300x450'}
                   alt={movie.title}
