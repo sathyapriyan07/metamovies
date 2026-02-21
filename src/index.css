@@ -21,6 +21,7 @@
 
 html, body {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -68,6 +69,7 @@ p {
 
 .app {
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .container {
@@ -626,5 +628,28 @@ p {
   .button-secondary {
     width: 100%;
     text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px 16px;
+    gap: 8px;
+  }
+
+  .logo {
+    order: 1;
+  }
+
+  .header-actions {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .search-input {
+    order: 3;
+    width: 100%;
   }
 }
