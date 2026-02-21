@@ -24,6 +24,7 @@
 @layer base {
   * {
     letter-spacing: 0.15px;
+    box-sizing: border-box;
   }
 
   html {
@@ -87,6 +88,12 @@
     width: 100%;
   }
 
+  @media (max-width: 768px) {
+    .container-desktop {
+      padding: 0 16px;
+    }
+  }
+
   @media (min-width: 1024px) {
     .container-desktop {
       padding: 0 60px;
@@ -98,6 +105,12 @@
     margin: 0 auto;
     padding: 28px 20px;
     width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .desktop-container {
+      padding: 20px 16px;
+    }
   }
 
   @media (min-width: 1024px) {
@@ -169,6 +182,13 @@
     box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
   }
 
+  @media (max-width: 768px) {
+    .cast-avatar {
+      width: 80px;
+      height: 80px;
+    }
+  }
+
   .movie-detail-wrapper {
     max-width: 1600px;
     margin: 0 auto;
@@ -176,6 +196,12 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .movie-detail-wrapper {
+      padding: 20px 16px;
+    }
   }
 
   @media (min-width: 1200px) {
@@ -210,6 +236,12 @@
     }
   }
 
+  @media (max-width: 768px) {
+    .cast-row {
+      gap: 14px;
+    }
+  }
+
   .sidebar-card {
     margin-bottom: 24px;
   }
@@ -218,6 +250,12 @@
     max-width: 1600px;
     margin: 0 auto;
     padding: 24px 20px;
+  }
+
+  @media (max-width: 768px) {
+    .search-desktop-wrapper {
+      padding: 20px 16px;
+    }
   }
 
   @media (min-width: 1200px) {
@@ -238,10 +276,24 @@
     }
   }
 
+  @media (max-width: 768px) {
+    .search-input {
+      height: 50px;
+      font-size: 14px;
+    }
+  }
+
   .desktop-movie-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .desktop-movie-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
   }
 
   @media (min-width: 1200px) {
@@ -255,6 +307,12 @@
     max-width: 1600px;
     margin: 0 auto;
     padding: 24px 20px;
+  }
+
+  @media (max-width: 768px) {
+    .home-desktop-wrapper {
+      padding: 20px 16px;
+    }
   }
 
   @media (min-width: 1200px) {
@@ -309,6 +367,62 @@
     .section-block {
       margin-top: 60px;
       margin-bottom: 40px;
+    }
+  }
+
+  .page-wrapper {
+    padding: 16px;
+  }
+
+  .hero {
+    position: relative;
+  }
+
+  .hero img {
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  .hero-content {
+    width: 100%;
+  }
+
+  .hero-title {
+    font-size: 22px;
+  }
+
+  .hero-meta {
+    font-size: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      height: 70vh;
+      min-height: 520px;
+    }
+
+    .hero-content {
+      padding: 20px;
+      padding-bottom: 36px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .action-buttons .btn-primary,
+    .action-buttons .btn-ghost {
+      flex: 1;
+    }
+
+    .action-buttons .btn-icon {
+      flex: 0 0 auto;
     }
   }
 
@@ -401,6 +515,18 @@
   @media (min-width: 1024px) {
     .ott-topbar {
       left: 240px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .ott-topbar {
+      height: 56px;
+      padding: 0 12px;
+    }
+
+    .ott-search {
+      height: 44px;
+      padding: 8px 12px;
     }
   }
 
@@ -518,6 +644,40 @@
   .carousel-shell {
     position: relative;
     overflow: hidden;
+  }
+
+  .bottom-nav {
+    height: 60px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav-inner {
+    height: 60px;
+  }
+
+  @media (max-width: 768px) {
+    .glass-card,
+    .glass-card-strong,
+    .glass-dark,
+    .glass-subtle,
+    .glass-base,
+    .glass-strong {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      min-height: 44px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+    }
   }
 
   .carousel-track {

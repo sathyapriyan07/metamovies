@@ -88,7 +88,7 @@ const Search = () => {
               value={query}
               onChange={handleInputChange}
               placeholder="Search movies and people"
-              className="w-full pl-12 pr-6 py-4 md:py-5 bg-transparent text-white placeholder:text-white/60 focus:outline-none"
+              className="search-input w-full pl-12 pr-6 py-4 md:py-5 bg-transparent text-white placeholder:text-white/60 focus:outline-none"
             />
           </div>
           {query && suggestions.length > 0 && (

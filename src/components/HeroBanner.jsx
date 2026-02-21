@@ -49,7 +49,7 @@ const HeroBanner = () => {
 
   return (
     <div
-      className="relative w-full h-[55vh] md:h-[70vh] lg:h-[75vh] overflow-hidden"
+      className="hero relative w-full h-[55vh] md:h-[70vh] lg:h-[75vh] overflow-hidden"
       onTouchStart={(e) => touchStartX.current = e.touches[0].clientX}
       onTouchMove={(e) => touchEndX.current = e.touches[0].clientX}
       onTouchEnd={handleSwipe}
@@ -61,7 +61,7 @@ const HeroBanner = () => {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f17] via-[#0b0f17]/50 to-transparent" />
 
-      <div className="relative h-full container-desktop flex items-end pb-12 md:pb-16 lg:pb-16">
+      <div className="hero-content relative h-full container-desktop flex items-end pb-12 md:pb-16 lg:pb-16">
         <div className="max-w-[700px] animate-fade-in">
           {featured.title_logo_url && !featured.use_text_title ? (
             <img
@@ -74,11 +74,11 @@ const HeroBanner = () => {
               }}
             />
           ) : null}
-          <h1 className={`text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 leading-[1.1] ${featured.title_logo_url && !featured.use_text_title ? 'hidden' : ''}`}>
+          <h1 className={`hero-title text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 leading-[1.1] ${featured.title_logo_url && !featured.use_text_title ? 'hidden' : ''}`}>
             {featured.title || featured.name}
           </h1>
 
-          <div className="flex items-center gap-3 mb-4 text-sm text-secondary flex-wrap">
+          <div className="hero-meta flex items-center gap-3 mb-4 text-sm text-secondary flex-wrap">
             {featured.release_date && <span>{featured.release_date.split('-')[0]}</span>}
             {featured.genres && featured.genres.length > 0 && (
               <>
@@ -94,7 +94,7 @@ const HeroBanner = () => {
             </p>
           )}
 
-          <div className="flex flex-wrap gap-3">
+          <div className="action-buttons flex flex-wrap gap-3">
             {featured.trailer_url && (
               <button
                 onClick={() => window.open(featured.trailer_url, '_blank', 'noopener,noreferrer')}

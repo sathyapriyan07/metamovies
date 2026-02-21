@@ -389,7 +389,7 @@ const MovieDetail = () => {
   return (
     <div className="min-h-screen pb-24 md:pb-12 lg:overflow-x-hidden animate-fade-in">
       {/* Hero Backdrop Section */}
-      <div ref={heroRef} className="relative w-full h-[50vh] md:h-[55vh] lg:h-[64vh] overflow-hidden">
+      <div ref={heroRef} className="hero relative w-full h-[50vh] md:h-[55vh] lg:h-[64vh] overflow-hidden">
         {heroPoster ? (
           <img
             src={heroPoster}
@@ -464,7 +464,7 @@ const MovieDetail = () => {
 
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#04060b] via-[#04060b]/80 to-transparent" />
         
-        <div className="relative z-20 h-full flex items-end pb-6 lg:pb-10">
+        <div className="hero-content relative z-20 h-full flex items-end pb-6 lg:pb-10">
           <div className="container-desktop">
             <div className="max-w-[700px]">
             {/* Title Logo or Text */}
@@ -479,17 +479,17 @@ const MovieDetail = () => {
                     e.target.nextElementSibling.style.display = 'block';
                   }}
                 />
-                <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] hidden">
+                <h1 className="hero-title text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] hidden">
                   {movie.title || 'Untitled'}
                 </h1>
               </div>
             ) : (
-              <h1 className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 md:mb-4 leading-[1.1]">
+              <h1 className="hero-title text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 md:mb-4 leading-[1.1]">
                 {movie.title || 'Untitled'}
               </h1>
             )}
             
-            <div className="flex items-center gap-2 text-xs md:text-sm text-gray-300 flex-wrap mb-4 lg:mb-5">
+            <div className="hero-meta flex items-center gap-2 text-xs md:text-sm text-gray-300 flex-wrap mb-4 lg:mb-5">
               {movie.release_date && <span>{movie.release_date.split('-')[0]}</span>}
               {movie.runtime > 0 && (
                 <>
@@ -505,7 +505,7 @@ const MovieDetail = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-3 md:gap-4 flex-wrap">
+            <div className="action-buttons flex items-center gap-3 md:gap-4 flex-wrap">
               {shouldLoadHeroVideo && heroVideoSource?.type === 'file' && (
                 <button
                   type="button"
