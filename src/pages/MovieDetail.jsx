@@ -63,6 +63,8 @@ const MovieDetail = () => {
     return match ? match[1] : null;
   };
   const isVideoFile = (url) => /\.(mp4|webm|ogg|m3u8)(\?|#|$)/i.test(url || '');
+  const directors = (movie.crew || []).filter((c) => c?.job === 'Director');
+  const writers = (movie.crew || []).filter((c) => ['Writer', 'Screenplay'].includes(c?.job));
   const combinedPeople = [
     ...(movie.cast || []).map((c) => ({
       key: `cast-${c.id}`,
@@ -108,7 +110,7 @@ const MovieDetail = () => {
         </div>
       </section>
 
-      <div className="detail-grid section">
+      <div className="detail-grid detail-layout section">
         <div>
           {movie.poster_url && (
             <div className="detail-poster-wrapper">
@@ -120,7 +122,7 @@ const MovieDetail = () => {
         <div>
           <div className="detail-title-block detail-content">
             {movie.title_logo_url ? (
-              <div className="detail-title-wrapper">
+              <div className="detail-title-logo-wrapper">
                 <img className="detail-title-logo" src={movie.title_logo_url} alt={movie.title} />
               </div>
             ) : (
@@ -138,26 +140,27 @@ const MovieDetail = () => {
                   {runtime}
                 </>
               ) : null}
+              {movie.trailer_url && (
+                <>
+                  <span className="meta-sep" aria-hidden="true">
+                    <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
+                      <circle cx="3" cy="3" r="3" />
+                    </svg>
+                  </span>
+                  <button className="detail-trailer" onClick={() => window.open(movie.trailer_url, '_blank')}>Play Trailer</button>
+                </>
+              )}
             </div>
             {movie.genres?.length > 0 && (
-              <div className="detail-genres">{movie.genres.join(' | ')}</div>
+              <div className="detail-genres">{movie.genres.join(' • ')}</div>
             )}
-            <div className="detail-actions">
-              {movie.trailer_url && (
-                <button className="button-primary" onClick={() => window.open(movie.trailer_url, '_blank')}>Watch Trailer</button>
-              )}
-              <button className="button-secondary" onClick={toggleWatchlist}>
-                {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-              </button>
-              {movie.is_now_showing && movie.booking_url && (
-                <button className="button-secondary" onClick={() => window.open(movie.booking_url, '_blank')}>Book Tickets</button>
-              )}
-            </div>
           </div>
 
+          <div className="detail-divider" />
+
           {movie.overview && (
-            <section className="section" style={{ marginTop: 0 }}>
-              <h2 className="section-title">Overview</h2>
+            <section className="detail-overview">
+              <h2>Overview</h2>
               <p>
                 {showFullOverview ? movie.overview : movie.overview.slice(0, 300)}
                 {movie.overview.length > 300 && !showFullOverview ? '...' : ''}
@@ -166,6 +169,23 @@ const MovieDetail = () => {
                 <button className="button-secondary" onClick={() => setShowFullOverview(!showFullOverview)} style={{ marginTop: 8 }}>
                   {showFullOverview ? 'Less' : 'More'}
                 </button>
+              )}
+            </section>
+          )}
+
+          {(directors.length > 0 || writers.length > 0) && (
+            <section className="credit-block">
+              {directors.length > 0 && (
+                <div style={{ marginBottom: 12 }}>
+                  <div className="credit-name">{directors[0].person?.name}</div>
+                  <div className="credit-role">Director</div>
+                </div>
+              )}
+              {writers.length > 0 && (
+                <div>
+                  <div className="credit-name">{writers[0].person?.name}</div>
+                  <div className="credit-role">Writer</div>
+                </div>
               )}
             </section>
           )}

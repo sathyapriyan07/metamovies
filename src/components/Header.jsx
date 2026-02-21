@@ -15,11 +15,13 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-inner">
-        <button className="logo" onClick={() => navigate('/')}>
-          <img src="/favicon.png" alt="MetaMovies" className="logo-mark" />
-          <span>MetaMovies</span>
+        <button className="header-left" onClick={() => navigate('/')}>
+          <span className="logo-circle">
+            <img src="/favicon.png" alt="MetaMovies" className="logo-mark" />
+          </span>
+          <span className="logo-text">MetaMovies</span>
         </button>
-        <form onSubmit={handleSubmit} style={{ flex: 1 }}>
+        <form onSubmit={handleSubmit} className="header-search">
           <input
             className="search-input"
             value={query}
@@ -28,13 +30,13 @@ const Header = () => {
             aria-label="Search"
           />
         </form>
-        <div className="header-actions">
+        <div className="header-right">
           {isAdmin && (
-            <button className="button-primary" onClick={() => navigate('/admin')}>
+            <button className="header-btn" onClick={() => navigate('/admin')}>
               Admin
             </button>
           )}
-          <button className="button-primary" onClick={() => navigate(user ? '/profile' : '/login')}>
+          <button className="header-btn" onClick={() => navigate(user ? '/profile' : '/login')}>
             {user ? 'Profile' : 'Login'}
           </button>
         </div>
