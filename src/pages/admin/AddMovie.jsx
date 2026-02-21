@@ -102,9 +102,12 @@ const AddMovie = () => {
 
   return (
     <AdminLayout title="Add Movie" subtitle="Create a new movie entry.">
-      <form onSubmit={handleSubmit} className="space-y-6 glass-card rounded-2xl p-6">
-        <div>
-          <label className="block text-sm font-medium mb-2">Title</label>
+      <form onSubmit={handleSubmit} className="admin-form glass-card rounded-2xl p-6">
+        <div className="admin-section">
+          <h3>Basics</h3>
+          <div className="admin-grid">
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Title</label>
           <input
             type="text"
             value={formData.title}
@@ -112,42 +115,40 @@ const AddMovie = () => {
             required
             className="w-full px-4 py-3 glass-input"
           />
-        </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Overview</label>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Overview</label>
           <textarea
             value={formData.overview}
             onChange={(e) => setFormData({ ...formData, overview: e.target.value })}
             rows={4}
             className="w-full px-4 py-3 glass-input"
           />
-        </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Release Date</label>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Release Date</label>
             <input
               type="date"
               value={formData.release_date}
               onChange={(e) => setFormData({ ...formData, release_date: e.target.value })}
               className="w-full px-4 py-3 glass-input"
             />
-          </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Runtime (min)</label>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Runtime (min)</label>
             <input
               type="number"
               value={formData.runtime}
               onChange={(e) => setFormData({ ...formData, runtime: e.target.value })}
               className="w-full px-4 py-3 glass-input"
             />
-          </div>
-        </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Rating</label>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Rating</label>
           <input
             type="number"
             step="0.1"
@@ -156,11 +157,10 @@ const AddMovie = () => {
             onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
             className="w-full px-4 py-3 glass-input"
           />
-        </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+            <div className="admin-field">
+              <label className="block text-sm font-medium flex items-center gap-2">
               <span>IMDb Rating</span>
               <img
                 src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='16' viewBox='0 0 24 16'><rect width='24' height='16' rx='3' fill='%23f5c518'/><text x='12' y='11' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='9' font-weight='700' fill='%23000000'>IMDb</text></svg>"
@@ -179,9 +179,9 @@ const AddMovie = () => {
               placeholder="0 - 10"
               className="w-full px-4 py-3 glass-input"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+            </div>
+            <div className="admin-field">
+              <label className="block text-sm font-medium flex items-center gap-2">
               <span>Rotten Tomatoes</span>
               <img
                 src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 2c3 2.5 6 5.5 6 9a6 6 0 1 1-12 0c0-3.5 3-6.5 6-9z'/><circle cx='9' cy='11' r='1.2' fill='%23ffffff'/><circle cx='15' cy='11' r='1.2' fill='%23ffffff'/></svg>"
@@ -199,11 +199,10 @@ const AddMovie = () => {
               placeholder="0 - 100"
               className="w-full px-4 py-3 glass-input"
             />
-          </div>
-        </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Genres (comma separated)</label>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Genres (comma separated)</label>
           <input
             type="text"
             value={formData.genres}
@@ -211,20 +210,25 @@ const AddMovie = () => {
             placeholder="Action, Drama, Thriller"
             className="w-full px-4 py-3 glass-input"
           />
-        </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Trailer URL</label>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Trailer URL</label>
           <input
             type="url"
             value={formData.trailer_url}
             onChange={(e) => setFormData({ ...formData, trailer_url: e.target.value })}
             className="w-full px-4 py-3 glass-input"
           />
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-3">
-          <label className="block text-sm font-medium">Platforms</label>
+        <div className="admin-section">
+          <h3>Platforms</h3>
+          <div className="admin-grid">
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Platforms</label>
           <input
             type="text"
             value={platformSearch}
@@ -249,78 +253,96 @@ const AddMovie = () => {
           {selectedPlatforms.length > 0 && (
             <p className="text-xs text-gray-400">{selectedPlatforms.length} platform(s) selected</p>
           )}
-        </div>
-
-        <div className="glass-card/0">
-          <label className="flex items-center gap-2 text-sm font-medium mb-3">
-            <input
-              type="checkbox"
-              checked={formData.is_now_showing}
-              onChange={(e) => setFormData({ ...formData, is_now_showing: e.target.checked })}
-              className="w-4 h-4"
-            />
-            Currently Streaming / In Theatres
-          </label>
-
-          {formData.is_now_showing && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Booking URL</label>
-                <input
-                  type="url"
-                  value={formData.booking_url}
-                  onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-4 py-3 glass-input"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Button Label (optional)</label>
-                <input
-                  type="text"
-                  value={formData.booking_label}
-                  onChange={(e) => setFormData({ ...formData, booking_label: e.target.value })}
-                  placeholder="Book Tickets"
-                  className="w-full px-4 py-3 glass-input"
-                />
-              </div>
             </div>
-          )}
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Poster Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setPosterFile(e.target.files[0])}
-            className="w-full px-4 py-3 glass-input"
-          />
+        <div className="admin-section">
+          <h3>Publish</h3>
+          <div className="admin-grid">
+            <div className="admin-field admin-full">
+              <label className="flex items-center gap-2 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  checked={formData.is_now_showing}
+                  onChange={(e) => setFormData({ ...formData, is_now_showing: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                Currently Streaming / In Theatres
+              </label>
+            </div>
+            {formData.is_now_showing && (
+              <div className="admin-grid admin-full">
+                <div className="admin-field">
+                  <label className="block text-sm font-medium">Booking URL</label>
+                  <input
+                    type="url"
+                    value={formData.booking_url}
+                    onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
+                    placeholder="https://..."
+                    className="w-full px-4 py-3 glass-input"
+                  />
+                </div>
+                <div className="admin-field">
+                  <label className="block text-sm font-medium">Button Label (optional)</label>
+                  <input
+                    type="text"
+                    value={formData.booking_label}
+                    onChange={(e) => setFormData({ ...formData, booking_label: e.target.value })}
+                    placeholder="Book Tickets"
+                    className="w-full px-4 py-3 glass-input"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Backdrop Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setBackdropFile(e.target.files[0])}
-            className="w-full px-4 py-3 glass-input"
-          />
+        <div className="admin-section">
+          <h3>Media</h3>
+          <div className="admin-grid">
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Poster Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setPosterFile(e.target.files[0])}
+                className="w-full px-4 py-3 glass-input"
+              />
+            </div>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Backdrop Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setBackdropFile(e.target.files[0])}
+                className="w-full px-4 py-3 glass-input"
+              />
+            </div>
+          </div>
         </div>
 
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={formData.trending}
-            onChange={(e) => setFormData({ ...formData, trending: e.target.checked })}
-            className="w-4 h-4"
-          />
-          Mark as Trending
-        </label>
-
-        <button type="submit" className="w-full btn-primary" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Movie'}
-        </button>
+        <div className="admin-section">
+          <h3>Finalize</h3>
+          <div className="admin-grid">
+            <div className="admin-field admin-full">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={formData.trending}
+                  onChange={(e) => setFormData({ ...formData, trending: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                Mark as Trending
+              </label>
+            </div>
+          </div>
+          <div className="admin-actions" style={{ marginTop: 16 }}>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Creating...' : 'Create Movie'}
+            </button>
+          </div>
+        </div>
       </form>
     </AdminLayout>
   );

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '../../components/AdminLayout';
-import Toast from '../../components/Toast';
 import { createPlatform, deletePlatform, getPlatforms, updatePlatform } from '../../services/supabase';
 
 const TYPES = [
@@ -103,7 +102,7 @@ const ManagePlatforms = () => {
 
   return (
     <AdminLayout title="Manage Platforms" subtitle="Add and manage platform mappings.">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <div>{toast.message}</div>}
 
       <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-6 space-y-4">
         <h2 className="text-lg font-semibold">{editing ? 'Edit Platform' : 'Add Platform'}</h2>

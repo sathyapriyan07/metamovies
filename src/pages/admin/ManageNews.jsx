@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
-import Toast from '../../components/Toast';
 
 const ManageNews = () => {
   const navigate = useNavigate();
@@ -78,7 +77,7 @@ const ManageNews = () => {
 
   return (
     <AdminLayout title="Manage News" subtitle="Edit or remove news articles">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <div>{toast.message}</div>}
       
       <div className="glass-card rounded-2xl p-4 md:p-6 pb-24 md:pb-12">
         <div className="mb-4 flex justify-between items-center">

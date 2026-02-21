@@ -53,9 +53,12 @@ const AddPerson = () => {
 
   return (
     <AdminLayout title="Add Person" subtitle="Create a new cast or crew profile.">
-      <form onSubmit={handleSubmit} className="space-y-6 glass-card rounded-2xl p-6">
-        <div>
-          <label className="block text-sm font-medium mb-2">Name</label>
+      <form onSubmit={handleSubmit} className="admin-form glass-card rounded-2xl p-6">
+        <div className="admin-section">
+          <h3>Basics</h3>
+          <div className="admin-grid">
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Name</label>
           <input
             type="text"
             value={formData.name}
@@ -63,83 +66,93 @@ const AddPerson = () => {
             required
             className="w-full px-4 py-3 glass-input"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Biography</label>
+            </div>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Biography</label>
           <textarea
             value={formData.biography}
             onChange={(e) => setFormData({ ...formData, biography: e.target.value })}
             rows={4}
             className="w-full px-4 py-3 glass-input"
           />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Birthday</label>
+            </div>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Birthday</label>
             <input
               type="date"
               value={formData.birthday}
               onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
               className="w-full px-4 py-3 glass-input"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Place of Birth</label>
+            </div>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Place of Birth</label>
             <input
               type="text"
               value={formData.place_of_birth}
               onChange={(e) => setFormData({ ...formData, place_of_birth: e.target.value })}
               className="w-full px-4 py-3 glass-input"
             />
+            </div>
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Profile Image</label>
+        <div className="admin-section">
+          <h3>Media</h3>
+          <div className="admin-grid">
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Profile Image</label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setProfileFile(e.target.files[0])}
             className="w-full px-4 py-3 glass-input"
           />
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Instagram</label>
+        <div className="admin-section">
+          <h3>Links</h3>
+          <div className="admin-grid">
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Instagram</label>
             <input
               type="url"
               value={formData.instagram}
               onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
               className="w-full px-4 py-3 glass-input"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Twitter</label>
+            </div>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Twitter</label>
             <input
               type="url"
               value={formData.twitter}
               onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
               className="w-full px-4 py-3 glass-input"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Facebook</label>
+            </div>
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Facebook</label>
             <input
               type="url"
               value={formData.facebook}
               onChange={(e) => setFormData({ ...formData, facebook: e.target.value })}
               className="w-full px-4 py-3 glass-input"
             />
+            </div>
           </div>
         </div>
 
-        <button type="submit" className="w-full btn-primary" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Person'}
-        </button>
+        <div className="admin-section">
+          <h3>Publish</h3>
+          <div className="admin-actions">
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Creating...' : 'Create Person'}
+            </button>
+          </div>
+        </div>
       </form>
     </AdminLayout>
   );

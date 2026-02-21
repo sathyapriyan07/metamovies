@@ -384,16 +384,16 @@ const TMDBImport = () => {
     <AdminLayout title="TMDB Import" subtitle="Import movies and people from TMDB.">
       <div className="glass-card rounded-2xl p-6">
 
-        <div className="flex gap-4 mb-6">
+        <div className="tab-container admin-tabs" style={{ marginBottom: 16 }}>
           <button
             onClick={() => document.getElementById('single-import').scrollIntoView({ behavior: 'smooth' })}
-            className="btn-secondary"
+            className="tab tab-admin-toggle"
           >
             Single Import
           </button>
           <button
             onClick={() => document.getElementById('bulk-import').scrollIntoView({ behavior: 'smooth' })}
-            className="btn-primary"
+            className="tab tab-admin-toggle"
           >
             Bulk Import
           </button>
@@ -411,26 +411,26 @@ const TMDBImport = () => {
           </div>
         )}
 
-        <div id="bulk-import" className="glass-dark p-6 rounded-xl mb-8">
-          <h2 className="text-2xl font-bold mb-4">Bulk Import</h2>
+        <div id="bulk-import" className="admin-section">
+          <h3>Bulk Import</h3>
           <p className="text-gray-400 text-sm mb-4">Import multiple movies at once using comma-separated TMDB IDs</p>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Type</label>
+
+          <div className="admin-grid">
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Type</label>
               <select
                 value={type}
                 onChange={(e) => { setType(e.target.value); setBulkSearchResults([]); setSelectedItems([]); }}
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                className="w-full px-4 py-3 glass-input"
                 disabled={bulkLoading}
               >
                 <option value="movie" className="bg-black">Movies</option>
-                                <option value="person" className="bg-black">Persons</option>
+                <option value="person" className="bg-black">Persons</option>
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Search & Select Multiple</label>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Search & Select Multiple</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -438,7 +438,7 @@ const TMDBImport = () => {
                   onChange={(e) => setBulkSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleBulkSearch()}
                   placeholder="Search to add multiple items..."
-                  className="flex-1 px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                  className="flex-1 px-4 py-3 glass-input"
                   disabled={bulkLoading}
                 />
                 <button
@@ -452,7 +452,7 @@ const TMDBImport = () => {
             </div>
 
             {bulkSearchResults.length > 0 && (
-              <div className="space-y-2">
+              <div className="admin-field admin-full">
                 <div className="flex justify-between items-center">
                   <p className="text-sm text-gray-400">{selectedItems.length} selected</p>
                   {selectedItems.length > 0 && (
@@ -499,14 +499,14 @@ const TMDBImport = () => {
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium mb-2">TMDB IDs (comma-separated)</label>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">TMDB IDs (comma-separated)</label>
               <textarea
                 value={bulkIds}
                 onChange={(e) => setBulkIds(e.target.value)}
                 placeholder="e.g., 550, 680, 13, 155, 497"
                 rows="4"
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                className="w-full px-4 py-3 glass-input"
                 disabled={bulkLoading}
               />
               <p className="text-xs text-gray-500 mt-1">Enter TMDB IDs separated by commas</p>
@@ -525,9 +525,11 @@ const TMDBImport = () => {
               </div>
             )}
 
+          </div>
+          <div className="admin-actions" style={{ marginTop: 12 }}>
             <button
               onClick={handleBulkImport}
-              className="btn-primary w-full"
+              className="btn-primary"
               disabled={bulkLoading || !bulkIds.trim()}
             >
               {bulkLoading ? 'Importing...' : 'Start Bulk Import'}
@@ -535,23 +537,23 @@ const TMDBImport = () => {
           </div>
         </div>
 
-        <div id="single-import" className="glass-dark p-6 rounded-xl mb-6">
-          <h2 className="text-2xl font-bold mb-4">Single Import</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Type</label>
+        <div id="single-import" className="admin-section">
+          <h3>Single Import</h3>
+          <div className="admin-grid">
+            <div className="admin-field">
+              <label className="block text-sm font-medium">Type</label>
               <select
                 value={type}
                 onChange={(e) => { setType(e.target.value); setSearchResults([]); }}
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                className="w-full px-4 py-3 glass-input"
               >
                 <option value="movie" className="bg-black">Movie</option>
-                                <option value="person" className="bg-black">Person</option>
+                <option value="person" className="bg-black">Person</option>
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Search TMDB</label>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Search TMDB</label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -559,7 +561,7 @@ const TMDBImport = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder="Search for movies..."
-                  className="flex-1 px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                  className="flex-1 px-4 py-3 glass-input"
                 />
                 <button
                   onClick={handleSearch}
@@ -572,7 +574,8 @@ const TMDBImport = () => {
             </div>
 
             {searchResults.length > 0 && (
-              <div className="max-h-80 overflow-y-auto space-y-2">
+              <div className="admin-field admin-full">
+                <div className="max-h-80 overflow-y-auto space-y-2">
                 {searchResults.map((item) => (
                   <div
                     key={item.id}
@@ -592,32 +595,35 @@ const TMDBImport = () => {
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             )}
 
-            <div className="border-t border-white/20 pt-4">
-              <label className="block text-sm font-medium mb-2">Or Enter TMDB ID Manually</label>
+            <div className="admin-field admin-full">
+              <label className="block text-sm font-medium">Or Enter TMDB ID Manually</label>
               <input
                 type="text"
                 value={tmdbId}
                 onChange={(e) => setTmdbId(e.target.value)}
                 placeholder="Enter TMDB ID (e.g., 550 for Fight Club)"
-                className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20 mb-3"
+                className="w-full px-4 py-3 glass-input"
               />
-              <button
-                onClick={() => handleFetch()}
-                className="btn-primary w-full"
-                disabled={loading || !tmdbId}
-              >
-                {loading ? 'Fetching...' : 'Fetch from TMDB'}
-              </button>
+              <div className="admin-actions" style={{ marginTop: 12 }}>
+                <button
+                  onClick={() => handleFetch()}
+                  className="btn-primary"
+                  disabled={loading || !tmdbId}
+                >
+                  {loading ? 'Fetching...' : 'Fetch from TMDB'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {preview && (
-          <div className="glass-dark p-6 rounded-xl">
-            <h2 className="text-2xl font-bold mb-4">Preview</h2>
+          <div className="admin-section">
+            <h3>Preview</h3>
             
             <div className="flex gap-6 mb-6">
               <img
@@ -636,7 +642,7 @@ const TMDBImport = () => {
 
             <button
               onClick={handleImport}
-              className="btn-primary w-full"
+              className="btn-primary"
               disabled={loading}
             >
               {loading ? 'Importing...' : 'Import to Database'}

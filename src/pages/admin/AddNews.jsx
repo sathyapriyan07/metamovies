@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
-import Toast from '../../components/Toast';
 
 const AddNews = () => {
   const navigate = useNavigate();
@@ -150,11 +149,14 @@ const AddNews = () => {
 
   return (
     <AdminLayout title="Add News" subtitle="Create a new news article">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <div>{toast.message}</div>}
       
       <div className="glass-card rounded-2xl p-6 max-w-4xl">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="admin-section">
+            <h3>Basics</h3>
+            <div className="admin-grid">
+              <div className="admin-field admin-full">
             <label className="block text-sm font-medium mb-2">Title *</label>
             <input
               type="text"
@@ -167,9 +169,9 @@ const AddNews = () => {
               className="w-full px-4 py-3 glass-input"
             />
             {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title}</p>}
-          </div>
+              </div>
 
-          <div>
+              <div className="admin-field admin-full">
             <label className="block text-sm font-medium mb-2">Image URL</label>
             <input
               type="url"
@@ -193,10 +195,15 @@ const AddNews = () => {
                 />
               </div>
             )}
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Content *</label>
+          <div className="admin-section">
+            <h3>Content</h3>
+            <div className="admin-grid">
+              <div className="admin-field admin-full">
+                <label className="block text-sm font-medium mb-2">Content *</label>
             <textarea
               value={content}
               onChange={(e) => {
@@ -208,10 +215,10 @@ const AddNews = () => {
               className="w-full px-4 py-3 glass-input resize-none"
             />
             {errors.content && <p className="text-red-400 text-sm mt-1">{errors.content}</p>}
-          </div>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Excerpt (optional)</label>
+              <div className="admin-field admin-full">
+                <label className="block text-sm font-medium mb-2">Excerpt (optional)</label>
             <textarea
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
@@ -219,11 +226,16 @@ const AddNews = () => {
               rows={2}
               className="w-full px-4 py-3 glass-input resize-none"
             />
+              </div>
+            </div>
           </div>
 
           {/* Persons Involved Section */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Persons Involved</label>
+          <div className="admin-section">
+            <h3>People</h3>
+            <div className="admin-grid">
+              <div className="admin-field admin-full">
+                <label className="block text-sm font-medium mb-2">Persons Involved</label>
             <div className="relative">
               <input
                 type="text"
@@ -285,10 +297,15 @@ const AddNews = () => {
               </div>
             )}
             <p className="text-xs text-gray-400 mt-2">{linkedPersons.length}/15 persons added</p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium">
+          <div className="admin-section">
+            <h3>Publish</h3>
+            <div className="admin-grid">
+              <div className="admin-field admin-full">
+                <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="checkbox"
                 checked={isFeatured}
@@ -297,31 +314,33 @@ const AddNews = () => {
               />
               Mark as Featured
             </label>
-          </div>
+              </div>
+            </div>
 
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setShowPreview(!showPreview)}
-              className="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg font-semibold"
-            >
-              {showPreview ? 'Hide Preview' : 'Show Preview'}
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {saving ? 'Publishing...' : 'Publish'}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/admin/news')}
-              disabled={saving}
-              className="flex-1 btn-ghost disabled:opacity-50"
-            >
-              Cancel
-            </button>
+            <div className="admin-actions" style={{ marginTop: 12 }}>
+              <button
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                className="btn-secondary"
+              >
+                {showPreview ? 'Hide Preview' : 'Show Preview'}
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? 'Publishing...' : 'Publish'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/admin/news')}
+                disabled={saving}
+                className="btn-ghost disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </form>
 

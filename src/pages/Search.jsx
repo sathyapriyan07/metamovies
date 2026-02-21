@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { searchAll, getTrendingMovies, getMovies } from '../services/supabase';
-import PosterCard from '../components/PosterCard';
-import CarouselRow from '../components/CarouselRow';
 import { useNavigate, useLocation } from 'react-router-dom';
+import PosterCard from '../components/PosterCard';
 
 const Search = () => {
   const location = useLocation();
@@ -76,105 +75,93 @@ const Search = () => {
   }, [query, results]);
 
   return (
-    <div className="min-h-screen pb-24 md:pb-12">
-      <div className="search-desktop-wrapper pt-24 md:pt-28 page-fade">
-        <div className="search-bar-desktop bg-[#0f1626] border border-white/8 rounded-2xl px-4 md:px-6 py-4">
-          <div className="relative">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              value={query}
-              onChange={handleInputChange}
-              placeholder="Search movies and people"
-              className="search-input w-full pl-12 pr-6 py-4 md:py-5 bg-transparent text-white placeholder:text-white/60 focus:outline-none"
-            />
-          </div>
-          {query && suggestions.length > 0 && (
-            <div className="mt-4 grid md:grid-cols-2 gap-2">
-              {suggestions.map((item) => (
-                <button
-                  key={`${item.type}-${item.id}`}
-                  onClick={() => navigate(item.type === 'person' ? `/person/${item.id}` : `/${item.type}/${item.id}`)}
-                  className="text-left px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition border border-white/10"
-                >
-                  <p className="text-sm text-gray-200">{item.title}</p>
-                  <span className="text-xs text-white/75 uppercase tracking-[0.25em]">{item.type}</span>
+    <div>
+      <h1>Search</h1>
+      <input
+        type="text"
+        value={query}
+        onChange={handleInputChange}
+        placeholder="Search movies and people"
+        className="search-input"
+        style={{ marginTop: 12, marginBottom: 12, width: '100%' }}
+      />
+      {query && suggestions.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <p>Suggestions</p>
+          <ul>
+            {suggestions.map((item) => (
+              <li key={`${item.type}-${item.id}`}>
+                <button className="button-secondary" onClick={() => navigate(item.type === 'person' ? `/person/${item.id}` : `/${item.type}/${item.id}`)}>
+                  {item.title} ({item.type})
                 </button>
-              ))}
-            </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {!query ? (
+        <div>
+          <section className="section">
+            <h2 className="section-title">Trending</h2>
+            {homeLoading ? <p>Loading...</p> : (
+              <div className="grid">
+                {trendingMovies.map((movie) => (
+                  <PosterCard key={movie.id} item={movie} type="movie" />
+                ))}
+              </div>
+            )}
+          </section>
+          <section className="section">
+            <h2 className="section-title">Popular Movies</h2>
+            {homeLoading ? <p>Loading...</p> : (
+              <div className="grid">
+                {popularMovies.map((movie) => (
+                  <PosterCard key={movie.id} item={movie} type="movie" />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      ) : (
+        <div>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <>
+              {results.movies.length > 0 && (
+                <section className="section">
+                  <h2 className="section-title">Movies</h2>
+                  <div className="grid">
+                    {results.movies.map((movie) => (
+                      <PosterCard key={movie.id} item={movie} type="movie" />
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {results.persons.length > 0 && (
+                <section className="section">
+                  <h2 className="section-title">People</h2>
+                  <ul>
+                    {results.persons.map((person) => (
+                      <li key={person.id}>
+                        <button className="button-secondary" onClick={() => navigate(`/person/${person.id}`)}>{person.name}</button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {results.movies.length === 0 && results.persons.length === 0 && (
+                <p>No results found for "{query}"</p>
+              )}
+            </>
           )}
         </div>
-
-        {!query ? (
-          <div>
-            <div className="section-block">
-              <CarouselRow title="Trending" items={trendingMovies} type="movie" loading={homeLoading} />
-            </div>
-            <div className="section-block">
-              <CarouselRow title="Popular Movies" items={popularMovies} type="movie" loading={homeLoading} />
-            </div>
-          </div>
-        ) : (
-          <div>
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-sky-400 mx-auto"></div>
-              </div>
-            ) : (
-              <>
-                {results.movies.length > 0 && (
-                  <div className="section-block">
-                    <h2 className="text-2xl md:text-3xl font-semibold mb-6">Movies</h2>
-                    <div className="desktop-movie-grid">
-                      {results.movies.map((movie) => (
-                        <PosterCard key={movie.id} item={movie} type="movie" />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {results.persons.length > 0 && (
-                  <div className="section-block">
-                    <h2 className="text-2xl md:text-3xl font-semibold mb-6">People</h2>
-                    <div className="desktop-movie-grid">
-                      {results.persons.map((person) => (
-                        <div
-                          key={person.id}
-                          onClick={() => navigate(`/person/${person.id}`)}
-                          className="cursor-pointer hover:scale-[1.02] will-change-transform transition"
-                        >
-                          <img
-                            src={person.profile_url || 'https://via.placeholder.com/300x450'}
-                            alt={person.name}
-                            className="w-full aspect-[2/3] object-cover rounded-2xl mb-2 border border-white/10"
-                            loading="lazy"
-                          />
-                          <p className="font-semibold text-sm text-center text-gray-100">{person.name}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {results.movies.length === 0 && results.persons.length === 0 && (
-                  <div className="text-center text-gray-400 py-16 bg-[#0f1626] border border-white/8 rounded-2xl">
-                    <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <p className="text-xl">No results found for "{query}"</p>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };
 
 export default Search;
-
-

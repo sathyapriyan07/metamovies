@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../services/supabase';
-import VideoCard from '../components/VideoCard';
+import { useNavigate } from 'react-router-dom';
+import { getFeaturedVideos } from '../services/supabase';
 
 const Videos = () => {
+  const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,53 +12,31 @@ const Videos = () => {
   }, []);
 
   const loadVideos = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('videos')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setVideos(data || []);
-    } catch (error) {
-      console.error('Error loading videos:', error);
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const { data } = await getFeaturedVideos(60, 0);
+    setVideos(data || []);
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen pt-6 md:pt-8 lg:pt-10 pb-24 md:pb-12">
-      <div className="container-desktop">
-        <div className="mb-8">
-          <p className="text-white/75 text-xs uppercase tracking-[0.3em]">Discover</p>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold mt-2">Featured Videos</h1>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-gray-400">Loading videos...</p>
-          </div>
-        ) : videos.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-            No videos available yet
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+    <div>
+      <h1>Videos</h1>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <section className="section">
+          <h2 className="section-title">Featured</h2>
+          <ul>
             {videos.map((video) => (
-              <VideoCard key={video.id} video={video} />
+              <li key={video.id}>
+                <button onClick={() => navigate(`/videos/${video.id}`)}>{video.title}</button>
+              </li>
             ))}
-          </div>
-        )}
-      </div>
+          </ul>
+        </section>
+      )}
     </div>
   );
 };
 
 export default Videos;
-
-
-
-

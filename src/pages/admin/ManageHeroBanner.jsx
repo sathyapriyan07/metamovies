@@ -107,7 +107,7 @@ const ManageHeroBanner = () => {
                       <div className="flex-1">
                         <p className="font-semibold text-sm">{item.title}</p>
                         <p className="text-xs text-gray-400">
-                          {item.release_date?.split('-')[0]} • {item.genres?.[0]}
+                          {item.release_date?.split('-')[0]} - {item.genres?.[0]}
                         </p>
                       </div>
                       <button
@@ -143,7 +143,7 @@ const ManageHeroBanner = () => {
                           Movie
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {content?.release_date?.split('-')[0]} • ⭐ {content?.rating?.toFixed(1)}
+                          {content?.release_date?.split('-')[0]} - ⭐ {content?.rating?.toFixed(1)}
                         </p>
                       </div>
                     </div>

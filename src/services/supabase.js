@@ -416,6 +416,43 @@ export const getFeaturedVideosByPerson = async (personId, limit = 8) => {
   return { data: videos, error };
 };
 
+export const getFeaturedVideos = async (limit = 20, offset = 0) => {
+  const { data, error } = await supabase
+    .from('videos')
+    .select('*')
+    .eq('is_featured', true)
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+  return { data, error };
+};
+
+export const getVideoById = async (id) => {
+  const { data, error } = await supabase
+    .from('videos')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
+export const getNews = async (limit = 20, offset = 0) => {
+  const { data, error } = await supabase
+    .from('news')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+  return { data, error };
+};
+
+export const getNewsById = async (id) => {
+  const { data, error } = await supabase
+    .from('news')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
 export const getPersonsByVideo = async (videoId) => {
   const relationConfig = await resolveVideoPersonRelationConfig();
   if (!relationConfig) {

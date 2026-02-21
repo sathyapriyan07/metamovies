@@ -1,9 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-import SidebarNav from './components/SidebarNav';
-import TopBar from './components/TopBar';
-import BottomNav from './components/BottomNav';
+import Header from './components/Header';
+import MobileBottomNav from './components/MobileBottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
@@ -45,215 +44,215 @@ import ManagePlatforms from './pages/admin/ManagePlatforms';
 
 function AppRoutes() {
   const location = useLocation();
-  const isWatchPage = location.pathname.startsWith('/watch/');
+
+  const Layout = ({ children }) => (
+    <div className="app">
+      <Header />
+      <main className="container page-pad">{children}</main>
+      <MobileBottomNav />
+    </div>
+  );
 
   return (
-    <div className="app-shell">
-      {!isWatchPage && <SidebarNav />}
-      <div className="app-main">
-        {!isWatchPage && <TopBar />}
-        <div className={isWatchPage ? '' : 'app-content'}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/movies" element={<Movies />} />
-            <Route path="/platforms" element={<Platforms />} />
-            <Route path="/platforms/:id" element={<PlatformDetail />} />
-            <Route path="/movie/:id" element={<MovieDetail />} />
-            <Route path="/watch/:id" element={<Watch />} />
-            <Route path="/movie/:id/cast-crew" element={<CastCrew />} />
-            <Route path="/person/:id" element={<PersonDetail />} />
-            <Route path="/videos" element={<Videos />} />
-            <Route path="/videos/:id" element={<VideoDetail />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/news/:id" element={<NewsDetail />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/platforms" element={<Platforms />} />
+        <Route path="/platforms/:id" element={<PlatformDetail />} />
+        <Route path="/movie/:id" element={<MovieDetail />} />
+        <Route path="/watch/:id" element={<Watch />} />
+        <Route path="/movie/:id/cast-crew" element={<CastCrew />} />
+        <Route path="/person/:id" element={<PersonDetail />} />
+        <Route path="/videos" element={<Videos />} />
+        <Route path="/videos/:id" element={<VideoDetail />} />
+        <Route path="/news" element={<News />} />
+        <Route path="/news/:id" element={<NewsDetail />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-            <Route
-              path="/profile"
-              element={(
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/profile"
+          element={(
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/watchlist"
-              element={(
-                <ProtectedRoute>
-                  <Watchlist />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/watchlist"
+          element={(
+            <ProtectedRoute>
+              <Watchlist />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin"
+          element={(
+            <ProtectedRoute adminOnly>
+              <AdminDashboard />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/tmdb-import"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <TMDBImport />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/tmdb-import"
+          element={(
+            <ProtectedRoute adminOnly>
+              <TMDBImport />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/add-movie"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <AddMovie />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/add-movie"
+          element={(
+            <ProtectedRoute adminOnly>
+              <AddMovie />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/add-person"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <AddPerson />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/add-person"
+          element={(
+            <ProtectedRoute adminOnly>
+              <AddPerson />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/add-video"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <AddVideo />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/add-video"
+          element={(
+            <ProtectedRoute adminOnly>
+              <AddVideo />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/add-news"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <AddNews />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/add-news"
+          element={(
+            <ProtectedRoute adminOnly>
+              <AddNews />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-movies"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageMovies />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-movies"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageMovies />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/videos"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageVideos />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/videos"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageVideos />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/news"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageNews />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/news"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageNews />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-collections"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageCollections />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-collections"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageCollections />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/update-persons"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <UpdatePersons />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/update-persons"
+          element={(
+            <ProtectedRoute adminOnly>
+              <UpdatePersons />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-links"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageLinks />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-links"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageLinks />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-persons"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManagePersons />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-persons"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManagePersons />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-crew"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageCrew />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-crew"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageCrew />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-hero-banner"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageHeroBanner />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-hero-banner"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageHeroBanner />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-users"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageUsers />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-users"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageUsers />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-avatars"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManageAvatars />
-                </ProtectedRoute>
-              )}
-            />
+        <Route
+          path="/admin/manage-avatars"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageAvatars />
+            </ProtectedRoute>
+          )}
+        />
 
-            <Route
-              path="/admin/manage-platforms"
-              element={(
-                <ProtectedRoute adminOnly>
-                  <ManagePlatforms />
-                </ProtectedRoute>
-              )}
-            />
-          </Routes>
-        </div>
-        {!isWatchPage && <BottomNav />}
-      </div>
-    </div>
+        <Route
+          path="/admin/manage-platforms"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManagePlatforms />
+            </ProtectedRoute>
+          )}
+        />
+      </Routes>
+    </Layout>
   );
 }
 

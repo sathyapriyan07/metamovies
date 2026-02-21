@@ -1,112 +1,45 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { getPlatformById, getMoviesByPlatform } from '../services/supabase';
 import PosterCard from '../components/PosterCard';
-import { SkeletonGrid } from '../components/SkeletonLoader';
-import { getMoviesByPlatform, getPlatformById } from '../services/supabase';
-
-const PAGE_SIZE = 20;
 
 const PlatformDetail = () => {
   const { id } = useParams();
   const [platform, setPlatform] = useState(null);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    const loadInitial = async () => {
-      setLoading(true);
-      const [{ data: platformData }, { data: movieData }] = await Promise.all([
-        getPlatformById(id),
-        getMoviesByPlatform(id, PAGE_SIZE, 0)
-      ]);
-
-      setPlatform(platformData || null);
-      setMovies(movieData || []);
-      setHasMore((movieData || []).length === PAGE_SIZE);
-      setPage(0);
-      setLoading(false);
-    };
-
-    loadInitial();
+    loadPlatform();
   }, [id]);
 
-  const loadMore = async () => {
-    const nextPage = page + 1;
-    setLoadingMore(true);
-    const { data } = await getMoviesByPlatform(id, PAGE_SIZE, nextPage * PAGE_SIZE);
-    const nextMovies = data || [];
-    setMovies((prev) => [...prev, ...nextMovies]);
-    setHasMore(nextMovies.length === PAGE_SIZE);
-    setPage(nextPage);
-    setLoadingMore(false);
+  const loadPlatform = async () => {
+    setLoading(true);
+    const [{ data: platformData }, { data: moviesData }] = await Promise.all([
+      getPlatformById(id),
+      getMoviesByPlatform(id, 60, 0)
+    ]);
+    setPlatform(platformData);
+    setMovies(moviesData || []);
+    setLoading(false);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-6 md:pt-8 lg:pt-10 pb-24 md:pb-12">
-        <div className="container-desktop">
-          <SkeletonGrid count={12} />
-        </div>
-      </div>
-    );
-  }
-
-  if (!platform) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-300">
-        Platform not found
-      </div>
-    );
-  }
+  if (loading) return <p>Loading...</p>;
+  if (!platform) return <p>Platform not found</p>;
 
   return (
-    <div className="min-h-screen pt-6 md:pt-8 lg:pt-10 pb-24 md:pb-12">
-      <div className="container-desktop">
-        <div className="glass-card rounded-3xl p-6 md:p-8 mb-8 flex items-center gap-4 md:gap-6">
-          {platform.logo_url ? (
-            <img
-              src={platform.logo_url}
-              alt={platform.name}
-              loading="lazy"
-              className="h-12 md:h-16 w-auto object-contain"
-            />
-          ) : (
-            <div className="h-12 md:h-16 flex items-center text-xl font-semibold">{platform.name}</div>
-          )}
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">{platform.name}</h1>
-            <p className="text-sm text-gray-400 capitalize">{platform.type}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+    <div>
+      <h1>{platform.name}</h1>
+      <section className="section">
+        <h2 className="section-title">Movies</h2>
+        <div className="grid">
           {movies.map((movie) => (
             <PosterCard key={movie.id} item={movie} type="movie" />
           ))}
         </div>
-
-        {hasMore && (
-          <div className="flex justify-center mt-10">
-            <button
-              type="button"
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="btn-primary"
-            >
-              {loadingMore ? 'Loading...' : 'Load More'}
-            </button>
-          </div>
-        )}
-      </div>
+      </section>
     </div>
   );
 };
 
 export default PlatformDetail;
-
-
-
-

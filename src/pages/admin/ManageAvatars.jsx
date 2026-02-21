@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
-import Avatar from '../../components/Avatar';
 import AdminLayout from '../../components/AdminLayout';
 
 const ManageAvatars = () => {
@@ -75,7 +74,7 @@ const ManageAvatars = () => {
           {newAvatarUrl && (
             <div className="mt-4 flex items-center gap-3">
               <span className="text-sm text-gray-400">Preview:</span>
-              <Avatar src={newAvatarUrl} name="Preview" size="lg" />
+              <img src={newAvatarUrl} alt="Preview" width={64} height={64} />
             </div>
           )}
         </div>
@@ -88,7 +87,11 @@ const ManageAvatars = () => {
             {avatars.map((avatar) => (
               <div key={avatar.id} className="glass-dark p-4 rounded-xl text-center">
                 <div className="flex justify-center mb-3">
-                  <Avatar src={avatar.url} name={avatar.name} size="lg" className="w-16 h-16 text-xl" />
+                  {avatar.url ? (
+                    <img src={avatar.url} alt={avatar.name} width={64} height={64} />
+                  ) : (
+                    <div>{avatar.name}</div>
+                  )}
                 </div>
                 <p className="text-sm text-gray-300 mb-3 truncate">{avatar.name}</p>
                 <button

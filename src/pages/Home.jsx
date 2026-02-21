@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   getTrendingMovies,
   getCollections,
   getCollectionWithItems
 } from '../services/supabase';
-import CarouselRow from '../components/CarouselRow';
 import PosterCard from '../components/PosterCard';
-import PlatformStreamingSection from '../components/PlatformStreamingSection';
-import HeroBanner from '../components/HeroBanner';
 
 const Home = () => {
+  const navigate = useNavigate();
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,48 +43,106 @@ const Home = () => {
     setLoading(false);
   };
 
+  const hero = trendingMovies[0];
+  const formatRuntime = (mins) => {
+    if (!mins || mins <= 0) return null;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    if (h === 0) return `${m}m`;
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}m`;
+  };
+  const getYouTubeId = (url) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com.*v=|youtu\.be\/)([^&?/]{11})/i);
+    return match ? match[1] : null;
+  };
+  const isVideoFile = (url) => /\.(mp4|webm|ogg|m3u8)(\?|#|$)/i.test(url || '');
+
   return (
-    <div className="min-h-screen pb-[88px] md:pb-12">
-      <HeroBanner />
-
-      <main className="home-desktop-wrapper pt-6 lg:pt-10">
-        <div className="lg:hidden">
-          <CarouselRow title="Trending Now" items={trendingMovies} type="movie" loading={loading} padded={false} />
-        </div>
-        <div className="hidden lg:block section-block">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-6">Trending Now</h2>
-          <div className="desktop-poster-grid">
-            {loading
-              ? Array.from({ length: 12 }).map((_, i) => (
-                  <div key={`t-${i}`} className="aspect-[2/3] rounded-2xl bg-white/10 animate-pulse" />
-                ))
-              : trendingMovies.map((movie) => (
-                  <div key={movie.id}>
-                    <PosterCard item={movie} type="movie" />
-                  </div>
-                ))}
+    <div>
+      {hero && (
+        <section className="section" style={{ marginTop: 0 }}>
+          <div className="hero">
+            {hero.trailer_url ? (
+              (() => {
+                const yt = getYouTubeId(hero.trailer_url);
+                if (yt) {
+                  return (
+                    <iframe
+                      className="hero-media"
+                      src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&modestbranding=1&rel=0`}
+                      title={`${hero.title} trailer`}
+                      allow="autoplay; encrypted-media; fullscreen"
+                      frameBorder="0"
+                    />
+                  );
+                }
+                if (isVideoFile(hero.trailer_url)) {
+                  return (
+                    <video className="hero-media" src={hero.trailer_url} autoPlay muted loop playsInline />
+                  );
+                }
+                return <img className="hero-media" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />;
+              })()
+            ) : (
+              <img className="hero-media" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />
+            )}
+            <div className="hero-overlay" />
+            <div className="hero-content">
+              {hero.title_logo_url ? (
+                <img className="hero-logo" src={hero.title_logo_url} alt={hero.title} />
+              ) : (
+                <h1>{hero.title}</h1>
+              )}
+              {hero.overview && <p style={{ maxWidth: 600 }}>{hero.overview}</p>}
+              <p>
+                {hero.release_date?.split('-')[0]}
+                {hero.runtime ? (
+                  <>
+                    <span className="meta-sep" aria-hidden="true">
+                      <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
+                        <circle cx="3" cy="3" r="3" />
+                      </svg>
+                    </span>
+                    {formatRuntime(hero.runtime)}
+                  </>
+                ) : null}
+              </p>
+              <div style={{ marginTop: 12, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <button className="button-primary">Watch Now</button>
+                <button className="button-secondary" onClick={() => navigate(`/movie/${hero.id}`)}>Details</button>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+      )}
 
-        <PlatformStreamingSection limit={12} />
+      <section className="section">
+        <h2 className="section-title">Trending</h2>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="grid">
+            {trendingMovies.map((movie) => (
+              <PosterCard key={movie.id} item={movie} type="movie" />
+            ))}
+          </div>
+        )}
+      </section>
 
-        {collections.map((collection) => (
-          <CarouselRow
-            key={collection.id}
-            title={collection.name}
-            items={collection.items}
-            type={collection.items[0]?.type || 'movie'}
-            loading={loading}
-            padded={false}
-          />
-        ))}
-      </main>
+      {collections.map((collection) => (
+        <section key={collection.id} className="section">
+          <h2 className="section-title">{collection.name}</h2>
+          <div className="grid">
+            {collection.items.map((item) => (
+              <PosterCard key={item.id} item={item} type={item.type || 'movie'} />
+            ))}
+          </div>
+        </section>
+      ))}
     </div>
   );
 };
 
 export default Home;
-
-
-
-

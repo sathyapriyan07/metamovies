@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase, setFeaturedVideoPersons } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
-import Toast from '../../components/Toast';
 
 const AddVideo = () => {
   const navigate = useNavigate();
@@ -178,12 +177,15 @@ const AddVideo = () => {
 
   return (
     <AdminLayout title="Add Video" subtitle="Add a new featured video from YouTube">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <div>{toast.message}</div>}
       
       <div className="glass-card rounded-2xl p-6 max-w-3xl">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium mb-2">YouTube URL *</label>
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="admin-section">
+            <h3>Basics</h3>
+            <div className="admin-grid">
+              <div className="admin-field admin-full">
+                <label className="block text-sm font-medium">YouTube URL *</label>
             <input
               type="url"
               value={youtubeUrl}
@@ -193,19 +195,19 @@ const AddVideo = () => {
             />
             {errors.youtubeUrl && <p className="text-red-400 text-sm mt-1">{errors.youtubeUrl}</p>}
             {youtubeId && (
-              <div className="mt-3">
+                <div className="mt-3">
                 <p className="text-xs text-gray-400 mb-2">Preview:</p>
                 <img
                   src={`https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`}
                   alt="Thumbnail"
                   className="w-full max-w-sm rounded-lg"
                 />
-              </div>
+                </div>
             )}
-          </div>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Title *</label>
+              <div className="admin-field">
+                <label className="block text-sm font-medium">Title *</label>
             <input
               type="text"
               value={title}
@@ -217,10 +219,10 @@ const AddVideo = () => {
               className="w-full px-4 py-3 glass-input"
             />
             {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title}</p>}
-          </div>
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Description</label>
+              <div className="admin-field admin-full">
+                <label className="block text-sm font-medium">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -228,10 +230,10 @@ const AddVideo = () => {
               rows={3}
               className="w-full px-4 py-3 glass-input resize-none"
             />
-          </div>
+              </div>
 
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium">
+              <div className="admin-field admin-full">
+                <label className="flex items-center gap-2 text-sm font-medium">
               <input
                 type="checkbox"
                 checked={isFeatured}
@@ -240,10 +242,15 @@ const AddVideo = () => {
               />
               Mark as Featured
             </label>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Persons Involved</label>
+          <div className="admin-section">
+            <h3>People</h3>
+            <div className="admin-grid">
+              <div className="admin-field admin-full">
+                <label className="block text-sm font-medium">Persons Involved</label>
             <div className="relative">
               <input
                 type="text"
@@ -303,24 +310,29 @@ const AddVideo = () => {
                 <p className="text-xs text-gray-400">{selectedPersons.length}/15 persons</p>
               </div>
             )}
+              </div>
+            </div>
           </div>
 
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {saving ? 'Adding...' : 'Add Video'}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/admin/videos')}
-              disabled={saving}
-              className="flex-1 btn-ghost disabled:opacity-50"
-            >
-              Cancel
-            </button>
+          <div className="admin-section">
+            <h3>Publish</h3>
+            <div className="admin-actions">
+              <button
+                type="submit"
+                disabled={saving}
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? 'Adding...' : 'Add Video'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/admin/videos')}
+                disabled={saving}
+                className="btn-ghost disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </form>
       </div>

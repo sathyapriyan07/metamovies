@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../services/supabase';
-import Avatar from '../../components/Avatar';
 import AdminLayout from '../../components/AdminLayout';
 
 const ManageUsers = () => {
@@ -117,11 +116,11 @@ const ManageUsers = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <Avatar 
-                        src={user.avatar_url} 
-                        name={user.username || user.auth_user?.email}
-                        size="lg"
-                      />
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt={user.username || user.auth_user?.email} width={64} height={64} />
+                      ) : (
+                        <div>{user.username || user.auth_user?.email}</div>
+                      )}
                       <div>
                         <p className="font-bold">{user.username || 'No username'}</p>
                         <p className="text-sm text-gray-400">{user.auth_user?.email}</p>
@@ -185,12 +184,11 @@ const ManageUsers = () => {
           <div className="bg-gray-900 p-6 rounded-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-4">Update Avatar</h3>
             <div className="mb-4 flex justify-center">
-              <Avatar 
-                src={avatarUrl} 
-                name={editingUser.username || editingUser.auth_user?.email}
-                size="lg"
-                className="w-20 h-20 text-2xl"
-              />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={editingUser.username || editingUser.auth_user?.email} width={80} height={80} />
+              ) : (
+                <div>{editingUser.username || editingUser.auth_user?.email}</div>
+              )}
             </div>
             <input 
               type="text" 

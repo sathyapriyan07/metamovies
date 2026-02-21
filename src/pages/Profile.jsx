@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase, signOut } from '../services/supabase';
-import Avatar from '../components/Avatar';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -55,97 +54,62 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pt-24 md:pt-28 pb-24 md:pb-12">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="mb-8">
-          <p className="text-white/75 text-xs uppercase tracking-[0.3em]">Account</p>
-          <h1 className="text-3xl md:text-5xl font-semibold mt-2">My Profile</h1>
-        </div>
+    <div>
+      <h1>My Profile</h1>
+      <p>{user.user_metadata?.username || 'User'}</p>
+      <p>{user.email}</p>
+      {user.user_metadata?.avatar_url && (
+        <img src={user.user_metadata.avatar_url} alt="avatar" width={80} />
+      )}
 
-        <div className="glass-card p-6 rounded-2xl mb-8">
-          <div className="flex items-center gap-4">
-            <Avatar
-              src={user.user_metadata?.avatar_url}
-              name={user.user_metadata?.username || user.email}
-              size="lg"
-              className="w-20 h-20 text-2xl"
-            />
-            <div>
-              <h2 className="text-2xl font-semibold">{user.user_metadata?.username || 'User'}</h2>
-              <p className="text-gray-400">{user.email}</p>
-            </div>
+      <section className="section">
+        <h2 className="section-title">Change Avatar</h2>
+        {avatarOptions.length > 0 && (
+          <div>
+            {avatarOptions.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => {
+                  setSelectedAvatar(option.url);
+                  setShowCustomUrl(false);
+                }}
+                className="button-secondary"
+                style={{ marginRight: 8, marginBottom: 8 }}
+              >
+                {option.name || 'Avatar'}
+              </button>
+            ))}
           </div>
-        </div>
+        )}
 
-        <div className="glass-card p-6 rounded-2xl mb-8">
-          <h3 className="text-xl font-semibold mb-4">Change Avatar</h3>
+        <button type="button" className="button-secondary" onClick={() => setShowCustomUrl(!showCustomUrl)} style={{ marginTop: 8 }}>
+          {showCustomUrl ? 'Hide' : 'Use'} custom URL
+        </button>
 
-          {avatarOptions.length > 0 && (
-            <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mb-4">
-              {avatarOptions.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedAvatar(option.url);
-                    setShowCustomUrl(false);
-                  }}
-                  className={`p-2 rounded-xl border-2 transition ${
-                    selectedAvatar === option.url && !showCustomUrl
-                      ? 'border-white/20 bg-white/12'
-                      : 'border-white/10 hover:border-white/30'
-                  }`}
-                >
-                  <Avatar src={option.url} name={option.name} size="md" />
-                </button>
-              ))}
-            </div>
-          )}
+        {showCustomUrl && (
+          <div style={{ marginTop: 8 }}>
+            <input
+              type="url"
+              value={customUrl}
+              onChange={(e) => setCustomUrl(e.target.value)}
+              placeholder="https://example.com/avatar.jpg"
+              className="search-input"
+            />
+          </div>
+        )}
 
-          <button
-            type="button"
-            onClick={() => setShowCustomUrl(!showCustomUrl)}
-            className="text-sm text-white/75 hover:text-white mb-3"
-          >
-            {showCustomUrl ? 'Hide' : 'Use'} custom URL
-          </button>
+        <button onClick={handleSave} disabled={saving} className="button-primary" style={{ marginTop: 8 }}>
+          {saving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </section>
 
-          {showCustomUrl && (
-            <div className="mb-4">
-              <input
-                type="url"
-                value={customUrl}
-                onChange={(e) => setCustomUrl(e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-                className="w-full px-4 py-3 glass-input"
-              />
-              {customUrl && (
-                <div className="mt-3 flex items-center gap-3">
-                  <span className="text-sm text-gray-400">Preview:</span>
-                  <Avatar src={customUrl} name="Preview" size="lg" />
-                </div>
-              )}
-            </div>
-          )}
-
-          <button onClick={handleSave} disabled={saving} className="w-full btn-primary">
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          <button onClick={() => navigate('/watchlist')} className="w-full btn-ghost">
-            My Watchlist
-          </button>
-          <button onClick={handleSignOut} className="w-full btn-ghost text-red-300">
-            Sign Out
-          </button>
-        </div>
-      </div>
+      <section className="section">
+        <button onClick={() => navigate('/watchlist')} className="button-primary">My Watchlist</button>
+        <button onClick={handleSignOut} className="button-secondary" style={{ marginLeft: 8 }}>Sign Out</button>
+      </section>
     </div>
   );
 };
 
 export default Profile;
-
-

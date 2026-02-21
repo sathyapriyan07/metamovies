@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { getMovies, deleteMovie, getPlatforms, getPlatformsByMovie, setMoviePlatforms, updateMovie } from '../../services/supabase';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
-import Toast from '../../components/Toast';
 
 const ManageMovies = () => {
   const navigate = useNavigate();
@@ -518,7 +517,7 @@ const ManageMovies = () => {
 
   return (
     <AdminLayout title="Manage Movies" subtitle="Edit or remove existing movies.">
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      {toast && <div>{toast.message}</div>}
       
       <div className="glass-card rounded-2xl p-4 md:p-6 pb-24 md:pb-12">
         <div className="mb-4">
