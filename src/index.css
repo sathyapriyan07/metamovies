@@ -13,7 +13,9 @@
   --space-xl: 80px;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -21,6 +23,9 @@
 
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
   overflow-x: hidden;
 }
 
@@ -37,13 +42,25 @@ a {
   text-decoration: none;
 }
 
-img {
+img,
+video {
   max-width: 100%;
+  height: auto;
   display: block;
 }
 
 button, input, select, textarea {
   font: inherit;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+input, textarea, select {
+  width: 100%;
 }
 
 h1 {
@@ -72,15 +89,27 @@ p {
   overflow-x: hidden;
 }
 
+#root {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
 .container {
-  padding: 24px;
-  max-width: 1600px;
+  width: 100%;
+  padding: 16px;
   margin: 0 auto;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .container {
-    padding: 60px 80px;
+    padding: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1400px;
+    padding: 48px 64px;
   }
 }
 
@@ -91,11 +120,11 @@ p {
   backdrop-filter: blur(24px);
   background: rgba(0, 0, 0, 0.75);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  height: 70px;
+  height: 60px;
 }
 
 .header-inner {
-  height: 70px;
+  height: 60px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -129,6 +158,8 @@ p {
   border: 1px solid rgba(255,255,255,0.08);
   color: var(--text);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  max-width: 500px;
 }
 
 .search-input:focus {
@@ -141,6 +172,10 @@ p {
   gap: 8px;
 }
 
+main {
+  padding-bottom: 80px;
+}
+
 .section {
   margin-top: var(--space-xl);
 }
@@ -148,6 +183,30 @@ p {
 @media (max-width: 768px) {
   .section {
     margin-top: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px 16px;
+    gap: 8px;
+  }
+
+  .logo {
+    order: 1;
+  }
+
+  .header-actions {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .search-input {
+    order: 3;
+    width: 100%;
+    max-width: none;
   }
 }
 
@@ -161,23 +220,31 @@ p {
   }
 }
 
-.grid {
+.grid,
+.poster-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 16px;
 }
 
 @media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
+  .grid,
+  .poster-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (min-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 24px;
+@media (min-width: 1024px) {
+  .grid,
+  .poster-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 1440px) {
+  .grid,
+  .poster-grid {
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 
@@ -215,6 +282,9 @@ p {
 .poster-title {
   font-size: 14px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .poster-year {
@@ -423,15 +493,23 @@ p {
   color: var(--text);
 }
 
-.detail-grid {
-  display: grid;
-  gap: 20px;
+.button {
+  display: inline-flex;
+  padding: 12px 20px;
+  max-width: 100%;
 }
 
-@media (min-width: 1200px) {
+.detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
   .detail-grid {
-    grid-template-columns: 360px 1fr;
-    gap: 80px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 64px;
   }
 }
 
@@ -440,6 +518,23 @@ p {
   gap: 14px;
   overflow-x: auto;
   padding-bottom: 8px;
+  scrollbar-width: none;
+}
+
+.cast-row::-webkit-scrollbar {
+  display: none;
+}
+
+.horizontal-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 @media (min-width: 1024px) {
@@ -554,6 +649,7 @@ p {
   justify-content: space-around;
   align-items: center;
   backdrop-filter: blur(16px);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @media (min-width: 1024px) {
@@ -587,6 +683,12 @@ p {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .hero-overlay {
@@ -628,6 +730,17 @@ p {
   .button-secondary {
     width: 100%;
     text-align: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header {
+    height: 70px;
+    padding: 0 48px;
+  }
+
+  .header-inner {
+    height: 70px;
   }
 }
 
