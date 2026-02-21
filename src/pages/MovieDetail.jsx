@@ -120,7 +120,9 @@ const MovieDetail = () => {
         <div>
           <div className="detail-title-block detail-content">
             {movie.title_logo_url ? (
-              <img className="hero-logo" src={movie.title_logo_url} alt={movie.title} />
+              <div className="detail-title-wrapper">
+                <img className="detail-title-logo" src={movie.title_logo_url} alt={movie.title} />
+              </div>
             ) : (
               <h1 className="detail-title">{movie.title}</h1>
             )}
