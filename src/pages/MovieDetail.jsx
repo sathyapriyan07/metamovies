@@ -79,7 +79,7 @@ const MovieDetail = () => {
   return (
     <div>
       <section className="section" style={{ marginTop: 0 }}>
-        <div className="hero">
+        <div className="detail-backdrop">
           {movie.trailer_url ? (
             (() => {
               const yt = getYouTubeId(movie.trailer_url);
@@ -99,13 +99,26 @@ const MovieDetail = () => {
                   <video className="hero-media" src={movie.trailer_url} autoPlay muted loop playsInline />
                 );
               }
-              return <img className="hero-media" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />;
+              return <img src={movie.backdrop_url || movie.poster_url} alt={movie.title} />;
             })()
           ) : (
-            <img className="hero-media" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />
+            <img src={movie.backdrop_url || movie.poster_url} alt={movie.title} />
           )}
-          <div className="hero-overlay" />
-          <div className="hero-content">
+          <div className="detail-backdrop-fade" />
+        </div>
+      </section>
+
+      <div className="detail-grid section">
+        <div>
+          {movie.poster_url && (
+            <div className="detail-poster-wrapper">
+              <img src={movie.poster_url} alt={movie.title} className="detail-poster" />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <div className="detail-title-block">
             {movie.title_logo_url ? (
               <img className="hero-logo" src={movie.title_logo_url} alt={movie.title} />
             ) : (
@@ -129,32 +142,19 @@ const MovieDetail = () => {
                 <p className="genre-line">{movie.genres.join(' | ')}</p>
               )}
             </div>
-            <div style={{ marginTop: 12, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div className="detail-actions">
               {movie.trailer_url && (
                 <button className="button-primary" onClick={() => window.open(movie.trailer_url, '_blank')}>Watch Trailer</button>
               )}
+              <button className="button-secondary" onClick={toggleWatchlist}>
+                {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+              </button>
               {movie.is_now_showing && movie.booking_url && (
                 <button className="button-secondary" onClick={() => window.open(movie.booking_url, '_blank')}>Book Tickets</button>
               )}
             </div>
           </div>
-        </div>
-      </section>
 
-      <div className="detail-grid section">
-        <div>
-          {movie.poster_url && (
-            <img src={movie.poster_url} alt={movie.title} style={{ borderRadius: 12 }} />
-          )}
-          <div style={{ marginTop: 12 }}>
-            <button className="button-primary" onClick={toggleWatchlist}>
-              {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-            </button>
-          </div>
-          <div style={{ marginTop: 12 }} />
-        </div>
-
-        <div>
           {movie.overview && (
             <section className="section" style={{ marginTop: 0 }}>
               <h2 className="section-title">Overview</h2>
@@ -175,11 +175,11 @@ const MovieDetail = () => {
               <h2 className="section-title">Cast</h2>
               <div className="cast-row">
                 {movie.cast.slice(0, 15).map((c) => (
-                  <div key={`cast-${c.id}`} className="cast-chip">
+                  <div key={`cast-${c.id}`} className="cast-card">
                     {c.person?.profile_url ? (
-                      <img src={c.person.profile_url} alt={c.person.name} className="cast-avatar" />
+                      <img src={c.person.profile_url} alt={c.person.name} className="cast-image" />
                     ) : (
-                      <div className="cast-avatar cast-avatar-fallback">{c.person?.name?.[0] || '?'}</div>
+                      <div className="cast-image cast-avatar-fallback">{c.person?.name?.[0] || '?'}</div>
                     )}
                     <button onClick={() => navigate(`/person/${c.person.id}`)} className="cast-name">
                       {c.person?.name}
@@ -196,11 +196,11 @@ const MovieDetail = () => {
               <h2 className="section-title">Crew</h2>
               <div className="cast-row">
                 {movie.crew.slice(0, 15).map((c) => (
-                  <div key={`crew-${c.id}`} className="cast-chip">
+                  <div key={`crew-${c.id}`} className="cast-card">
                     {c.person?.profile_url ? (
-                      <img src={c.person.profile_url} alt={c.person.name} className="cast-avatar" />
+                      <img src={c.person.profile_url} alt={c.person.name} className="cast-image" />
                     ) : (
-                      <div className="cast-avatar cast-avatar-fallback">{c.person?.name?.[0] || '?'}</div>
+                      <div className="cast-image cast-avatar-fallback">{c.person?.name?.[0] || '?'}</div>
                     )}
                     <button onClick={() => navigate(`/person/${c.person.id}`)} className="cast-name">
                       {c.person?.name}
@@ -215,7 +215,7 @@ const MovieDetail = () => {
           {platforms.length > 0 && (
             <section className="section">
               <h2 className="section-title">Platforms</h2>
-              <div className="tab-container">
+              <div className="tabs">
                 {platforms.map((platform) => (
                   <button
                     key={platform.id}
@@ -235,7 +235,7 @@ const MovieDetail = () => {
           {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music || movie.music_links.amazon_music) && (
             <section className="section">
               <h2 className="section-title">Music Platforms</h2>
-              <div className="tab-container">
+              <div className="tabs">
                 {movie.music_links.spotify && (
                   <a className="tab active platform-tab" href={movie.music_links.spotify} target="_blank" rel="noopener noreferrer">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" className="platform-logo" />
