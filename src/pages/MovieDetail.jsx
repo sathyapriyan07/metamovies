@@ -65,12 +65,21 @@ const MovieDetail = () => {
     return `${h}h ${m}m`;
   };
   const runtime = formatRuntime(movie.runtime);
-  const directors = (movie.crew || []).filter((c) => c?.job === 'Director');
-  const writers = (movie.crew || []).filter((c) => ['Writer', 'Screenplay'].includes(c?.job));
+  const getYouTubeId = (url) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com.*v=|youtu\.be\/)([^&?/]{11})/i);
+    return match ? match[1] : null;
+  };
+  const trailerId = getYouTubeId(movie.trailer_url);
 
-  const metaLine = [year, runtime, movie.genres?.length ? movie.genres.join(', ') : null]
+  const metaLine = [
+    year,
+    runtime,
+    movie.genres?.length ? movie.genres.join(' • ') : null
+  ]
     .filter(Boolean)
-    .join(' ? ');
+    .join(' • ');
+
   const reviewItems = Array.isArray(movie.reviews) ? movie.reviews : [];
   const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
   const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
@@ -79,11 +88,26 @@ const MovieDetail = () => {
     <div className="min-h-screen bg-[#0f0f0f] text-white">
       <div className="max-w-2xl mx-auto px-4 pb-10">
         <div className="px-4 pt-4">
-          <img loading="lazy"
-            src={movie.backdrop_url || movie.poster_url}
-            alt={movie.title}
-            className="w-full h-[180px] object-cover rounded-md"
-          />
+          {trailerId ? (
+            <div className="relative w-full h-[200px] rounded-md overflow-hidden">
+              <iframe
+                className="absolute top-0 left-0 w-[130%] h-[130%] -translate-x-[15%] -translate-y-[15%]"
+                src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&playsinline=1&loop=1&playlist=${trailerId}`}
+                title="Trailer"
+                frameBorder="0"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+              <div className="absolute inset-0 bg-black/40" />
+            </div>
+          ) : (
+            <img
+              loading="lazy"
+              src={movie.backdrop_url || movie.poster_url}
+              alt={movie.title}
+              className="w-full h-[200px] object-cover rounded-md"
+            />
+          )}
         </div>
         <section className="rounded-md overflow-hidden border border-gray-800 bg-[#1a1a1a] mt-4">
           <div className="p-4">
@@ -160,41 +184,34 @@ const MovieDetail = () => {
           </section>
         )}
 
-        {(directors.length > 0 || writers.length > 0 || (movie.crew || []).some((c) => /music|composer/i.test(c?.job || ''))) && (
+        {(movie.crew || []).length > 0 && (
           <section className="py-6">
             <h2 className="text-lg font-semibold mb-3">Crew</h2>
-            <div className="space-y-2 text-sm text-gray-300">
-              {directors.length > 0 && (
-                <div>
-                  <span className="text-gray-400">Director: </span>
-                  <button className="text-white/90" onClick={() => navigate(`/person/${directors[0].person?.id}`)}>
-                    {directors[0].person?.name}
-                  </button>
-                </div>
-              )}
-              {writers.length > 0 && (
-                <div>
-                  <span className="text-gray-400">Writer: </span>
-                  {writers.slice(0, 2).map((w, idx) => (
-                    <button
-                      key={`writer-${w.id || idx}`}
-                      className="text-white/90"
-                      onClick={() => navigate(`/person/${w.person?.id}`)}
-                    >
-                      {w.person?.name}
-                      {idx < Math.min(writers.length, 2) - 1 ? ', ' : ''}
-                    </button>
-                  ))}
-                </div>
-              )}
-              {(movie.crew || []).some((c) => /music|composer/i.test(c?.job || '')) && (
-                <div>
-                  <span className="text-gray-400">Music: </span>
-                  <span className="text-white/90">
-                    {(movie.crew || []).find((c) => /music|composer/i.test(c?.job || ''))?.person?.name}
-                  </span>
-                </div>
-              )}
+            <div className="space-y-3">
+              {(movie.crew || []).map((member) => (
+                <button
+                  key={member.id}
+                  className="w-full flex items-center gap-3 text-left"
+                  onClick={() => navigate(`/person/${member.person?.id}`)}
+                >
+                  {member.person?.profile_url ? (
+                    <img
+                      loading="lazy"
+                      src={member.person.profile_url}
+                      alt={member.person.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center text-xs">
+                      {member.person?.name?.[0] || '?'}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-white">{member.person?.name}</p>
+                    <p className="text-xs text-gray-400">{member.job || 'Crew'}</p>
+                  </div>
+                </button>
+              ))}
             </div>
           </section>
         )}

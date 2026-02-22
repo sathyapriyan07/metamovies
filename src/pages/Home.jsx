@@ -116,9 +116,9 @@ const Home = () => {
                 <h2 className="text-lg font-semibold">{collection.name || 'Collection'}</h2>
                 <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {collection.items.slice(0, 8).map((item) => (
-                  <div key={item.id} className="cursor-pointer" onClick={() => navigate(`/movie/${item.id}`)}>
+              <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                {collection.items.map((item) => (
+                  <div key={item.id} className="min-w-[140px] cursor-pointer" onClick={() => navigate(`/movie/${item.id}`)}>
                     <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
                       {typeof item.rating === 'number' && (
                         <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
