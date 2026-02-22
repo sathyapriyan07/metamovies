@@ -41,6 +41,17 @@ const MovieDetail = () => {
     }
   };
 
+  const extractYouTubeId = (url) => {
+    const regExp =
+      /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&?/]+)/;
+    const match = url?.match(regExp);
+    return match ? match[1] : null;
+  };
+  const videoId = useMemo(() => {
+    if (!movie?.trailer_url) return null;
+    return extractYouTubeId(movie.trailer_url);
+  }, [movie?.trailer_url]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0f0f0f] text-white">
@@ -66,17 +77,6 @@ const MovieDetail = () => {
     return `${h}h ${m}m`;
   };
   const runtime = formatRuntime(movie.runtime);
-  const extractYouTubeId = (url) => {
-    const regExp =
-      /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&?/]+)/;
-    const match = url?.match(regExp);
-    return match ? match[1] : null;
-  };
-  const videoId = useMemo(() => {
-    if (!movie?.trailer_url) return null;
-    return extractYouTubeId(movie.trailer_url);
-  }, [movie?.trailer_url]);
-
   const bullet = '\u2022';
   const genresText = Array.isArray(movie.genres)
     ? movie.genres.join(` ${bullet} `)
