@@ -94,6 +94,15 @@ export const getTrendingMovies = async () => {
   return { data, error };
 };
 
+export const getPersons = async (limit = 20) => {
+  const { data, error } = await supabase
+    .from('persons')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return { data, error };
+};
+
 export const getUpcomingMovies = async () => {
   const { data, error } = await supabase
     .from('movies')

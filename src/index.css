@@ -144,10 +144,9 @@ p {
   position: sticky;
   top: 0;
   z-index: 10;
-  backdrop-filter: blur(24px);
-  background: #000000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  height: 60px;
+  background: #0f0f0f;
+  border-bottom: 1px solid #1f1f1f;
+  height: 50px;
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
@@ -482,6 +481,24 @@ p {
 .admin-actions .btn-primary,
 .admin-actions .btn-secondary,
 .admin-actions .btn-ghost {
+}
+
+.glass-card {
+  background: #1a1a1a;
+  border: 1px solid #1f1f1f;
+  border-radius: 6px;
+}
+
+.glass-input {
+  background: #1a1a1a;
+  border: 1px solid #1f1f1f;
+  color: #ffffff;
+  border-radius: 6px;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: #f5c518;
 }
 
 .btn-primary {

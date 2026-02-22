@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/Header';
@@ -42,15 +42,10 @@ import ManageAvatars from './pages/admin/ManageAvatars';
 import ManagePlatforms from './pages/admin/ManagePlatforms';
 
 function AppRoutes() {
-  const location = useLocation();
-  const isHome = location.pathname === '/';
-
   const Layout = ({ children }) => (
-    <div className="min-h-screen overflow-x-hidden bg-black text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[#0f0f0f] text-white">
       <Header />
-      <main className={isHome ? 'p-0' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20'}>
-        {children}
-      </main>
+      <main>{children}</main>
     </div>
   );
 

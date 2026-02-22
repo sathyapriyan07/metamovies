@@ -17,45 +17,44 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full h-[50px] bg-[#0f0f0f] border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 h-full">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full h-[50px] bg-[#0f0f0f] border-b border-gray-800">
+        <div className="max-w-2xl mx-auto px-4 h-full">
           <div className="h-full flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <button className="text-[#F5C518] font-semibold text-sm" onClick={() => navigate('/')}>
+              MetaMovies+
+            </button>
+
+            <div className="flex items-center gap-4">
+              <button
+                className="text-white/80 hover:text-white transition"
+                onClick={() => navigate('/search')}
+                aria-label="Search"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+                  <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+              <button
+                className="text-white/80 hover:text-white transition"
+                onClick={() => navigate(user ? '/profile' : '/login')}
+                aria-label="Profile"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
+                  <path d="M4 20c2.2-3.5 13.8-3.5 16 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
               <button
                 className="text-white/80 hover:text-white transition"
                 onClick={() => setIsOpen(true)}
                 aria-label="Open menu"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </button>
-              <button className="text-[#F5C518] font-semibold" onClick={() => navigate('/')}>
-                MetaMovies+
-              </button>
             </div>
-
-            <button
-              className="text-white/80 hover:text-white transition"
-              onClick={() => navigate('/search')}
-              aria-label="Search"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-                <path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </button>
-
-            <button
-              className="text-white/80 hover:text-white transition"
-              onClick={() => navigate(user ? '/profile' : '/login')}
-              aria-label="Profile"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
-                <path d="M4 20c2.2-3.5 13.8-3.5 16 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </button>
           </div>
         </div>
       </header>

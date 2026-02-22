@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useWatchlist } from '../hooks/useWatchlist';
 import { supabase, signOut } from '../services/supabase';
 
 const Profile = () => {
@@ -11,6 +12,7 @@ const Profile = () => {
   const [customUrl, setCustomUrl] = useState('');
   const [showCustomUrl, setShowCustomUrl] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { watchlist, loading: watchlistLoading } = useWatchlist();
 
   useEffect(() => {
     if (!user) {
@@ -55,7 +57,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
-      <div className="max-w-7xl mx-auto px-4 pt-12 pb-10">
+      <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full overflow-hidden bg-[#1a1a1a]">
             {user.user_metadata?.avatar_url ? (
@@ -118,6 +120,38 @@ const Profile = () => {
             <button onClick={() => navigate('/watchlist')} className="btn-primary">My Watchlist</button>
             <button onClick={handleSignOut} className="btn-secondary">Sign Out</button>
           </div>
+        </section>
+
+        <section className="py-6">
+          <h2 className="text-lg font-semibold mb-3">Watchlist</h2>
+          {watchlistLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {watchlist.filter((item) => item.movie).map((item) => (
+                <button
+                  key={item.id}
+                  className="text-left"
+                  onClick={() => navigate(`/movie/${item.movie.id}`)}
+                >
+                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800">
+                    {typeof item.movie.rating === 'number' && (
+                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
+                        {item.movie.rating.toFixed(1)}
+                      </div>
+                    )}
+                    <img
+                      loading="lazy"
+                      src={item.movie.poster_url || item.movie.backdrop_url}
+                      alt={item.movie.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="mt-2 text-sm font-medium truncate">{item.movie.title}</p>
+                </button>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>

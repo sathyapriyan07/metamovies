@@ -49,7 +49,7 @@ const Movies = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
-      <div className="max-w-7xl mx-auto px-4 pt-12 pb-10">
+      <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
         <h1 className="text-lg font-semibold">Movies</h1>
         <div className="mt-4 flex flex-col gap-3">
           <input
