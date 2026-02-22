@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieById } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -14,8 +14,6 @@ const MovieDetail = () => {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const playerRef = useRef(null);
-  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     loadMovie();
@@ -93,80 +91,22 @@ const MovieDetail = () => {
     movie.title_logo_url.trim() !== '' &&
     !movie.use_text_title;
 
-  useEffect(() => {
-    if (!videoId) return;
-
-    const initPlayer = () => {
-      if (!window.YT || !window.YT.Player) return;
-      if (playerRef.current?.loadVideoById) {
-        playerRef.current.loadVideoById(videoId);
-        playerRef.current.mute();
-        setIsMuted(true);
-        return;
-      }
-      playerRef.current = new window.YT.Player('yt-player', {
-        videoId,
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          controls: 0,
-          modestbranding: 1,
-          rel: 0,
-          playsinline: 1,
-        },
-        events: {
-          onReady: (event) => {
-            event.target.mute();
-            event.target.playVideo();
-            setIsMuted(true);
-          },
-          onError: () => {
-            setVideoError(true);
-          },
-        },
-      });
-    };
-
-    window.onYouTubeIframeAPIReady = initPlayer;
-
-    if (window.YT && window.YT.Player) {
-      initPlayer();
-      return;
-    }
-
-    if (!document.getElementById('yt-iframe-api')) {
-      const tag = document.createElement('script');
-      tag.id = 'yt-iframe-api';
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.body.appendChild(tag);
-    }
-  }, [videoId]);
-
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
       <div className="max-w-2xl mx-auto px-4 pb-10">
         <div className="px-4 pt-4">
           <div className="relative w-full h-[220px] rounded-md overflow-hidden bg-black">
             {videoId && !videoError ? (
-              <>
-                <div id="yt-player" className="absolute inset-0 w-full h-full" />
-                <div className="absolute inset-0 bg-black/40" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!playerRef.current) return;
-                    if (isMuted) {
-                      playerRef.current.unMute();
-                    } else {
-                      playerRef.current.mute();
-                    }
-                    setIsMuted(!isMuted);
-                  }}
-                  className="absolute bottom-3 right-3 bg-black/60 text-white px-3 py-2 rounded-md text-sm"
-                >
-                  {isMuted ? 'Unmute' : 'Mute'}
-                </button>
-              </>
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title="Trailer"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onError={() => setVideoError(true)}
+                loading="lazy"
+              />
             ) : (
               <img
                 loading="lazy"
