@@ -5,11 +5,11 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-red-600"></div>
-      </div>
-    );
+      return (
+        <div className="min-h-screen bg-[#0f0f0f] text-white flex items-center justify-center">
+          <div className="text-sm text-gray-400">Loading...</div>
+        </div>
+      );
   }
 
   if (!user) {

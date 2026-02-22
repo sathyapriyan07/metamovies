@@ -46,8 +46,20 @@ const PersonDetail = () => {
     ].sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
   }, [person]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!person) return <p>Person not found</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] text-white">
+        <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">Loading...</div>
+      </div>
+    );
+  }
+  if (!person) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] text-white">
+        <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">Person not found</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">

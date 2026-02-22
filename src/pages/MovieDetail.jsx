@@ -40,8 +40,20 @@ const MovieDetail = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!movie) return <p>Movie not found</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] text-white">
+        <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">Loading...</div>
+      </div>
+    );
+  }
+  if (!movie) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] text-white">
+        <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">Movie not found</div>
+      </div>
+    );
+  }
 
   const year = movie.release_date?.split('-')[0];
   const formatRuntime = (mins) => {
@@ -65,16 +77,15 @@ const MovieDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
-      <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
-        <section className="rounded-md overflow-hidden border border-gray-800 bg-[#1a1a1a]">
-          <div className="relative h-[180px] w-full">
-            <img loading="lazy"
-              src={movie.backdrop_url || movie.poster_url}
-              alt={movie.title}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-          </div>
+      <div className="max-w-2xl mx-auto px-4 pb-10">
+        <div className="px-4 pt-4">
+          <img loading="lazy"
+            src={movie.backdrop_url || movie.poster_url}
+            alt={movie.title}
+            className="w-full h-[180px] object-cover rounded-md"
+          />
+        </div>
+        <section className="rounded-md overflow-hidden border border-gray-800 bg-[#1a1a1a] mt-4">
           <div className="p-4">
             <div className="flex gap-3">
               {movie.poster_url && (

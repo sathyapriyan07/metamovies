@@ -45,7 +45,7 @@ function AppRoutes() {
   const Layout = ({ children }) => (
     <div className="min-h-screen overflow-x-hidden bg-[#0f0f0f] text-white">
       <Header />
-      <main>{children}</main>
+      <main className="pt-16">{children}</main>
     </div>
   );
 

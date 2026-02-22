@@ -2,18 +2,14 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   getHeroBanners,
-  getTrendingMovies,
-  getMovies,
-  getUpcomingMovies
+  getCollections,
+  getCollectionWithItems
 } from '../services/supabase';
 
 const Home = () => {
   const navigate = useNavigate();
-  const [trendingMovies, setTrendingMovies] = useState([]);
   const [heroBanners, setHeroBanners] = useState([]);
-  const [popularMovies, setPopularMovies] = useState([]);
-  const [topRatedMovies, setTopRatedMovies] = useState([]);
-  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,22 +18,28 @@ const Home = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [hero, trending, popular, upcoming] = await Promise.all([
+    const [hero, cols] = await Promise.all([
       getHeroBanners(),
-      getTrendingMovies(),
-      getMovies(24, 0),
-      getUpcomingMovies()
+      getCollections()
     ]);
 
     const sortedHero = (hero.data || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
     setHeroBanners(sortedHero);
-    setTrendingMovies(trending.data || []);
-    const popularItems = popular.data || [];
-    setPopularMovies(popularItems.slice(0, 8));
-    setTopRatedMovies(
-      [...popularItems].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 8)
+
+    const collectionsWithItems = await Promise.all(
+      (cols.data || []).map(async (col) => {
+        const { data } = await getCollectionWithItems(col.id);
+        return {
+          ...col,
+          items:
+            data?.collection_items?.map((item) => ({
+              ...(item.movie || {}),
+              type: 'movie'
+            })) || []
+        };
+      })
     );
-    setUpcomingMovies((upcoming.data || []).slice(0, 8));
+    setCollections(collectionsWithItems);
     setLoading(false);
   };
 
@@ -52,7 +54,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white pt-16 pb-10">
+    <div className="min-h-screen bg-[#0f0f0f] text-white pb-10">
       <div className="max-w-2xl mx-auto px-4 pt-4">
         {hero ? (
           <div className="bg-[#1a1a1a] rounded-md overflow-hidden">
@@ -105,133 +107,41 @@ const Home = () => {
       </div>
 
       <div className="max-w-2xl mx-auto px-4">
-        <section className="py-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Popular</h2>
-            <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
-          </div>
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {popularMovies.slice(0, 8).map((movie) => (
-                <div key={movie.id} className="cursor-pointer" onClick={() => navigate(`/movie/${movie.id}`)}>
-                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
-                    {typeof movie.rating === 'number' && (
-                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
-                        {movie.rating.toFixed(1)}
-                      </div>
-                    )}
-                    <img
-                      src={movie.poster_url || movie.backdrop_url}
-                      alt={movie.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
+        {loading ? (
+          <p className="py-6">Loading...</p>
+        ) : collections.length > 0 ? (
+          collections.map((collection) => (
+            <section key={collection.id} className="py-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-semibold">{collection.name || 'Collection'}</h2>
+                <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {collection.items.slice(0, 8).map((item) => (
+                  <div key={item.id} className="cursor-pointer" onClick={() => navigate(`/movie/${item.id}`)}>
+                    <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                      {typeof item.rating === 'number' && (
+                        <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
+                          {item.rating.toFixed(1)}
+                        </div>
+                      )}
+                      <img
+                        src={item.poster_url || item.backdrop_url}
+                        alt={item.title || item.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm font-medium truncate">{item.title || item.name}</p>
+                    <p className="text-xs text-gray-400">{item.release_date?.split('-')[0]}</p>
                   </div>
-                  <p className="mt-2 text-sm font-medium truncate">{movie.title}</p>
-                  <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="py-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Streaming Now</h2>
-            <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
-          </div>
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {trendingMovies.slice(0, 8).map((movie) => (
-                <div key={movie.id} className="cursor-pointer" onClick={() => navigate(`/movie/${movie.id}`)}>
-                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
-                    {typeof movie.rating === 'number' && (
-                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
-                        {movie.rating.toFixed(1)}
-                      </div>
-                    )}
-                    <img
-                      src={movie.poster_url || movie.backdrop_url}
-                      alt={movie.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <p className="mt-2 text-sm font-medium truncate">{movie.title}</p>
-                  <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="py-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Top Rated</h2>
-            <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
-          </div>
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {topRatedMovies.slice(0, 8).map((movie) => (
-                <div key={movie.id} className="cursor-pointer" onClick={() => navigate(`/movie/${movie.id}`)}>
-                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
-                    {typeof movie.rating === 'number' && (
-                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
-                        {movie.rating.toFixed(1)}
-                      </div>
-                    )}
-                    <img
-                      src={movie.poster_url || movie.backdrop_url}
-                      alt={movie.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <p className="mt-2 text-sm font-medium truncate">{movie.title}</p>
-                  <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="py-6">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Upcoming</h2>
-            <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
-          </div>
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {upcomingMovies.slice(0, 8).map((movie) => (
-                <div key={movie.id} className="cursor-pointer" onClick={() => navigate(`/movie/${movie.id}`)}>
-                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
-                    {typeof movie.rating === 'number' && (
-                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
-                        {movie.rating.toFixed(1)}
-                      </div>
-                    )}
-                    <img
-                      src={movie.poster_url || movie.backdrop_url}
-                      alt={movie.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <p className="mt-2 text-sm font-medium truncate">{movie.title}</p>
-                  <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+                ))}
+              </div>
+            </section>
+          ))
+        ) : (
+          <div className="py-6 text-sm text-gray-400">No featured content added yet.</div>
+        )}
       </div>
     </div>
   );

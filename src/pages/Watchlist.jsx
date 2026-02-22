@@ -10,7 +10,13 @@ const Watchlist = () => {
     setItems(movies);
   }, [watchlist]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] text-white">
+        <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">

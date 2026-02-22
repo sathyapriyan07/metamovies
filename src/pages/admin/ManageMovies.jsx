@@ -532,7 +532,7 @@ const ManageMovies = () => {
 
         {loading ? (
           <div className="text-center py-8">
-            <div className="inline-block w-8 h-8 border-4 border-white/40 border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-sm text-gray-400">Loading...</div>
             <p className="mt-2 text-gray-400">Loading movies...</p>
           </div>
         ) : filteredMovies.length === 0 ? (

@@ -36,7 +36,7 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout title="Admin Dashboard" subtitle="Quick overview of your content library.">
-      <div className="space-y-8">
+      <div className="px-4 pt-6 space-y-6">
         <section>
           <h2 className="text-lg font-semibold mb-4">Stats</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
