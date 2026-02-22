@@ -84,7 +84,7 @@ const MovieDetail = () => {
 
   return (
     <div>
-      <section className="relative w-full h-[85vh] overflow-hidden">
+      <section className="relative w-screen h-[85vh] overflow-hidden">
         {movie.trailer_url ? (
           (() => {
             const yt = getYouTubeId(movie.trailer_url);
@@ -110,9 +110,9 @@ const MovieDetail = () => {
           <img className="absolute inset-0 h-full w-full object-cover" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-black/60" />
 
-        <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16 max-w-7xl mx-auto">
+        <div className="relative z-10 h-full flex flex-col justify-end max-w-7xl mx-auto px-6 pb-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:gap-6">
             {movie.poster_url && (
               <div className="shrink-0">
