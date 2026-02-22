@@ -99,8 +99,8 @@ const MovieDetail = () => {
     netflix: '/logos/netflix.png',
     sony_liv: '/logos/sonyliv.png',
     spotify: '/logos/spotify.png',
-    apple_music: '/logos/applemusic.png',
-    youtube_music: '/logos/youtubemusic.png',
+    apple_music: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/960px-Apple_Music_icon.svg.png',
+    youtube_music: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/YouTubeMusic_Logo.png',
     jiosaavn: '/logos/jiosaavn.png',
   };
   const shouldShowLogo =
