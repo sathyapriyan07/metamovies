@@ -68,67 +68,25 @@ const AdminDashboard = () => {
             <section>
               <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <Link to="/admin/add-movie" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                <Link to="/admin/add-movie" className="bg-white/5 rounded-2xl p-5 hover:bg-white/10 transition cursor-pointer">
                   <h3 className="text-base font-semibold mb-2">Add Movie</h3>
                   <p className="text-gray-400 text-sm">Add a new movie to the database</p>
                 </Link>
-                <Link to="/admin/add-video" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                <Link to="/admin/add-video" className="bg-white/5 rounded-2xl p-5 hover:bg-white/10 transition cursor-pointer">
                   <h3 className="text-base font-semibold mb-2">Add Video</h3>
                   <p className="text-gray-400 text-sm">Add a featured YouTube video</p>
                 </Link>
-                <Link to="/admin/add-news" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                <Link to="/admin/add-news" className="bg-white/5 rounded-2xl p-5 hover:bg-white/10 transition cursor-pointer">
                   <h3 className="text-base font-semibold mb-2">Add News</h3>
                   <p className="text-gray-400 text-sm">Publish a news article</p>
                 </Link>
-                <Link to="/admin/add-person" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                <Link to="/admin/add-person" className="bg-white/5 rounded-2xl p-5 hover:bg-white/10 transition cursor-pointer">
                   <h3 className="text-base font-semibold mb-2">Add Person</h3>
                   <p className="text-gray-400 text-sm">Add cast or crew member</p>
                 </Link>
-                <Link to="/admin/tmdb-import" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                <Link to="/admin/tmdb-import" className="bg-white/5 rounded-2xl p-5 hover:bg-white/10 transition cursor-pointer">
                   <h3 className="text-base font-semibold mb-2">TMDB Import</h3>
                   <p className="text-gray-400 text-sm">Import from TMDB database</p>
-                </Link>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-semibold mb-4">Admin Menu</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <Link to="/admin/manage-movies" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Movies
-                </Link>
-                <Link to="/admin/videos" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Videos
-                </Link>
-                <Link to="/admin/news" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage News
-                </Link>
-                <Link to="/admin/manage-collections" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Collections
-                </Link>
-                <Link to="/admin/update-persons" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Update Persons
-                </Link>
-                <Link to="/admin/manage-links" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Links
-                </Link>
-                <Link to="/admin/manage-persons" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Persons
-                </Link>
-                <Link to="/admin/manage-crew" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Crew
-                </Link>
-                <Link to="/admin/manage-platforms" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Platforms
-                </Link>
-                <Link to="/admin/manage-hero-banner" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Hero Banner
-                </Link>
-                <Link to="/admin/manage-users" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Users
-                </Link>
-                <Link to="/admin/manage-avatars" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
-                  Manage Avatars
                 </Link>
               </div>
             </section>
