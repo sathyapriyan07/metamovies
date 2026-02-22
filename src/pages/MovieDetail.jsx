@@ -92,6 +92,17 @@ const MovieDetail = () => {
   const musicPlatforms = movie.music_links
     ? Object.entries(movie.music_links).filter(([, url]) => url)
     : [];
+  const platformLogos = {
+    prime: '/logos/prime.png',
+    hotstar: '/logos/hotstar.png',
+    zee5: '/logos/zee5.png',
+    netflix: '/logos/netflix.png',
+    sony_liv: '/logos/sonyliv.png',
+    spotify: '/logos/spotify.png',
+    apple_music: '/logos/applemusic.png',
+    youtube_music: '/logos/youtubemusic.png',
+    jiosaavn: '/logos/jiosaavn.png',
+  };
   const shouldShowLogo =
     movie?.title_logo_url &&
     movie.title_logo_url.trim() !== '' &&
@@ -253,43 +264,69 @@ const MovieDetail = () => {
         )}
 
         {ottPlatforms.length > 0 && (
-          <section className="px-4 mt-6">
-            <h2 className="text-lg font-semibold mb-3">Watch On</h2>
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {ottPlatforms.map(([platform, url]) => (
-                <a
-                  key={platform}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-w-[80px] flex flex-col items-center"
-                >
-                  <div className="w-14 h-14 bg-[#1A1A1A] rounded-md flex items-center justify-center text-xs text-white capitalize">
-                    {platform}
-                  </div>
-                </a>
-              ))}
+          <section className="px-4 mt-8">
+            <h2 className="text-lg font-semibold mb-4">Watch On</h2>
+            <div className="flex gap-5 overflow-x-auto pb-2 no-scrollbar">
+              {ottPlatforms.map(([platform, url]) => {
+                const logoSrc = platformLogos[platform];
+                return (
+                  <a
+                    key={platform}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="min-w-[80px] flex flex-col items-center"
+                  >
+                    <div className="w-16 h-16 bg-[#111] rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition">
+                      {logoSrc ? (
+                        <img
+                          src={logoSrc}
+                          alt={platform}
+                          className="w-10 h-10 object-contain"
+                        />
+                      ) : (
+                        <span className="text-xs text-white capitalize">
+                          {platform.replace('_', ' ')}
+                        </span>
+                      )}
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           </section>
         )}
 
         {musicPlatforms.length > 0 && (
-          <section className="px-4 mt-6">
-            <h2 className="text-lg font-semibold mb-3">Listen On</h2>
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {musicPlatforms.map(([platform, url]) => (
-                <a
-                  key={platform}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="min-w-[80px] flex flex-col items-center"
-                >
-                  <div className="w-14 h-14 bg-[#1A1A1A] rounded-md flex items-center justify-center text-xs text-white capitalize">
-                    {platform.replace('_', ' ')}
-                  </div>
-                </a>
-              ))}
+          <section className="px-4 mt-8">
+            <h2 className="text-lg font-semibold mb-4">Listen On</h2>
+            <div className="flex gap-5 overflow-x-auto pb-2 no-scrollbar">
+              {musicPlatforms.map(([platform, url]) => {
+                const logoSrc = platformLogos[platform];
+                return (
+                  <a
+                    key={platform}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="min-w-[80px] flex flex-col items-center"
+                  >
+                    <div className="w-16 h-16 bg-[#111] rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition">
+                      {logoSrc ? (
+                        <img
+                          src={logoSrc}
+                          alt={platform}
+                          className="w-10 h-10 object-contain"
+                        />
+                      ) : (
+                        <span className="text-xs text-white capitalize">
+                          {platform.replace('_', ' ')}
+                        </span>
+                      )}
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           </section>
         )}
