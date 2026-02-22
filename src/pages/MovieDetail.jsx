@@ -13,6 +13,7 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     loadMovie();
@@ -65,15 +66,16 @@ const MovieDetail = () => {
     return `${h}h ${m}m`;
   };
   const runtime = formatRuntime(movie.runtime);
-  const getYouTubeId = (url) => {
-    if (!url) return null;
-    const match = url.match(/(?:youtube\.com.*v=|youtu\.be\/)([^&?/]{11})/i);
+  const extractYouTubeId = (url) => {
+    const regExp =
+      /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&?/]+)/;
+    const match = url?.match(regExp);
     return match ? match[1] : null;
   };
-  const trailerId = useMemo(
-    () => getYouTubeId(movie?.trailer_url),
-    [movie?.trailer_url]
-  );
+  const videoId = useMemo(() => {
+    if (!movie?.trailer_url) return null;
+    return extractYouTubeId(movie.trailer_url);
+  }, [movie?.trailer_url]);
 
   const bullet = '\u2022';
   const genresText = Array.isArray(movie.genres)
@@ -89,14 +91,15 @@ const MovieDetail = () => {
     <div className="min-h-screen bg-[#0f0f0f] text-white">
       <div className="max-w-2xl mx-auto px-4 pb-10">
         <div className="px-4 pt-4">
-          <div className="relative w-full h-[200px] rounded-md overflow-hidden bg-black">
-            {trailerId ? (
+          <div className="relative w-full h-[220px] rounded-md overflow-hidden bg-black">
+            {videoId && !videoError ? (
               <iframe
-                className="absolute top-0 left-0 w-full h-full pointer-events-none"
-                src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=${trailerId}&disablekb=1&fs=0`}
+                className="absolute inset-0 w-full h-full"
+                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&playsinline=1&loop=1&playlist=${videoId}`}
                 title="Trailer"
                 frameBorder="0"
                 allow="autoplay; encrypted-media"
+                onError={() => setVideoError(true)}
                 loading="lazy"
               />
             ) : (
