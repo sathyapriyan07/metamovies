@@ -86,6 +86,12 @@ const MovieDetail = () => {
   const reviewItems = Array.isArray(movie.reviews) ? movie.reviews : [];
   const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
   const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
+  const ottPlatforms = movie.watch_links
+    ? Object.entries(movie.watch_links).filter(([, url]) => url)
+    : [];
+  const musicPlatforms = movie.music_links
+    ? Object.entries(movie.music_links).filter(([, url]) => url)
+    : [];
   const shouldShowLogo =
     movie?.title_logo_url &&
     movie.title_logo_url.trim() !== '' &&
@@ -143,6 +149,13 @@ const MovieDetail = () => {
                 <div className="mt-3 inline-flex items-center justify-center w-11 h-11 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
                   {typeof movie.rating === 'number' ? movie.rating.toFixed(1) : 'NR'}
                 </div>
+                {movie.imdb_rating && (
+                  <div className="mt-4 flex items-center gap-2">
+                    <div className="bg-[#F5C518] text-black font-bold px-3 py-1 rounded-md text-sm">
+                      IMDb {movie.imdb_rating}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -229,6 +242,53 @@ const MovieDetail = () => {
                     <p className="text-xs text-gray-400">{member.job || 'Crew'}</p>
                   </div>
                 </button>
+              ))}
+            </div>
+            {movie.composer_name && (
+              <div className="mt-4 text-sm text-gray-300">
+                <span className="text-gray-400">Music:</span> {movie.composer_name}
+              </div>
+            )}
+          </section>
+        )}
+
+        {ottPlatforms.length > 0 && (
+          <section className="px-4 mt-6">
+            <h2 className="text-lg font-semibold mb-3">Watch On</h2>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {ottPlatforms.map(([platform, url]) => (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-w-[80px] flex flex-col items-center"
+                >
+                  <div className="w-14 h-14 bg-[#1A1A1A] rounded-md flex items-center justify-center text-xs text-white capitalize">
+                    {platform}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {musicPlatforms.length > 0 && (
+          <section className="px-4 mt-6">
+            <h2 className="text-lg font-semibold mb-3">Listen On</h2>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {musicPlatforms.map(([platform, url]) => (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-w-[80px] flex flex-col items-center"
+                >
+                  <div className="w-14 h-14 bg-[#1A1A1A] rounded-md flex items-center justify-center text-xs text-white capitalize">
+                    {platform.replace('_', ' ')}
+                  </div>
+                </a>
               ))}
             </div>
           </section>
