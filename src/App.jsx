@@ -44,11 +44,12 @@ import ManagePlatforms from './pages/admin/ManagePlatforms';
 
 function AppRoutes() {
   const location = useLocation();
+  const isHome = location.pathname === '/';
 
   const Layout = ({ children }) => (
     <div className="min-h-screen overflow-x-hidden bg-black text-white">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+      <main className={isHome ? 'p-0' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20'}>
         {children}
       </main>
       <MobileBottomNav />
