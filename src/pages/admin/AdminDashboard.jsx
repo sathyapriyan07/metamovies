@@ -36,101 +36,102 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout title="Admin Dashboard" subtitle="Quick overview of your content library.">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-4">
-          <div className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-            <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Movies</h3>
-            <p className="text-3xl font-semibold mt-2">{stats.movies}</p>
-          </div>
-          <div className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-            <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Videos</h3>
-            <p className="text-3xl font-semibold mt-2">{stats.videos}</p>
-          </div>
-          <div className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-            <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">News</h3>
-            <p className="text-3xl font-semibold mt-2">{stats.news}</p>
-          </div>
-          <div className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-            <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Persons</h3>
-            <p className="text-3xl font-semibold mt-2">{stats.persons}</p>
-          </div>
-          <div className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-            <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Users</h3>
-            <p className="text-3xl font-semibold mt-2">{stats.users}</p>
-          </div>
-        </div>
+      <div className="pt-16 pb-20 min-h-screen bg-black text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full rounded-2xl bg-white/5 p-6 sm:p-8 space-y-8">
+            <section>
+              <h2 className="text-lg font-semibold mb-4">Stats</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="bg-white/5 rounded-xl p-4">
+                  <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Movies</h3>
+                  <p className="text-2xl sm:text-3xl font-semibold mt-2">{stats.movies}</p>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4">
+                  <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Videos</h3>
+                  <p className="text-2xl sm:text-3xl font-semibold mt-2">{stats.videos}</p>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4">
+                  <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">News</h3>
+                  <p className="text-2xl sm:text-3xl font-semibold mt-2">{stats.news}</p>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4">
+                  <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Persons</h3>
+                  <p className="text-2xl sm:text-3xl font-semibold mt-2">{stats.persons}</p>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4">
+                  <h3 className="text-gray-400 text-xs uppercase tracking-[0.2em]">Users</h3>
+                  <p className="text-2xl sm:text-3xl font-semibold mt-2">{stats.users}</p>
+                </div>
+              </div>
+            </section>
 
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            <Link to="/admin/add-movie" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Add Movie</h3>
-              <p className="text-gray-400 text-sm">Add a new movie to the database</p>
-            </Link>
-            <Link to="/admin/add-video" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Add Video</h3>
-              <p className="text-gray-400 text-sm">Add a featured YouTube video</p>
-            </Link>
-            <Link to="/admin/add-news" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Add News</h3>
-              <p className="text-gray-400 text-sm">Publish a news article</p>
-            </Link>
-            <Link to="/admin/add-person" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Add Person</h3>
-              <p className="text-gray-400 text-sm">Add cast or crew member</p>
-            </Link>
-            <Link to="/admin/tmdb-import" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">TMDB Import</h3>
-              <p className="text-gray-400 text-sm">Import from TMDB database</p>
-            </Link>
-            <Link to="/admin/manage-movies" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Movies</h3>
-              <p className="text-gray-400 text-sm">Edit or delete movies</p>
-            </Link>
-            <Link to="/admin/videos" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Videos</h3>
-              <p className="text-gray-400 text-sm">Edit or delete videos</p>
-            </Link>
-            <Link to="/admin/news" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage News</h3>
-              <p className="text-gray-400 text-sm">Edit or delete news articles</p>
-            </Link>
-            <Link to="/admin/manage-collections" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Collections</h3>
-              <p className="text-gray-400 text-sm">Create custom home sections</p>
-            </Link>
-            <Link to="/admin/update-persons" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Update Persons</h3>
-              <p className="text-gray-400 text-sm">Fetch full cast/crew details</p>
-            </Link>
-            <Link to="/admin/manage-links" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Links</h3>
-              <p className="text-gray-400 text-sm">Add trailer and streaming links</p>
-            </Link>
-            <Link to="/admin/manage-persons" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Persons</h3>
-              <p className="text-gray-400 text-sm">Edit persons and add images</p>
-            </Link>
-            <Link to="/admin/manage-crew" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Crew</h3>
-              <p className="text-gray-400 text-sm">Add directors and composers</p>
-            </Link>
-            <Link to="/admin/manage-platforms" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Platforms</h3>
-              <p className="text-gray-400 text-sm">Manage platform catalogs</p>
-            </Link>
-            <Link to="/admin/manage-hero-banner" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Hero Banner</h3>
-              <p className="text-gray-400 text-sm">Control homepage hero section</p>
-            </Link>
-            <Link to="/admin/manage-users" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Users</h3>
-              <p className="text-gray-400 text-sm">Approve and manage user accounts</p>
-            </Link>
-            <Link to="/admin/manage-avatars" className="bg-[#111827] border border-white/10 rounded-xl p-5 card-hover">
-              <h3 className="text-lg font-semibold mb-2">Manage Avatars</h3>
-              <p className="text-gray-400 text-sm">Add avatar options</p>
-            </Link>
+            <section>
+              <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <Link to="/admin/add-movie" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                  <h3 className="text-base font-semibold mb-2">Add Movie</h3>
+                  <p className="text-gray-400 text-sm">Add a new movie to the database</p>
+                </Link>
+                <Link to="/admin/add-video" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                  <h3 className="text-base font-semibold mb-2">Add Video</h3>
+                  <p className="text-gray-400 text-sm">Add a featured YouTube video</p>
+                </Link>
+                <Link to="/admin/add-news" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                  <h3 className="text-base font-semibold mb-2">Add News</h3>
+                  <p className="text-gray-400 text-sm">Publish a news article</p>
+                </Link>
+                <Link to="/admin/add-person" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                  <h3 className="text-base font-semibold mb-2">Add Person</h3>
+                  <p className="text-gray-400 text-sm">Add cast or crew member</p>
+                </Link>
+                <Link to="/admin/tmdb-import" className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                  <h3 className="text-base font-semibold mb-2">TMDB Import</h3>
+                  <p className="text-gray-400 text-sm">Import from TMDB database</p>
+                </Link>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-semibold mb-4">Admin Menu</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Link to="/admin/manage-movies" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Movies
+                </Link>
+                <Link to="/admin/videos" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Videos
+                </Link>
+                <Link to="/admin/news" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage News
+                </Link>
+                <Link to="/admin/manage-collections" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Collections
+                </Link>
+                <Link to="/admin/update-persons" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Update Persons
+                </Link>
+                <Link to="/admin/manage-links" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Links
+                </Link>
+                <Link to="/admin/manage-persons" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Persons
+                </Link>
+                <Link to="/admin/manage-crew" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Crew
+                </Link>
+                <Link to="/admin/manage-platforms" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Platforms
+                </Link>
+                <Link to="/admin/manage-hero-banner" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Hero Banner
+                </Link>
+                <Link to="/admin/manage-users" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Users
+                </Link>
+                <Link to="/admin/manage-avatars" className="bg-white/10 hover:bg-white/20 transition rounded-xl p-4 text-sm font-medium">
+                  Manage Avatars
+                </Link>
+              </div>
+            </section>
           </div>
         </div>
       </div>
