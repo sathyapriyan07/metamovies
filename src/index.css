@@ -996,3 +996,254 @@ main {
     width: 100%;
   }
 }
+
+.home-hero {
+  position: relative;
+  height: 80vh;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  padding: 0 5%;
+  overflow: hidden;
+  background: #000000;
+}
+
+.home-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.95) 15%,
+    rgba(0,0,0,0.85) 40%,
+    rgba(0,0,0,0.4) 65%,
+    rgba(0,0,0,0.1) 85%
+  );
+}
+
+.home-hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-poster {
+  width: 180px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+}
+
+.hero-title-logo {
+  max-width: 260px;
+  margin-bottom: 18px;
+}
+
+.hero-title-text {
+  margin-bottom: 12px;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  color: #cbd5e1;
+  gap: 6px;
+}
+
+.hero-description {
+  margin-top: 12px;
+  color: #d1d5db;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.hero-buttons .btn-primary,
+.detail-actions .btn-primary {
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  background: #ffffff;
+  color: #000000;
+}
+
+.hero-buttons .btn-secondary,
+.detail-actions .btn-secondary,
+.detail-overview .btn-secondary {
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(255,255,255,0.15);
+  color: #ffffff;
+}
+
+.poster-row {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+
+.poster-row::-webkit-scrollbar {
+  display: none;
+}
+
+.poster-row .poster-card {
+  width: 180px;
+  flex: 0 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+}
+
+.poster-row .poster-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+}
+
+.detail-hero {
+  position: relative;
+  height: 80vh;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  padding: 0 6%;
+  overflow: hidden;
+  background: #000000;
+}
+
+.detail-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.98) 10%,
+    rgba(0,0,0,0.85) 35%,
+    rgba(0,0,0,0.5) 65%,
+    rgba(0,0,0,0.2) 90%
+  );
+}
+
+.detail-hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.detail-poster-col {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.detail-poster {
+  width: 180px;
+  border-radius: 22px;
+  box-shadow: 0 35px 80px rgba(0,0,0,0.85);
+}
+
+.detail-title-logo {
+  max-width: 300px;
+  margin-bottom: 18px;
+}
+
+.detail-title {
+  font-size: clamp(28px, 3vw, 42px);
+  margin-bottom: 12px;
+}
+
+.detail-meta {
+  font-size: 14px;
+  color: #aab3c2;
+  margin-bottom: 12px;
+}
+
+.detail-overview {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #d1d5db;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .detail-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .detail-poster-col {
+    justify-content: flex-start;
+  }
+
+  .detail-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-hero {
+    height: auto;
+    padding-top: 60px;
+    flex-direction: column;
+  }
+
+  .detail-poster {
+    width: 180px;
+    margin-bottom: 20px;
+  }
+
+  .hero-buttons,
+  .detail-actions {
+    justify-content: center;
+  }
+}

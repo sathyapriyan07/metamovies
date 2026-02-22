@@ -62,68 +62,76 @@ const Home = () => {
   return (
     <div>
       {hero && (
-        <section className="section" style={{ marginTop: 0 }}>
-          <div className="hero">
-            {hero.trailer_url ? (
-              (() => {
-                const yt = getYouTubeId(hero.trailer_url);
-                if (yt) {
-                  return (
-                    <iframe
-                      className="hero-media"
-                      src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&modestbranding=1&rel=0`}
-                      title={`${hero.title} trailer`}
-                      allow="autoplay; encrypted-media; fullscreen"
-                      frameBorder="0"
-                    />
-                  );
-                }
-                if (isVideoFile(hero.trailer_url)) {
-                  return (
-                    <video className="hero-media" src={hero.trailer_url} autoPlay muted loop playsInline />
-                  );
-                }
-                return <img className="hero-media" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />;
-              })()
+        <section className="home-hero">
+          {hero.trailer_url ? (
+            (() => {
+              const yt = getYouTubeId(hero.trailer_url);
+              if (yt) {
+                return (
+                  <iframe
+                    className="home-hero-media"
+                    src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&modestbranding=1&rel=0`}
+                    title={`${hero.title} trailer`}
+                    allow="autoplay; encrypted-media; fullscreen"
+                    frameBorder="0"
+                  />
+                );
+              }
+              if (isVideoFile(hero.trailer_url)) {
+                return (
+                  <video className="home-hero-media" src={hero.trailer_url} autoPlay muted loop playsInline />
+                );
+              }
+              return <img className="home-hero-media" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />;
+            })()
+          ) : (
+            <img className="home-hero-media" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />
+          )}
+          <div className="hero-content">
+            {hero.poster_url && <img className="hero-poster" src={hero.poster_url} alt={hero.title} />}
+            {hero.title_logo_url ? (
+              <img className="hero-title-logo" src={hero.title_logo_url} alt={hero.title} />
             ) : (
-              <img className="hero-media" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />
+              <h1 className="hero-title-text">{hero.title}</h1>
             )}
-            <div className="hero-overlay" />
-            <div className="hero-content">
-              {hero.title_logo_url ? (
-                <img className="hero-logo" src={hero.title_logo_url} alt={hero.title} />
-              ) : (
-                <h1>{hero.title}</h1>
-              )}
-              {hero.overview && <p style={{ maxWidth: 600 }}>{hero.overview}</p>}
-              <p>
-                {hero.release_date?.split('-')[0]}
-                {hero.runtime ? (
-                  <>
-                    <span className="meta-sep" aria-hidden="true">
-                      <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
-                        <circle cx="3" cy="3" r="3" />
-                      </svg>
-                    </span>
-                    {formatRuntime(hero.runtime)}
-                  </>
-                ) : null}
-              </p>
-              <div style={{ marginTop: 12, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <button className="button-primary">Watch Now</button>
-                <button className="button-secondary" onClick={() => navigate(`/movie/${hero.id}`)}>Details</button>
-              </div>
+            <div className="hero-meta">
+              {hero.release_date?.split('-')[0]}
+              {hero.runtime ? (
+                <>
+                  <span className="meta-sep" aria-hidden="true">
+                    <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
+                      <circle cx="3" cy="3" r="3" />
+                    </svg>
+                  </span>
+                  {formatRuntime(hero.runtime)}
+                </>
+              ) : null}
+              {hero.genres?.length ? (
+                <>
+                  <span className="meta-sep" aria-hidden="true">
+                    <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
+                      <circle cx="3" cy="3" r="3" />
+                    </svg>
+                  </span>
+                  {hero.genres.join(' • ')}
+                </>
+              ) : null}
+            </div>
+            {hero.overview && <p className="hero-description">{hero.overview}</p>}
+            <div className="hero-buttons">
+              <button className="btn-primary">Watch Trailer</button>
+              <button className="btn-secondary" onClick={() => navigate(`/movie/${hero.id}`)}>Details</button>
             </div>
           </div>
         </section>
       )}
 
       <section className="section">
-        <h2 className="section-title">Trending</h2>
+        <h2 className="section-title">Streaming Now</h2>
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="grid">
+          <div className="poster-row">
             {trendingMovies.map((movie) => (
               <PosterCard key={movie.id} item={movie} type="movie" />
             ))}
@@ -134,7 +142,7 @@ const Home = () => {
       {collections.map((collection) => (
         <section key={collection.id} className="section">
           <h2 className="section-title">{collection.name}</h2>
-          <div className="grid">
+          <div className="poster-row">
             {collection.items.map((item) => (
               <PosterCard key={item.id} item={item} type={item.type || 'movie'} />
             ))}
