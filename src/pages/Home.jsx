@@ -52,16 +52,16 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white pt-12 pb-10">
-      <div className="max-w-2xl mx-auto px-4">
+    <div className="min-h-screen bg-[#0f0f0f] text-white pt-16 pb-10">
+      <div className="max-w-2xl mx-auto px-4 pt-4">
         {hero ? (
           <div className="bg-[#1a1a1a] rounded-md overflow-hidden">
-            <div className="aspect-video">
+            <div>
               <img
                 src={hero.backdrop_url || hero.poster_url}
                 alt={hero.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
+                className="w-full h-[220px] object-cover rounded-md"
+                loading="eager"
               />
             </div>
             <div className="p-4">
