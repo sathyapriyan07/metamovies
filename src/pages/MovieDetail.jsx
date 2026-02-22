@@ -79,7 +79,7 @@ const MovieDetail = () => {
   ];
 
   return (
-    <div className="px-6 max-w-7xl mx-auto">
+    <div>
       <section className="relative w-full h-[85vh] overflow-hidden">
         {movie.trailer_url ? (
           (() => {
@@ -108,7 +108,7 @@ const MovieDetail = () => {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
 
-        <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16 max-w-7xl mx-auto">
+        <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:gap-6">
             {movie.poster_url && (
               <div className="shrink-0">
@@ -173,130 +173,132 @@ const MovieDetail = () => {
         </div>
       </section>
 
-      {(directors.length > 0 || writers.length > 0) && (
-        <section className="mt-10 space-y-6">
-          {directors.length > 0 && (
-            <div>
-              <p
-                className="text-base font-medium cursor-pointer hover:text-white transition"
-                onClick={() => navigate(`/person/${directors[0].person?.id}`)}
-              >
-                {directors[0].person?.name}
-              </p>
-              <div className="text-sm text-gray-400">Director</div>
-            </div>
-          )}
-          {writers.length > 0 && (
-            <div>
-              <p
-                className="text-base font-medium cursor-pointer hover:text-white transition"
-                onClick={() => navigate(`/person/${writers[0].person?.id}`)}
-              >
-                {writers[0].person?.name}
-              </p>
-              <div className="text-sm text-gray-400">Writer</div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {movie.cast?.length > 0 && (
-        <section className="mt-12 space-y-6">
-          <h2 className="text-xl font-semibold">Cast</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
-            {movie.cast.slice(0, 15).map((c) => (
-              <div key={`cast-${c.id}`} className="flex flex-col items-center text-center space-y-2">
-                {c.person?.profile_url ? (
-                  <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
-                ) : (
-                  <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
-                    {c.person?.name?.[0] || '?'}
-                  </div>
-                )}
-                <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
-                  {c.person?.name}
-                </button>
-                <div className="text-xs text-gray-400">{c.character}</div>
+      <div className="max-w-7xl mx-auto px-6 mt-10">
+        {(directors.length > 0 || writers.length > 0) && (
+          <section className="space-y-6">
+            {directors.length > 0 && (
+              <div>
+                <p
+                  className="text-base font-medium cursor-pointer hover:text-white transition"
+                  onClick={() => navigate(`/person/${directors[0].person?.id}`)}
+                >
+                  {directors[0].person?.name}
+                </p>
+                <div className="text-sm text-gray-400">Director</div>
               </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {movie.crew?.length > 0 && (
-        <section className="mt-12 space-y-6">
-          <h2 className="text-xl font-semibold">Crew</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
-            {movie.crew.slice(0, 15).map((c) => (
-              <div key={`crew-${c.id}`} className="flex flex-col items-center text-center space-y-2">
-                {c.person?.profile_url ? (
-                  <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
-                ) : (
-                  <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
-                    {c.person?.name?.[0] || '?'}
-                  </div>
-                )}
-                <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
-                  {c.person?.name}
-                </button>
-                <div className="text-xs text-gray-400">{c.job}</div>
+            )}
+            {writers.length > 0 && (
+              <div>
+                <p
+                  className="text-base font-medium cursor-pointer hover:text-white transition"
+                  onClick={() => navigate(`/person/${writers[0].person?.id}`)}
+                >
+                  {writers[0].person?.name}
+                </p>
+                <div className="text-sm text-gray-400">Writer</div>
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+            )}
+          </section>
+        )}
 
-      {platforms.length > 0 && (
-        <section className="mt-12 space-y-6">
-          <h2 className="text-xl font-semibold">Platforms</h2>
-          <div className="tabs">
-            {platforms.map((platform) => (
-              <button
-                key={platform.id}
-                className="tab platform-tab"
-                onClick={() => navigate(`/platforms/${platform.id}`)}
-              >
-                {platform.logo_url && (
-                  <img src={platform.logo_url} alt={platform.name} className="platform-logo" />
-                )}
-                <span>{platform.name}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
+        {movie.cast?.length > 0 && (
+          <section className="mt-12 space-y-6">
+            <h2 className="text-xl font-semibold">Cast</h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
+              {movie.cast.slice(0, 15).map((c) => (
+                <div key={`cast-${c.id}`} className="flex flex-col items-center text-center space-y-2">
+                  {c.person?.profile_url ? (
+                    <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
+                      {c.person?.name?.[0] || '?'}
+                    </div>
+                  )}
+                  <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
+                    {c.person?.name}
+                  </button>
+                  <div className="text-xs text-gray-400">{c.character}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music || movie.music_links.amazon_music) && (
-        <section className="mt-12 space-y-6">
-          <h2 className="text-xl font-semibold">Music Platforms</h2>
-          <div className="tabs">
-            {movie.music_links.spotify && (
-              <a className="tab active platform-tab" href={movie.music_links.spotify} target="_blank" rel="noopener noreferrer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" className="platform-logo" />
-                <span>Spotify</span>
-              </a>
-            )}
-            {movie.music_links.apple_music && (
-              <a className="tab active platform-tab" href={movie.music_links.apple_music} target="_blank" rel="noopener noreferrer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/960px-Apple_Music_icon.svg.png" alt="Apple Music" className="platform-logo" />
-                <span>Apple Music</span>
-              </a>
-            )}
-            {movie.music_links.youtube_music && (
-              <a className="tab active platform-tab" href={movie.music_links.youtube_music} target="_blank" rel="noopener noreferrer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Youtube_Music_icon.svg" alt="YouTube Music" className="platform-logo" />
-                <span>YouTube Music</span>
-              </a>
-            )}
-            {movie.music_links.amazon_music && (
-              <a className="tab active platform-tab" href={movie.music_links.amazon_music} target="_blank" rel="noopener noreferrer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Amazon_Music_logo.svg" alt="Amazon Music" className="platform-logo" />
-                <span>Amazon Music</span>
-              </a>
-            )}
-          </div>
-        </section>
-      )}
+        {movie.crew?.length > 0 && (
+          <section className="mt-12 space-y-6">
+            <h2 className="text-xl font-semibold">Crew</h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
+              {movie.crew.slice(0, 15).map((c) => (
+                <div key={`crew-${c.id}`} className="flex flex-col items-center text-center space-y-2">
+                  {c.person?.profile_url ? (
+                    <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
+                      {c.person?.name?.[0] || '?'}
+                    </div>
+                  )}
+                  <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
+                    {c.person?.name}
+                  </button>
+                  <div className="text-xs text-gray-400">{c.job}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {platforms.length > 0 && (
+          <section className="mt-12 space-y-6">
+            <h2 className="text-xl font-semibold">Platforms</h2>
+            <div className="tabs">
+              {platforms.map((platform) => (
+                <button
+                  key={platform.id}
+                  className="tab platform-tab"
+                  onClick={() => navigate(`/platforms/${platform.id}`)}
+                >
+                  {platform.logo_url && (
+                    <img src={platform.logo_url} alt={platform.name} className="platform-logo" />
+                  )}
+                  <span>{platform.name}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music || movie.music_links.amazon_music) && (
+          <section className="mt-12 space-y-6">
+            <h2 className="text-xl font-semibold">Music Platforms</h2>
+            <div className="tabs">
+              {movie.music_links.spotify && (
+                <a className="tab active platform-tab" href={movie.music_links.spotify} target="_blank" rel="noopener noreferrer">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" className="platform-logo" />
+                  <span>Spotify</span>
+                </a>
+              )}
+              {movie.music_links.apple_music && (
+                <a className="tab active platform-tab" href={movie.music_links.apple_music} target="_blank" rel="noopener noreferrer">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/960px-Apple_Music_icon.svg.png" alt="Apple Music" className="platform-logo" />
+                  <span>Apple Music</span>
+                </a>
+              )}
+              {movie.music_links.youtube_music && (
+                <a className="tab active platform-tab" href={movie.music_links.youtube_music} target="_blank" rel="noopener noreferrer">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Youtube_Music_icon.svg" alt="YouTube Music" className="platform-logo" />
+                  <span>YouTube Music</span>
+                </a>
+              )}
+              {movie.music_links.amazon_music && (
+                <a className="tab active platform-tab" href={movie.music_links.amazon_music} target="_blank" rel="noopener noreferrer">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Amazon_Music_logo.svg" alt="Amazon Music" className="platform-logo" />
+                  <span>Amazon Music</span>
+                </a>
+              )}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 };
