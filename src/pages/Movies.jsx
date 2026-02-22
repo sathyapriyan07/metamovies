@@ -10,6 +10,7 @@ const Movies = () => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [selectedGenre, setSelectedGenre] = useState(searchParams.get('genre') || 'All');
+  const [search, setSearch] = useState('');
 
   const genres = ['All', 'Action', 'Comedy', 'Drama', 'Horror', 'Romance', 'Thriller', 'Sci-Fi', 'Fantasy', 'Animation'];
 
@@ -47,40 +48,54 @@ const Movies = () => {
   };
 
   return (
-    <div>
-      <h1>Movies</h1>
-      <div className="tab-container" style={{ marginTop: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-        {genres.map((genre) => (
-          <button
-            key={genre}
-            onClick={() => handleGenreClick(genre)}
-            className={`tab ${selectedGenre === genre ? 'active' : ''}`}
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <div className="max-w-7xl mx-auto px-4 pt-12 pb-10">
+        <h1 className="text-lg font-semibold">Movies</h1>
+        <div className="mt-4 flex flex-col gap-3">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search movies"
+            className="w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white placeholder:text-gray-500"
+          />
+          <select
+            value={selectedGenre}
+            onChange={(e) => handleGenreClick(e.target.value)}
+            className="w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white"
           >
-            {genre}
-          </button>
-        ))}
-      </div>
-
-      {loading && page === 0 ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {movies.map((movie) => (
-              <PosterCard key={movie.id} item={movie} type="movie" />
+            {genres.map((genre) => (
+              <option key={genre} value={genre} className="bg-[#0f0f0f]">
+                {genre}
+              </option>
             ))}
-          </div>
-          {hasMore && (
-            <div style={{ marginTop: 16 }}>
-              <button onClick={() => setPage((p) => p + 1)} className="button-primary" disabled={loading}>
-                {loading ? 'Loading...' : 'Load More'}
-              </button>
+          </select>
+        </div>
+
+        {loading && page === 0 ? (
+          <p className="mt-4">Loading...</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+              {movies
+                .filter((m) => m.title?.toLowerCase().includes(search.toLowerCase()))
+                .map((movie) => (
+                  <PosterCard key={movie.id} item={movie} type="movie" />
+                ))}
             </div>
-          )}
-        </>
-      )}
+            {hasMore && (
+              <div className="mt-6">
+                <button onClick={() => setPage((p) => p + 1)} className="w-full btn-primary" disabled={loading}>
+                  {loading ? 'Loading...' : 'Load More'}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
+
 };
 
 export default Movies;

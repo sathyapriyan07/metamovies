@@ -475,7 +475,7 @@ const TMDBImport = () => {
                           }`}
                         >
                           <input type="checkbox" checked={!!isSelected} onChange={() => {}} className="mt-1" />
-                          <img
+                          <img loading="lazy"
                             src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
                             alt={item.title || item.name}
                             className="w-12 h-16 object-cover rounded-md"
@@ -578,7 +578,7 @@ const TMDBImport = () => {
                       onClick={() => handleSelectFromSearch(item)}
                       className="flex items-center gap-4 bg-white/5 hover:bg-white/10 rounded-xl p-3 cursor-pointer transition"
                     >
-                      <img
+                      <img loading="lazy"
                         src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
                         alt={item.title || item.name}
                         className="w-12 h-16 object-cover rounded-md"
@@ -620,7 +620,7 @@ const TMDBImport = () => {
             <div className="bg-white/5 rounded-2xl p-6 space-y-5 mt-8">
               <h3 className="text-lg font-semibold">Preview</h3>
               <div className="flex gap-6">
-                <img
+                <img loading="lazy"
                   src={type === 'person' ? getImageUrl(preview.profile_path, 'w300') : getImageUrl(preview.poster_path, 'w300')}
                   alt={preview.title || preview.name}
                   className="w-28 sm:w-32 rounded-lg"

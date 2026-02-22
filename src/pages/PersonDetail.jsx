@@ -51,59 +51,79 @@ const PersonDetail = () => {
   if (!person) return <p>Person not found</p>;
 
   return (
-    <div>
-      <section className="section" style={{ marginTop: 0 }}>
-        <div className="person-hero">
-          <div className="person-hero-image">
-            <img src={person.profile_url || 'https://via.placeholder.com/800x800'} alt={person.name} />
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <div className="max-w-7xl mx-auto px-4 pt-12 pb-10">
+        <section className="flex flex-col items-center text-center gap-3">
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-[#1a1a1a]">
+            <img loading="lazy" src={person.profile_url || 'https://via.placeholder.com/800x800'} alt={person.name} className="w-full h-full object-cover" />
           </div>
-          <div>
-            <h1>{person.name}</h1>
-            {person.known_for_department && <p>{person.known_for_department}</p>}
-          </div>
-        </div>
-      </section>
-
-      {person.biography && (
-        <section className="section">
-          <h2 className="section-title">Biography</h2>
-          <p>
-            {showFullBio ? person.biography : person.biography.slice(0, 300)}
-            {person.biography.length > 300 && !showFullBio ? '...' : ''}
-          </p>
-          {person.biography.length > 300 && (
-            <button className="button-secondary" onClick={() => setShowFullBio(!showFullBio)} style={{ marginTop: 8 }}>
-              {showFullBio ? 'Show Less' : 'More'}
-            </button>
+          <h1 className="text-2xl font-bold">{person.name}</h1>
+          {person.known_for_department && <p className="text-sm text-gray-400">{person.known_for_department}</p>}
+          {(person.birthday || person.place_of_birth) && (
+            <p className="text-sm text-gray-400">
+              {person.birthday || ''}{person.birthday && person.place_of_birth ? ' ? ' : ''}{person.place_of_birth || ''}
+            </p>
           )}
         </section>
-      )}
 
-      <section className="section">
-        <h2 className="section-title">Filmography</h2>
-        <div className="grid">
-          {movieCredits.map((credit, i) => (
-            <PosterCard key={i} item={credit} type="movie" />
-          ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <h2 className="section-title">Featured Videos</h2>
-        {videosLoading ? (
-          <p>Loading...</p>
-        ) : (
-          <ul>
-            {featuredVideos.map((video) => (
-              <li key={video.id}>
-                <button className="button-secondary" onClick={() => navigate(`/videos/${video.id}`)}>{video.title}</button>
-              </li>
-            ))}
-          </ul>
+        {person.biography && (
+          <section className="py-6">
+            <h2 className="text-lg font-semibold mb-3">Biography</h2>
+            <p className="text-sm text-gray-300">
+              {showFullBio ? person.biography : person.biography.slice(0, 300)}
+              {person.biography.length > 300 && !showFullBio ? '...' : ''}
+            </p>
+            {person.biography.length > 300 && (
+              <button className="mt-2 text-sm text-gray-400 hover:text-white transition" onClick={() => setShowFullBio(!showFullBio)}>
+                {showFullBio ? 'Read Less' : 'Read More'}
+              </button>
+            )}
+          </section>
         )}
-      </section>
+
+        {movieCredits.length > 0 && (
+          <section className="py-6">
+            <h2 className="text-lg font-semibold mb-3">Known For</h2>
+            <div className="flex gap-3 overflow-x-auto">
+              {movieCredits.slice(0, 10).map((credit, i) => (
+                <div key={`known-${i}`} className="min-w-[120px]" onClick={() => navigate(`/movie/${credit.id}`)}>
+                  <div className="aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                    <img src={credit.poster_url || credit.backdrop_url} alt={credit.title} className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                  <p className="mt-2 text-sm font-medium truncate">{credit.title}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="py-6">
+          <h2 className="text-lg font-semibold mb-3">Filmography</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {movieCredits.map((credit, i) => (
+              <PosterCard key={i} item={credit} type="movie" />
+            ))}
+          </div>
+        </section>
+
+        <section className="py-6">
+          <h2 className="text-lg font-semibold mb-3">Featured Videos</h2>
+          {videosLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <div className="space-y-2">
+              {featuredVideos.map((video) => (
+                <button key={video.id} className="w-full text-left bg-[#1a1a1a] rounded-md p-3" onClick={() => navigate(`/videos/${video.id}`)}>
+                  <p className="text-sm font-medium">{video.title}</p>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
+
 };
 
 export default PersonDetail;

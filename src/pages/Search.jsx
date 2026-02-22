@@ -54,113 +54,150 @@ const Search = () => {
       handleSearch(value);
     }, 300);
 
-    return () => clearTimeout(timeoutId);
-  };
-
-  const suggestions = useMemo(() => {
-    if (!query) return [];
-    const list = [
-      ...results.movies.slice(0, 4).map((item) => ({
-        id: item.id,
-        title: item.title,
-        type: 'movie'
-      })),
-      ...results.persons.slice(0, 4).map((item) => ({
-        id: item.id,
-        title: item.name,
-        type: 'person'
-      }))
-    ];
-    return list.slice(0, 6);
-  }, [query, results]);
-
-  return (
-    <div>
-      <h1>Search</h1>
+    return (
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <div className="max-w-7xl mx-auto px-4 pt-12 pb-10">
+        <div className="sticky top-[50px] z-10 bg-[#0f0f0f] pb-3">
           <input
             type="text"
             value={query}
             onChange={handleInputChange}
             placeholder="Search movies and people"
-            className="mt-3 mb-3 w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:border-white/30"
+            className="w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white placeholder:text-gray-500"
           />
-      {query && suggestions.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <p>Suggestions</p>
-          <ul>
-            {suggestions.map((item) => (
-              <li key={`${item.type}-${item.id}`}>
-                <button className="button-secondary" onClick={() => navigate(item.type === 'person' ? `/person/${item.id}` : `/${item.type}/${item.id}`)}>
-                  {item.title} ({item.type})
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {!query ? (
-        <div>
-          <section className="section">
-            <h2 className="section-title">Trending</h2>
-            {homeLoading ? <p>Loading...</p> : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {trendingMovies.map((movie) => (
-                  <PosterCard key={movie.id} item={movie} type="movie" />
-                ))}
-              </div>
-            )}
-          </section>
-          <section className="section">
-            <h2 className="section-title">Popular Movies</h2>
-            {homeLoading ? <p>Loading...</p> : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {popularMovies.map((movie) => (
-                  <PosterCard key={movie.id} item={movie} type="movie" />
-                ))}
-              </div>
-            )}
-          </section>
-        </div>
-      ) : (
-        <div>
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <>
-              {results.movies.length > 0 && (
-                <section className="section">
-                  <h2 className="section-title">Movies</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {results.movies.map((movie) => (
-                      <PosterCard key={movie.id} item={movie} type="movie" />
+          {query && (results.movies.length > 0 || results.persons.length > 0) && (
+            <div className="mt-2 bg-[#1a1a1a] rounded-md p-3 space-y-3">
+              {results.movies.slice(0, 4).length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-400 mb-2">Movies</p>
+                  <div className="space-y-2">
+                    {results.movies.slice(0, 4).map((item) => (
+                      <button
+                        key={`movie-${item.id}`}
+                        className="w-full flex items-center gap-3 text-left"
+                        onClick={() => navigate(`/movie/${item.id}`)}
+                      >
+                        <img loading="lazy"
+                          src={item.poster_url || item.backdrop_url}
+                          alt={item.title}
+                          className="w-10 h-14 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{item.title}</p>
+                          <p className="text-xs text-gray-400">{item.release_date?.split('-')[0]}</p>
+                        </div>
+                        <span className="text-xs text-gray-400">Movie</span>
+                      </button>
                     ))}
                   </div>
-                </section>
+                </div>
               )}
-
-              {results.persons.length > 0 && (
-                <section className="section">
-                  <h2 className="section-title">People</h2>
-                  <ul>
-                    {results.persons.map((person) => (
-                      <li key={person.id}>
-                        <button className="button-secondary" onClick={() => navigate(`/person/${person.id}`)}>{person.name}</button>
-                      </li>
+              {results.persons.slice(0, 4).length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-400 mb-2">People</p>
+                  <div className="space-y-2">
+                    {results.persons.slice(0, 4).map((item) => (
+                      <button
+                        key={`person-${item.id}`}
+                        className="w-full flex items-center gap-3 text-left"
+                        onClick={() => navigate(`/person/${item.id}`)}
+                      >
+                        <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center text-xs">
+                          {item.name?.[0] || '?'}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{item.name}</p>
+                          <p className="text-xs text-gray-400">Actor</p>
+                        </div>
+                        <span className="text-xs text-gray-400">Person</span>
+                      </button>
                     ))}
-                  </ul>
-                </section>
+                  </div>
+                </div>
               )}
-
-              {results.movies.length === 0 && results.persons.length === 0 && (
-                <p>No results found for "{query}"</p>
-              )}
-            </>
+            </div>
           )}
         </div>
-      )}
+
+        {!query ? (
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-3">Popular Searches</h2>
+            {homeLoading ? (
+              <p>Loading...</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {trendingMovies.slice(0, 6).map((movie) => (
+                  <button
+                    key={movie.id}
+                    className="text-left"
+                    onClick={() => navigate(`/movie/${movie.id}`)}
+                  >
+                    <div className="aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                      <img
+                        src={movie.poster_url || movie.backdrop_url}
+                        alt={movie.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm font-medium truncate">{movie.title}</p>
+                    <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-6">
+            {loading ? (
+              <p>Loading...</p>
+            ) : (
+              <>
+                {results.movies.length > 0 && (
+                  <section className="py-6">
+                    <h2 className="text-lg font-semibold mb-3">Movies</h2>
+                    <div className="grid grid-cols-2 gap-3">
+                      {results.movies.map((movie) => (
+                        <PosterCard key={movie.id} item={movie} type="movie" />
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {results.persons.length > 0 && (
+                  <section className="py-6">
+                    <h2 className="text-lg font-semibold mb-3">People</h2>
+                    <div className="space-y-2">
+                      {results.persons.map((person) => (
+                        <button
+                          key={person.id}
+                          className="w-full flex items-center gap-3 text-left bg-[#1a1a1a] rounded-md p-3"
+                          onClick={() => navigate(`/person/${person.id}`)}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center text-xs">
+                            {person.name?.[0] || '?'}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{person.name}</p>
+                            <p className="text-xs text-gray-400">Person</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {results.movies.length === 0 && results.persons.length === 0 && (
+                  <p>No results found for "{query}"</p>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
+
 };
 
 export default Search;

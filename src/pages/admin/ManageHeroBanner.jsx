@@ -96,7 +96,7 @@ const ManageHeroBanner = () => {
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {searchResults.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                      <img
+                      <img loading="lazy"
                         src={item.poster_url || 'https://via.placeholder.com/50x75'}
                         alt={item.title}
                         className="w-12 h-18 object-cover rounded"
@@ -127,7 +127,7 @@ const ManageHeroBanner = () => {
                   return (
                     <div key={banner.id} className="flex items-center gap-4 bg-white/5 rounded-xl p-4 justify-between">
                       <div className="flex items-center gap-4">
-                        <img
+                        <img loading="lazy"
                           src={content?.poster_url || 'https://via.placeholder.com/60x90'}
                           alt={content?.title}
                           className="w-14 h-20 object-cover rounded-lg"

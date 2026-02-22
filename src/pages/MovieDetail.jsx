@@ -13,8 +13,6 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
-  const [showAllCast, setShowAllCast] = useState(false);
-  const [showAllCrew, setShowAllCrew] = useState(false);
 
   useEffect(() => {
     loadMovie();
@@ -45,10 +43,6 @@ const MovieDetail = () => {
   if (loading) return <p>Loading...</p>;
   if (!movie) return <p>Movie not found</p>;
 
-  const platforms = (movie.movie_platforms || [])
-    .map((entry) => entry.platform)
-    .filter(Boolean);
-
   const year = movie.release_date?.split('-')[0];
   const formatRuntime = (mins) => {
     if (!mins || mins <= 0) return null;
@@ -59,274 +53,223 @@ const MovieDetail = () => {
     return `${h}h ${m}m`;
   };
   const runtime = formatRuntime(movie.runtime);
-  const getYouTubeId = (url) => {
-    if (!url) return null;
-    const match = url.match(/(?:youtube\.com.*v=|youtu\.be\/)([^&?/]{11})/i);
-    return match ? match[1] : null;
-  };
-  const isVideoFile = (url) => /\.(mp4|webm|ogg|m3u8)(\?|#|$)/i.test(url || '');
   const directors = (movie.crew || []).filter((c) => c?.job === 'Director');
   const writers = (movie.crew || []).filter((c) => ['Writer', 'Screenplay'].includes(c?.job));
-  const combinedPeople = [
-    ...(movie.cast || []).map((c) => ({
-      key: `cast-${c.id}`,
-      person: c.person,
-      role: c.character,
-    })),
-    ...(movie.crew || []).map((c) => ({
-      key: `crew-${c.id}`,
-      person: c.person,
-      role: c.job,
-    })),
-  ];
-  const visibleCast = showAllCast ? (movie.cast || []) : (movie.cast || []).slice(0, 6);
-  const visibleCrew = showAllCrew ? (movie.crew || []) : (movie.crew || []).slice(0, 6);
+
+  const metaLine = [year, runtime, movie.genres?.length ? movie.genres.join(', ') : null]
+    .filter(Boolean)
+    .join(' ? ');
+  const reviewItems = Array.isArray(movie.reviews) ? movie.reviews : [];
+  const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
+  const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
 
   return (
-    <div>
-      <section className="relative w-screen h-[85vh] overflow-hidden">
-        {movie.trailer_url ? (
-          (() => {
-            const yt = getYouTubeId(movie.trailer_url);
-            if (yt) {
-              return (
-                <iframe
-                  className="absolute inset-0 h-full w-full object-cover"
-                  src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&modestbranding=1&rel=0`}
-                  title={`${movie.title} trailer`}
-                  allow="autoplay; encrypted-media; fullscreen"
-                  frameBorder="0"
-                />
-              );
-            }
-            if (isVideoFile(movie.trailer_url)) {
-              return (
-                <video className="absolute inset-0 h-full w-full object-cover" src={movie.trailer_url} autoPlay muted loop playsInline />
-              );
-            }
-            return <img className="absolute inset-0 h-full w-full object-cover" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />;
-          })()
-        ) : (
-          <img className="absolute inset-0 h-full w-full object-cover" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />
-        )}
-
-        <div className="absolute inset-0 bg-black/60" />
-
-        <div className="relative z-10 h-full flex flex-col justify-end max-w-7xl mx-auto px-6 pb-16">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:gap-6">
-            {movie.poster_url && (
-              <div className="shrink-0">
-                <img
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
+        <section className="rounded-md overflow-hidden border border-gray-800 bg-[#1a1a1a]">
+          <div className="relative h-[180px] w-full">
+            <img loading="lazy"
+              src={movie.backdrop_url || movie.poster_url}
+              alt={movie.title}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          </div>
+          <div className="p-4">
+            <div className="flex gap-3">
+              {movie.poster_url && (
+                <img loading="lazy"
                   src={movie.poster_url}
                   alt={movie.title}
-                  className="w-28 sm:w-36 md:w-48 aspect-[2/3] rounded-xl object-cover shadow-2xl"
+                  className="w-[120px] h-[170px] object-cover rounded-md shadow"
                 />
-              </div>
-            )}
-            <div className="flex flex-col space-y-4 max-w-2xl">
-              {movie.title_logo_url ? (
-                <img className="w-48 sm:w-64 md:w-72 object-contain" src={movie.title_logo_url} alt={movie.title} />
-              ) : (
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">{movie.title}</h1>
               )}
-              <div className="text-sm text-gray-400 flex flex-wrap items-center gap-2">
-                <span>{year}</span>
-                {runtime ? (
-                  <>
-                    <span className="h-1 w-1 rounded-full bg-gray-400" aria-hidden="true" />
-                    <span>{runtime}</span>
-                  </>
-                ) : null}
-                {movie.genres?.length > 0 ? (
-                  <>
-                    <span className="h-1 w-1 rounded-full bg-gray-400" aria-hidden="true" />
-                    <span>{movie.genres.join(' • ')}</span>
-                  </>
-                ) : null}
-              </div>
-
-              {movie.overview && (
-                <div className="text-base text-gray-300 leading-relaxed">
-                  <p className="text-base text-gray-300 leading-relaxed">
-                    {showFullOverview ? movie.overview : movie.overview.slice(0, 300)}
-                    {movie.overview.length > 300 && !showFullOverview ? '...' : ''}
-                  </p>
-                  {movie.overview.length > 300 && (
-                    <button
-                      className="mt-2 text-xs text-white/80 hover:text-white transition"
-                      onClick={() => setShowFullOverview(!showFullOverview)}
-                    >
-                      {showFullOverview ? 'Less' : 'More'}
-                    </button>
-                  )}
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl font-bold">{movie.title}</h1>
+                <div className="mt-2 text-sm text-gray-400">{metaLine || 'Details unavailable'}</div>
+                <div className="mt-3 inline-flex items-center justify-center w-11 h-11 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
+                  {typeof movie.rating === 'number' ? movie.rating.toFixed(1) : 'NR'}
                 </div>
-              )}
-
-              <div className="mt-6 flex gap-4">
-                {movie.trailer_url && (
-                  <button className="px-4 py-2 rounded-full bg-white text-black text-sm font-medium" onClick={() => window.open(movie.trailer_url, '_blank')}>
-                    Watch Trailer
-                  </button>
-                )}
-                <button className="px-4 py-2 rounded-full bg-white/15 text-white text-sm font-medium" onClick={toggleWatchlist}>
-                  {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-                </button>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="w-full">
-        <div className="max-w-7xl mx-auto px-6 py-10">
-        {(directors.length > 0 || writers.length > 0) && (
-          <section className="space-y-6">
-            {directors.length > 0 && (
-              <div>
-                <p
-                  className="text-base font-medium cursor-pointer hover:text-white transition"
-                  onClick={() => navigate(`/person/${directors[0].person?.id}`)}
-                >
-                  {directors[0].person?.name}
-                </p>
-                <div className="text-sm text-gray-400">Director</div>
-              </div>
+        <section className="py-6">
+          <div className="flex flex-col gap-3">
+            {movie.trailer_url && (
+              <button className="btn-primary h-11 w-full" onClick={() => window.open(movie.trailer_url, '_blank')}>
+                Watch Trailer
+              </button>
             )}
-            {writers.length > 0 && (
-              <div>
-                <p
-                  className="text-base font-medium cursor-pointer hover:text-white transition"
-                  onClick={() => navigate(`/person/${writers[0].person?.id}`)}
-                >
-                  {writers[0].person?.name}
-                </p>
-                <div className="text-sm text-gray-400">Writer</div>
-              </div>
+            <button className="btn-secondary h-11 w-full" onClick={toggleWatchlist}>
+              {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+            </button>
+          </div>
+        </section>
+
+        {movie.overview && (
+          <section className="py-6">
+            <h2 className="text-lg font-semibold mb-3">Storyline</h2>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {showFullOverview ? movie.overview : movie.overview.slice(0, 180)}
+              {movie.overview.length > 180 && !showFullOverview ? '...' : ''}
+            </p>
+            {movie.overview.length > 180 && (
+              <button className="mt-2 text-sm text-gray-400 hover:text-white transition" onClick={() => setShowFullOverview(!showFullOverview)}>
+                {showFullOverview ? 'Read Less' : 'Read More'}
+              </button>
             )}
           </section>
         )}
 
         {movie.cast?.length > 0 && (
-          <section className="mt-12 space-y-6">
-            <h2 className="text-xl font-semibold">Cast</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
-              {visibleCast.map((c) => (
-                <div key={`cast-${c.id}`} className="flex flex-col items-center text-center space-y-2">
+          <section className="py-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold">Cast</h2>
+              <span className="text-sm text-[#F5C518]">See All</span>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {movie.cast.slice(0, 12).map((c) => (
+                <div key={`cast-${c.id}`} className="min-w-[90px] text-center">
                   {c.person?.profile_url ? (
-                    <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
+                    <img loading="lazy" src={c.person.profile_url} alt={c.person.name} className="w-16 h-16 rounded-full object-cover mx-auto" />
                   ) : (
-                    <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs">
                       {c.person?.name?.[0] || '?'}
                     </div>
                   )}
-                  <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
+                  <button onClick={() => navigate(`/person/${c.person.id}`)} className="mt-2 text-xs font-medium">
                     {c.person?.name}
                   </button>
                   <div className="text-xs text-gray-400">{c.character}</div>
                 </div>
               ))}
             </div>
-            {movie.cast.length > 6 && (
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setShowAllCast(!showAllCast)}
-                  className="text-sm text-gray-400 hover:text-white transition"
-                >
-                  {showAllCast ? 'View Less' : 'View More'}
-                </button>
-              </div>
-            )}
           </section>
         )}
 
-        {movie.crew?.length > 0 && (
-          <section className="mt-12 space-y-6">
-            <h2 className="text-xl font-semibold">Crew</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
-              {visibleCrew.map((c) => (
-                <div key={`crew-${c.id}`} className="flex flex-col items-center text-center space-y-2">
-                  {c.person?.profile_url ? (
-                    <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
-                  ) : (
-                    <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
-                      {c.person?.name?.[0] || '?'}
-                    </div>
-                  )}
-                  <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
-                    {c.person?.name}
+        {(directors.length > 0 || writers.length > 0 || (movie.crew || []).some((c) => /music|composer/i.test(c?.job || ''))) && (
+          <section className="py-6">
+            <h2 className="text-lg font-semibold mb-3">Crew</h2>
+            <div className="space-y-2 text-sm text-gray-300">
+              {directors.length > 0 && (
+                <div>
+                  <span className="text-gray-400">Director: </span>
+                  <button className="text-white/90" onClick={() => navigate(`/person/${directors[0].person?.id}`)}>
+                    {directors[0].person?.name}
                   </button>
-                  <div className="text-xs text-gray-400">{c.job}</div>
+                </div>
+              )}
+              {writers.length > 0 && (
+                <div>
+                  <span className="text-gray-400">Writer: </span>
+                  {writers.slice(0, 2).map((w, idx) => (
+                    <button
+                      key={`writer-${w.id || idx}`}
+                      className="text-white/90"
+                      onClick={() => navigate(`/person/${w.person?.id}`)}
+                    >
+                      {w.person?.name}
+                      {idx < Math.min(writers.length, 2) - 1 ? ', ' : ''}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {(movie.crew || []).some((c) => /music|composer/i.test(c?.job || '')) && (
+                <div>
+                  <span className="text-gray-400">Music: </span>
+                  <span className="text-white/90">
+                    {(movie.crew || []).find((c) => /music|composer/i.test(c?.job || ''))?.person?.name}
+                  </span>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        <section className="py-6">
+          <h2 className="text-lg font-semibold mb-3">Ratings & Reviews</h2>
+          <div className="text-sm text-gray-300 mb-3">
+            <span className="text-[#F5C518] font-semibold">User Rating:</span>{' '}
+            {typeof movie.rating === 'number' ? `${movie.rating.toFixed(1)} / 10` : 'NR'}
+          </div>
+          <div className="space-y-3">
+            {reviewItems.length > 0 ? (
+              reviewItems.slice(0, 2).map((review, idx) => (
+                <div key={`review-${idx}`} className="bg-[#1a1a1a] border border-gray-800 rounded-md p-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">{review.username || 'User'}</span>
+                    <span className="text-[#F5C518]">{review.rating || 'NR'}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2 line-clamp-2">{review.text || 'Review unavailable.'}</p>
+                  {review.spoiler && (
+                    <span className="mt-2 inline-block text-xs bg-[#2a2a2a] px-2 py-0.5 rounded-md">Spoiler</span>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="bg-[#1a1a1a] border border-gray-800 rounded-md p-3 text-sm text-gray-400">
+                No reviews yet.
+              </div>
+            )}
+          </div>
+          <button className="mt-3 text-sm text-gray-400 hover:text-white transition">See All Reviews</button>
+        </section>
+
+        {(mediaVideos.length > 0 || mediaPhotos.length > 0) && (
+          <section className="py-6">
+            <h2 className="text-lg font-semibold mb-3">Media</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {mediaVideos.map((url) => (
+                <button
+                  key={url}
+                  className="aspect-video rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800 flex items-center justify-center text-sm"
+                  onClick={() => window.open(url, '_blank')}
+                >
+                  Play Video
+                </button>
+              ))}
+              {mediaPhotos.map((url) => (
+                <div key={url} className="aspect-video rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800">
+                  <img loading="lazy" src={url} alt="Media" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
-            {movie.crew.length > 6 && (
-              <div className="flex justify-center">
+          </section>
+        )}
+
+        <section className="py-6">
+          <h2 className="text-lg font-semibold mb-3">Similar Movies</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {movie.similar_movies?.length ? (
+              movie.similar_movies.slice(0, 6).map((item) => (
                 <button
-                  onClick={() => setShowAllCrew(!showAllCrew)}
-                  className="text-sm text-gray-400 hover:text-white transition"
+                  key={`similar-${item.id}`}
+                  className="text-left"
+                  onClick={() => navigate(`/movie/${item.id}`)}
                 >
-                  {showAllCrew ? 'View Less' : 'View More'}
+                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800">
+                    {typeof item.rating === 'number' && (
+                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
+                        {item.rating.toFixed(1)}
+                      </div>
+                    )}
+                    <img loading="lazy" src={item.poster_url || item.backdrop_url} alt={item.title} className="w-full h-full object-cover" />
+                  </div>
+                  <p className="mt-2 text-sm font-medium truncate">{item.title}</p>
                 </button>
-              </div>
+              ))
+            ) : (
+              <div className="col-span-2 text-sm text-gray-400">No similar movies available.</div>
             )}
-          </section>
-        )}
-
-        {platforms.length > 0 && (
-          <section className="mt-12 space-y-6">
-            <h2 className="text-xl font-semibold">Platforms</h2>
-            <div className="tabs">
-              {platforms.map((platform) => (
-                <button
-                  key={platform.id}
-                  className="tab platform-tab"
-                  onClick={() => navigate(`/platforms/${platform.id}`)}
-                >
-                  {platform.logo_url && (
-                    <img src={platform.logo_url} alt={platform.name} className="platform-logo" />
-                  )}
-                  <span>{platform.name}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music || movie.music_links.amazon_music) && (
-          <section className="mt-12 space-y-6">
-            <h2 className="text-xl font-semibold">Music Platforms</h2>
-            <div className="tabs">
-              {movie.music_links.spotify && (
-                <a className="tab active platform-tab" href={movie.music_links.spotify} target="_blank" rel="noopener noreferrer">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" className="platform-logo" />
-                  <span>Spotify</span>
-                </a>
-              )}
-              {movie.music_links.apple_music && (
-                <a className="tab active platform-tab" href={movie.music_links.apple_music} target="_blank" rel="noopener noreferrer">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/960px-Apple_Music_icon.svg.png" alt="Apple Music" className="platform-logo" />
-                  <span>Apple Music</span>
-                </a>
-              )}
-              {movie.music_links.youtube_music && (
-                <a className="tab active platform-tab" href={movie.music_links.youtube_music} target="_blank" rel="noopener noreferrer">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Youtube_Music_icon.svg" alt="YouTube Music" className="platform-logo" />
-                  <span>YouTube Music</span>
-                </a>
-              )}
-              {movie.music_links.amazon_music && (
-                <a className="tab active platform-tab" href={movie.music_links.amazon_music} target="_blank" rel="noopener noreferrer">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Amazon_Music_logo.svg" alt="Amazon Music" className="platform-logo" />
-                  <span>Amazon Music</span>
-                </a>
-              )}
-            </div>
-          </section>
-        )}
-        </div>
+          </div>
+        </section>
       </div>
     </div>
   );
+
+
 };
 
 export default MovieDetail;

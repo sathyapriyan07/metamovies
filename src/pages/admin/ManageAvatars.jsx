@@ -74,7 +74,7 @@ const ManageAvatars = () => {
           {newAvatarUrl && (
             <div className="mt-4 flex items-center gap-3">
               <span className="text-sm text-gray-400">Preview:</span>
-              <img src={newAvatarUrl} alt="Preview" width={64} height={64} />
+              <img loading="lazy" src={newAvatarUrl} alt="Preview" width={64} height={64} />
             </div>
           )}
         </div>
@@ -88,7 +88,7 @@ const ManageAvatars = () => {
               <div key={avatar.id} className="glass-dark p-4 rounded-xl text-center">
                 <div className="flex justify-center mb-3">
                   {avatar.url ? (
-                    <img src={avatar.url} alt={avatar.name} width={64} height={64} />
+                    <img loading="lazy" src={avatar.url} alt={avatar.name} width={64} height={64} />
                   ) : (
                     <div>{avatar.name}</div>
                   )}

@@ -117,7 +117,7 @@ const ManageUsers = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       {user.avatar_url ? (
-                        <img src={user.avatar_url} alt={user.username || user.auth_user?.email} width={64} height={64} />
+                        <img loading="lazy" src={user.avatar_url} alt={user.username || user.auth_user?.email} width={64} height={64} />
                       ) : (
                         <div>{user.username || user.auth_user?.email}</div>
                       )}
@@ -185,7 +185,7 @@ const ManageUsers = () => {
             <h3 className="text-xl font-bold mb-4">Update Avatar</h3>
             <div className="mb-4 flex justify-center">
               {avatarUrl ? (
-                <img src={avatarUrl} alt={editingUser.username || editingUser.auth_user?.email} width={80} height={80} />
+                <img loading="lazy" src={avatarUrl} alt={editingUser.username || editingUser.auth_user?.email} width={80} height={80} />
               ) : (
                 <div>{editingUser.username || editingUser.auth_user?.email}</div>
               )}

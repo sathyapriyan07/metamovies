@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/Header';
-import MobileBottomNav from './components/MobileBottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
@@ -52,7 +51,6 @@ function AppRoutes() {
       <main className={isHome ? 'p-0' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20'}>
         {children}
       </main>
-      <MobileBottomNav />
     </div>
   );
 

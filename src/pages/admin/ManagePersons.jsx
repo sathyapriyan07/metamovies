@@ -123,7 +123,7 @@ const ManagePersons = () => {
                       selectedPerson?.id === person.id ? 'border-2 border-red-600' : ''
                     }`}
                   >
-                    <img
+                    <img loading="lazy"
                       src={person.profile_url || 'https://via.placeholder.com/50x75'}
                       alt={person.name}
                       className="w-12 h-18 object-cover rounded"
@@ -223,7 +223,7 @@ const ManagePersons = () => {
                   {formData.profile_url && (
                     <div>
                       <label className="block text-sm font-medium mb-2">Preview</label>
-                      <img
+                      <img loading="lazy"
                         src={formData.profile_url}
                         alt="Preview"
                         className="w-32 h-48 object-cover rounded-lg"

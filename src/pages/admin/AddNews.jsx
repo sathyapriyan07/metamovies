@@ -187,7 +187,7 @@ const AddNews = () => {
             {imageUrl && (
               <div className="mt-3">
                 <p className="text-xs text-gray-400 mb-2">Preview:</p>
-                <img
+                <img loading="lazy"
                   src={imageUrl}
                   alt="Preview"
                   className="w-full max-w-md rounded-lg"
@@ -255,7 +255,7 @@ const AddNews = () => {
                       onClick={() => addPerson(person)}
                       className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition text-left"
                     >
-                      <img
+                      <img loading="lazy"
                         src={person.profile_image_url || 'https://via.placeholder.com/40'}
                         alt={person.name}
                         className="w-10 h-10 rounded-full object-cover"
@@ -272,7 +272,7 @@ const AddNews = () => {
               <div className="flex flex-wrap gap-2 mt-3">
                 {linkedPersons.map((person) => (
                   <div key={person.id} className="flex items-center gap-2 px-3 py-2 glass-card rounded-full">
-                    <img
+                    <img loading="lazy"
                       src={person.profile_image_url || 'https://via.placeholder.com/24'}
                       alt={person.name}
                       className="w-6 h-6 rounded-full object-cover"
@@ -350,7 +350,7 @@ const AddNews = () => {
             <div className="glass-card rounded-2xl overflow-hidden">
               {imageUrl && (
                 <div className="aspect-video">
-                  <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+                  <img loading="lazy" src={imageUrl} alt={title} className="w-full h-full object-cover" />
                 </div>
               )}
               <div className="p-6">
@@ -363,7 +363,7 @@ const AddNews = () => {
                     <div className="flex gap-3 overflow-x-auto">
                       {linkedPersons.map((person) => (
                         <div key={person.id} className="text-center">
-                          <img
+                          <img loading="lazy"
                             src={person.profile_image_url || 'https://via.placeholder.com/80'}
                             alt={person.name}
                             className="w-20 h-20 rounded-full object-cover mx-auto mb-2"

@@ -197,7 +197,7 @@ const AddVideo = () => {
             {youtubeId && (
                 <div className="mt-3">
                 <p className="text-xs text-gray-400 mb-2">Preview:</p>
-                <img
+                <img loading="lazy"
                   src={`https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`}
                   alt="Thumbnail"
                   className="w-full max-w-sm rounded-lg"
@@ -269,7 +269,7 @@ const AddVideo = () => {
                       onClick={() => addPerson(person)}
                       className="w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors"
                     >
-                      <img
+                      <img loading="lazy"
                         src={getPersonImage(person)}
                         alt={person.name}
                         className="w-10 h-10 rounded-full object-cover"
@@ -285,7 +285,7 @@ const AddVideo = () => {
               <div className="mt-3 space-y-2">
                 {selectedPersons.map(person => (
                   <div key={person.id} className="flex items-center gap-3 glass-card p-3 rounded-lg">
-                    <img
+                    <img loading="lazy"
                       src={getPersonImage(person)}
                       alt={person.name}
                       className="w-10 h-10 rounded-full object-cover"

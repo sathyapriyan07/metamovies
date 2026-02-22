@@ -56,102 +56,78 @@ const Home = () => {
     if (m === 0) return `${h}h`;
     return `${h}h ${m}m`;
   };
-  const getYouTubeId = (url) => {
-    if (!url) return null;
-    const match = url.match(/(?:youtube\.com.*v=|youtu\.be\/)([^&?/]{11})/i);
-    return match ? match[1] : null;
-  };
-  const isVideoFile = (url) => /\.(mp4|webm|ogg|m3u8)(\?|#|$)/i.test(url || '');
 
   return (
-    <div className="pb-20 bg-black text-white min-h-screen overflow-x-hidden">
-      {hero ? (
-        <section className="relative w-full h-[85vh] overflow-hidden bg-black">
-          {hero.trailer_url ? (
-            (() => {
-              const yt = getYouTubeId(hero.trailer_url);
-              if (yt) {
-                return (
-                  <iframe
-                    className="absolute inset-0 w-full h-full object-cover"
-                    src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&modestbranding=1&rel=0`}
-                    title={`${hero.title} trailer`}
-                    allow="autoplay; encrypted-media; fullscreen"
-                    frameBorder="0"
-                  />
-                );
-              }
-              if (isVideoFile(hero.trailer_url)) {
-                return (
-                  <video className="absolute inset-0 w-full h-full object-cover" src={hero.trailer_url} autoPlay muted loop playsInline />
-                );
-              }
-              return <img className="absolute inset-0 w-full h-full object-cover" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />;
-            })()
-          ) : (
-            <img className="absolute inset-0 w-full h-full object-cover" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />
-          )}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-
-          <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16 max-w-7xl mx-auto">
-            {hero.title_logo_url ? (
-              <img className="max-w-[360px] w-full mb-4" src={hero.title_logo_url} alt={hero.title} />
-            ) : (
-              <h1 className="text-4xl font-bold mb-4">{hero.title}</h1>
-            )}
-            <div className="text-sm text-gray-400 flex flex-wrap items-center gap-2 mt-3">
-              <span>{hero.release_date?.split('-')[0]}</span>
-              {hero.runtime ? (
-                <>
-                  <span className="h-1 w-1 rounded-full bg-gray-400" aria-hidden="true" />
-                  <span>{formatRuntime(hero.runtime)}</span>
-                </>
-              ) : null}
-              {hero.genres?.length ? (
-                <>
-                  <span className="h-1 w-1 rounded-full bg-gray-400" aria-hidden="true" />
-                  <span>{hero.genres.join(' • ')}</span>
-                </>
-              ) : null}
+    <div className="min-h-screen bg-[#0f0f0f] text-white pt-12 pb-10">
+      <div className="px-4">
+        {hero ? (
+          <div className="bg-[#1a1a1a] rounded-md overflow-hidden">
+            <div className="aspect-video">
+              <img
+                src={hero.backdrop_url || hero.poster_url}
+                alt={hero.title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
-            {hero.overview && (
-              <p className="mt-4 max-w-xl text-gray-300">
-                {hero.overview}
-              </p>
-            )}
-            <div className="mt-6 flex gap-4">
-              <button className="bg-white text-black px-6 py-2 rounded-full font-medium">Watch Trailer</button>
-              <button className="bg-white/20 backdrop-blur-md px-6 py-2 rounded-full" onClick={() => navigate(`/movie/${hero.id}`)}>Details</button>
+            <div className="p-4">
+              <h1 className="text-2xl font-bold">{hero.title}</h1>
+              <div className="text-sm text-gray-400 mt-3 flex flex-wrap items-center gap-2">
+                <span>{hero.release_date?.split('-')[0]}</span>
+                {hero.runtime ? (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-gray-500" aria-hidden="true" />
+                    <span>{formatRuntime(hero.runtime)}</span>
+                  </>
+                ) : null}
+                {hero.genres?.length ? (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-gray-500" aria-hidden="true" />
+                    <span>{hero.genres.join(' • ')}</span>
+                  </>
+                ) : null}
+              </div>
+              {hero.overview && (
+                <p className="text-gray-300 mt-4 max-w-xl text-sm">
+                  {hero.overview}
+                </p>
+              )}
+              <div className="flex gap-3 mt-4">
+                <button className="bg-[#F5C518] text-black px-4 py-2 rounded-md text-sm font-medium">
+                  Watch Trailer
+                </button>
+                <button className="bg-[#1a1a1a] text-white px-4 py-2 rounded-md text-sm border border-white/10">
+                  + Watchlist
+                </button>
+              </div>
             </div>
           </div>
-        </section>
-      ) : (
-        <section className="relative w-full h-[85vh] overflow-hidden bg-black">
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-          <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16">
-            <h1 className="text-3xl sm:text-5xl font-semibold mb-3">Hero Banner Coming Soon</h1>
-            <p className="text-sm sm:text-base text-gray-400 max-w-xl">
-              Add a movie in the Hero Banner admin page to feature it here.
-            </p>
+        ) : (
+          <div className="bg-[#1a1a1a] rounded-md p-4">
+            <h1 className="text-2xl font-bold">Featured Title</h1>
+            <p className="text-sm text-gray-400 mt-2">Add a Hero Banner in admin to show it here.</p>
           </div>
-        </section>
-      )}
+        )}
+      </div>
 
-      <div className="max-w-7xl mx-auto px-6 mt-8">
-        <section className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Streaming Now</h2>
+      <div className="max-w-7xl mx-auto px-4">
+        <section className="py-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold">Streaming Now</h2>
+            <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
+          </div>
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {trendingMovies.map((movie) => (
-                <div
-                  key={movie.id}
-                  className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
-                  onClick={() => navigate(`/movie/${movie.id}`)}
-                >
-                  <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
+            <div className="grid grid-cols-2 gap-3">
+              {trendingMovies.slice(0, 6).map((movie) => (
+                <div key={movie.id} className="cursor-pointer" onClick={() => navigate(`/movie/${movie.id}`)}>
+                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                    {typeof movie.rating === 'number' && (
+                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
+                        {movie.rating.toFixed(1)}
+                      </div>
+                    )}
                     <img
                       src={movie.poster_url || movie.backdrop_url}
                       alt={movie.title}
@@ -159,7 +135,7 @@ const Home = () => {
                       loading="lazy"
                     />
                   </div>
-                  <p className="mt-3 text-sm font-medium truncate">{movie.title}</p>
+                  <p className="mt-2 text-sm font-medium truncate">{movie.title}</p>
                   <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
                 </div>
               ))}
@@ -167,17 +143,21 @@ const Home = () => {
           )}
         </section>
 
-        {collections.map((collection) => (
-          <section key={collection.id} className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">{collection.name}</h2>
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {collection.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
-                  onClick={() => navigate(`/movie/${item.id}`)}
-                >
-                  <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
+        {collections.map((collection, idx) => (
+          <section key={collection.id} className="py-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold">{collection.name || ['Popular Movies','Top Rated','Upcoming'][idx] || 'Collection'}</h2>
+              <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {collection.items.slice(0, 6).map((item) => (
+                <div key={item.id} className="cursor-pointer" onClick={() => navigate(`/movie/${item.id}`)}>
+                  <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                    {typeof item.rating === 'number' && (
+                      <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
+                        {item.rating.toFixed(1)}
+                      </div>
+                    )}
                     <img
                       src={item.poster_url || item.backdrop_url}
                       alt={item.title || item.name}
@@ -185,7 +165,7 @@ const Home = () => {
                       loading="lazy"
                     />
                   </div>
-                  <p className="mt-3 text-sm font-medium truncate">{item.title || item.name}</p>
+                  <p className="mt-2 text-sm font-medium truncate">{item.title || item.name}</p>
                   <p className="text-xs text-gray-400">{item.release_date?.split('-')[0]}</p>
                 </div>
               ))}
@@ -195,6 +175,7 @@ const Home = () => {
       </div>
     </div>
   );
+
 };
 
 export default Home;

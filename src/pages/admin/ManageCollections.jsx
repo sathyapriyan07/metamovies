@@ -153,7 +153,7 @@ const ManageCollections = () => {
                     const content = item.movie;
                     return (
                       <div key={item.id} className="glass-dark p-3 rounded-lg flex gap-3">
-                        <img
+                        <img loading="lazy"
                           src={content.poster_url || 'https://via.placeholder.com/50x75'}
                           alt={content.title}
                           className="w-12 h-18 object-cover rounded"
