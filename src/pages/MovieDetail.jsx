@@ -13,6 +13,8 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
+  const [showAllCast, setShowAllCast] = useState(false);
+  const [showAllCrew, setShowAllCrew] = useState(false);
 
   useEffect(() => {
     loadMovie();
@@ -77,10 +79,12 @@ const MovieDetail = () => {
       role: c.job,
     })),
   ];
+  const visibleCast = showAllCast ? (movie.cast || []) : (movie.cast || []).slice(0, 6);
+  const visibleCrew = showAllCrew ? (movie.crew || []) : (movie.crew || []).slice(0, 6);
 
   return (
     <div>
-      <section className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] h-[85vh] overflow-hidden">
+      <section className="relative w-full h-[85vh] overflow-hidden">
         {movie.trailer_url ? (
           (() => {
             const yt = getYouTubeId(movie.trailer_url);
@@ -173,7 +177,8 @@ const MovieDetail = () => {
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-6 mt-10">
+      <div className="w-full">
+        <div className="max-w-7xl mx-auto px-6 py-10">
         {(directors.length > 0 || writers.length > 0) && (
           <section className="space-y-6">
             {directors.length > 0 && (
@@ -205,7 +210,7 @@ const MovieDetail = () => {
           <section className="mt-12 space-y-6">
             <h2 className="text-xl font-semibold">Cast</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
-              {movie.cast.slice(0, 15).map((c) => (
+              {visibleCast.map((c) => (
                 <div key={`cast-${c.id}`} className="flex flex-col items-center text-center space-y-2">
                   {c.person?.profile_url ? (
                     <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
@@ -221,6 +226,16 @@ const MovieDetail = () => {
                 </div>
               ))}
             </div>
+            {movie.cast.length > 6 && (
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowAllCast(!showAllCast)}
+                  className="text-sm text-gray-400 hover:text-white transition"
+                >
+                  {showAllCast ? 'View Less' : 'View More'}
+                </button>
+              </div>
+            )}
           </section>
         )}
 
@@ -228,7 +243,7 @@ const MovieDetail = () => {
           <section className="mt-12 space-y-6">
             <h2 className="text-xl font-semibold">Crew</h2>
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
-              {movie.crew.slice(0, 15).map((c) => (
+              {visibleCrew.map((c) => (
                 <div key={`crew-${c.id}`} className="flex flex-col items-center text-center space-y-2">
                   {c.person?.profile_url ? (
                     <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
@@ -244,6 +259,16 @@ const MovieDetail = () => {
                 </div>
               ))}
             </div>
+            {movie.crew.length > 6 && (
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowAllCrew(!showAllCrew)}
+                  className="text-sm text-gray-400 hover:text-white transition"
+                >
+                  {showAllCrew ? 'View Less' : 'View More'}
+                </button>
+              </div>
+            )}
           </section>
         )}
 
@@ -298,6 +323,7 @@ const MovieDetail = () => {
             </div>
           </section>
         )}
+        </div>
       </div>
     </div>
   );
