@@ -79,8 +79,8 @@ const MovieDetail = () => {
   ];
 
   return (
-    <div>
-      <section className="relative h-[70vh] w-full overflow-hidden bg-black">
+    <div className="px-6 max-w-7xl mx-auto">
+      <section className="relative w-full h-[85vh] overflow-hidden">
         {movie.trailer_url ? (
           (() => {
             const yt = getYouTubeId(movie.trailer_url);
@@ -108,8 +108,8 @@ const MovieDetail = () => {
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
 
-        <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6">
+        <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16 max-w-7xl mx-auto">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:gap-6">
             {movie.poster_url && (
               <div className="shrink-0">
                 <img
@@ -119,13 +119,13 @@ const MovieDetail = () => {
                 />
               </div>
             )}
-            <div className="flex flex-col gap-3 max-w-2xl">
+            <div className="flex flex-col space-y-4 max-w-2xl">
               {movie.title_logo_url ? (
-                <img className="max-w-[240px] w-full" src={movie.title_logo_url} alt={movie.title} />
+                <img className="w-48 sm:w-64 md:w-72 object-contain" src={movie.title_logo_url} alt={movie.title} />
               ) : (
-                <h1 className="text-2xl sm:text-3xl font-semibold">{movie.title}</h1>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">{movie.title}</h1>
               )}
-              <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2">
+              <div className="text-sm text-gray-400 flex flex-wrap items-center gap-2">
                 <span>{year}</span>
                 {runtime ? (
                   <>
@@ -142,8 +142,8 @@ const MovieDetail = () => {
               </div>
 
               {movie.overview && (
-                <div className="text-sm text-gray-300 leading-relaxed">
-                  <p>
+                <div className="text-base text-gray-300 leading-relaxed">
+                  <p className="text-base text-gray-300 leading-relaxed">
                     {showFullOverview ? movie.overview : movie.overview.slice(0, 300)}
                     {movie.overview.length > 300 && !showFullOverview ? '...' : ''}
                   </p>
@@ -158,7 +158,7 @@ const MovieDetail = () => {
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-3">
+              <div className="mt-6 flex gap-4">
                 {movie.trailer_url && (
                   <button className="px-4 py-2 rounded-full bg-white text-black text-sm font-medium" onClick={() => window.open(movie.trailer_url, '_blank')}>
                     Watch Trailer
@@ -174,37 +174,49 @@ const MovieDetail = () => {
       </section>
 
       {(directors.length > 0 || writers.length > 0) && (
-        <section className="section credit-block">
+        <section className="mt-10 space-y-6">
           {directors.length > 0 && (
-            <div style={{ marginBottom: 12 }}>
-              <div className="credit-name">{directors[0].person?.name}</div>
-              <div className="credit-role">Director</div>
+            <div>
+              <p
+                className="text-base font-medium cursor-pointer hover:text-white transition"
+                onClick={() => navigate(`/person/${directors[0].person?.id}`)}
+              >
+                {directors[0].person?.name}
+              </p>
+              <div className="text-sm text-gray-400">Director</div>
             </div>
           )}
           {writers.length > 0 && (
             <div>
-              <div className="credit-name">{writers[0].person?.name}</div>
-              <div className="credit-role">Writer</div>
+              <p
+                className="text-base font-medium cursor-pointer hover:text-white transition"
+                onClick={() => navigate(`/person/${writers[0].person?.id}`)}
+              >
+                {writers[0].person?.name}
+              </p>
+              <div className="text-sm text-gray-400">Writer</div>
             </div>
           )}
         </section>
       )}
 
       {movie.cast?.length > 0 && (
-        <section className="section">
-          <h2 className="section-title">Cast</h2>
-          <div className="cast-row">
+        <section className="mt-12 space-y-6">
+          <h2 className="text-xl font-semibold">Cast</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
             {movie.cast.slice(0, 15).map((c) => (
-              <div key={`cast-${c.id}`} className="cast-card">
+              <div key={`cast-${c.id}`} className="flex flex-col items-center text-center space-y-2">
                 {c.person?.profile_url ? (
-                  <img src={c.person.profile_url} alt={c.person.name} className="cast-image" />
+                  <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
                 ) : (
-                  <div className="cast-image cast-avatar-fallback">{c.person?.name?.[0] || '?'}</div>
+                  <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
+                    {c.person?.name?.[0] || '?'}
+                  </div>
                 )}
-                <button onClick={() => navigate(`/person/${c.person.id}`)} className="cast-name">
+                <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
                   {c.person?.name}
                 </button>
-                <div className="cast-role">{c.character}</div>
+                <div className="text-xs text-gray-400">{c.character}</div>
               </div>
             ))}
           </div>
@@ -212,20 +224,22 @@ const MovieDetail = () => {
       )}
 
       {movie.crew?.length > 0 && (
-        <section className="section">
-          <h2 className="section-title">Crew</h2>
-          <div className="cast-row">
+        <section className="mt-12 space-y-6">
+          <h2 className="text-xl font-semibold">Crew</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
             {movie.crew.slice(0, 15).map((c) => (
-              <div key={`crew-${c.id}`} className="cast-card">
+              <div key={`crew-${c.id}`} className="flex flex-col items-center text-center space-y-2">
                 {c.person?.profile_url ? (
-                  <img src={c.person.profile_url} alt={c.person.name} className="cast-image" />
+                  <img src={c.person.profile_url} alt={c.person.name} className="w-20 h-20 rounded-xl object-cover" />
                 ) : (
-                  <div className="cast-image cast-avatar-fallback">{c.person?.name?.[0] || '?'}</div>
+                  <div className="w-20 h-20 rounded-xl bg-white/10 flex items-center justify-center">
+                    {c.person?.name?.[0] || '?'}
+                  </div>
                 )}
-                <button onClick={() => navigate(`/person/${c.person.id}`)} className="cast-name">
+                <button onClick={() => navigate(`/person/${c.person.id}`)} className="text-sm font-medium">
                   {c.person?.name}
                 </button>
-                <div className="cast-role">{c.job}</div>
+                <div className="text-xs text-gray-400">{c.job}</div>
               </div>
             ))}
           </div>
@@ -233,8 +247,8 @@ const MovieDetail = () => {
       )}
 
       {platforms.length > 0 && (
-        <section className="section">
-          <h2 className="section-title">Platforms</h2>
+        <section className="mt-12 space-y-6">
+          <h2 className="text-xl font-semibold">Platforms</h2>
           <div className="tabs">
             {platforms.map((platform) => (
               <button
@@ -253,8 +267,8 @@ const MovieDetail = () => {
       )}
 
       {movie.music_links && (movie.music_links.spotify || movie.music_links.apple_music || movie.music_links.youtube_music || movie.music_links.amazon_music) && (
-        <section className="section">
-          <h2 className="section-title">Music Platforms</h2>
+        <section className="mt-12 space-y-6">
+          <h2 className="text-xl font-semibold">Music Platforms</h2>
           <div className="tabs">
             {movie.music_links.spotify && (
               <a className="tab active platform-tab" href={movie.music_links.spotify} target="_blank" rel="noopener noreferrer">
@@ -288,4 +302,3 @@ const MovieDetail = () => {
 };
 
 export default MovieDetail;
-
