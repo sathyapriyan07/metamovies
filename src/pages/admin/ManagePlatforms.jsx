@@ -184,7 +184,7 @@ const ManagePlatforms = () => {
                     <span className="text-xs text-gray-400">No logo</span>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1">
                   <p className="font-medium truncate">{platform.name}</p>
                   <p className="text-xs text-gray-400 capitalize">{platform.type}</p>
                 </div>

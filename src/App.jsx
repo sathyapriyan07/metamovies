@@ -46,9 +46,11 @@ function AppRoutes() {
   const location = useLocation();
 
   const Layout = ({ children }) => (
-    <div className="app">
+    <div className="min-h-screen overflow-x-hidden bg-black text-white">
       <Header />
-      <main className="container page-pad">{children}</main>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+        {children}
+      </main>
       <MobileBottomNav />
     </div>
   );

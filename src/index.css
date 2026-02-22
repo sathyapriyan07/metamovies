@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --bg: #000000;
   --bg-deep: #000000;
@@ -108,7 +112,6 @@ p {
 
 @media (min-width: 1280px) {
   .container {
-    max-width: 1400px;
     padding: 48px 64px;
   }
 }
@@ -135,15 +138,10 @@ p {
   justify-content: space-between;
 }
 
-.header-inner > * {
-  min-width: 0;
-}
-
 .header-left {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-width: 0;
   background: transparent;
   border: 0;
   color: var(--text);
@@ -182,7 +180,6 @@ p {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   max-width: 500px;
-  min-width: 0;
 }
 
 .search-input:focus {
@@ -192,7 +189,6 @@ p {
 
 .header-search {
   flex: 1;
-  min-width: 0;
   display: flex;
   justify-content: center;
 }
@@ -218,10 +214,6 @@ p {
     padding: 6px 8px;
     font-size: 12px;
   }
-}
-
-main {
-  padding-bottom: 90px;
 }
 
 .section {
@@ -466,7 +458,6 @@ main {
 .admin-actions .btn-primary,
 .admin-actions .btn-secondary,
 .admin-actions .btn-ghost {
-  min-width: 140px;
 }
 
 .btn-primary {

@@ -77,14 +77,13 @@ const Search = () => {
   return (
     <div>
       <h1>Search</h1>
-      <input
-        type="text"
-        value={query}
-        onChange={handleInputChange}
-        placeholder="Search movies and people"
-        className="search-input"
-        style={{ marginTop: 12, marginBottom: 12, width: '100%' }}
-      />
+          <input
+            type="text"
+            value={query}
+            onChange={handleInputChange}
+            placeholder="Search movies and people"
+            className="mt-3 mb-3 w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder:text-gray-400 focus:outline-none focus:border-white/30"
+          />
       {query && suggestions.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <p>Suggestions</p>
@@ -105,7 +104,7 @@ const Search = () => {
           <section className="section">
             <h2 className="section-title">Trending</h2>
             {homeLoading ? <p>Loading...</p> : (
-              <div className="grid">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {trendingMovies.map((movie) => (
                   <PosterCard key={movie.id} item={movie} type="movie" />
                 ))}
@@ -115,7 +114,7 @@ const Search = () => {
           <section className="section">
             <h2 className="section-title">Popular Movies</h2>
             {homeLoading ? <p>Loading...</p> : (
-              <div className="grid">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {popularMovies.map((movie) => (
                   <PosterCard key={movie.id} item={movie} type="movie" />
                 ))}
@@ -132,7 +131,7 @@ const Search = () => {
               {results.movies.length > 0 && (
                 <section className="section">
                   <h2 className="section-title">Movies</h2>
-                  <div className="grid">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     {results.movies.map((movie) => (
                       <PosterCard key={movie.id} item={movie} type="movie" />
                     ))}

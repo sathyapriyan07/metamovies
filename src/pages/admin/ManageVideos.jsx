@@ -101,7 +101,7 @@ const ManageVideos = () => {
                     className="w-24 h-16 object-cover rounded-md shadow-md flex-shrink-0"
                     loading="lazy"
                   />
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1">
                     <h3 className="text-base font-semibold truncate">{video.title}</h3>
                     <p className="text-xs text-gray-400 line-clamp-1">{video.description}</p>
                   </div>

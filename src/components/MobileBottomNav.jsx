@@ -13,12 +13,18 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <nav className="mobile-nav">
-      {items.map((item) => (
-        <Link key={item.to} to={item.to} style={{ color: isActive(item.to) ? '#ffffff' : '#9ca3af' }}>
-          {item.label}
-        </Link>
-      ))}
+    <nav className="fixed bottom-0 left-0 right-0 w-full bg-black/95 border-t border-white/10 lg:hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between text-sm">
+        {items.map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={`transition ${isActive(item.to) ? 'text-white' : 'text-gray-400'}`}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
     </nav>
   );
 };

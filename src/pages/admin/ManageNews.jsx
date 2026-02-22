@@ -108,7 +108,7 @@ const ManageNews = () => {
                       loading="lazy"
                     />
                   )}
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1">
                     <h3 className="text-base font-semibold truncate">{article.title}</h3>
                     <p className="text-xs text-gray-400">{formatDate(article.created_at)}</p>
                     <p className="text-xs text-gray-400 line-clamp-1 mt-1">{article.excerpt}</p>

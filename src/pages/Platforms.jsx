@@ -24,11 +24,15 @@ const Platforms = () => {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="platform-grid" style={{ marginTop: 16 }}>
+        <div className="mt-4 grid grid-cols-2 gap-4">
           {platforms.map((platform) => (
-            <button key={platform.id} onClick={() => navigate(`/platforms/${platform.id}`)} className="button">
+            <button
+              key={platform.id}
+              onClick={() => navigate(`/platforms/${platform.id}`)}
+              className="aspect-[3/2] rounded-xl border border-white/10 bg-white/5 p-4 flex items-center justify-center hover:bg-white/10 transition"
+            >
               {platform.logo_url ? (
-                <img src={platform.logo_url} alt={platform.name} style={{ maxHeight: 48 }} />
+                <img src={platform.logo_url} alt={platform.name} className="max-h-12 object-contain" />
               ) : (
                 platform.name
               )}

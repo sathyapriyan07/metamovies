@@ -80,14 +80,14 @@ const MovieDetail = () => {
 
   return (
     <div>
-      <section className="detail-hero">
+      <section className="relative h-[70vh] w-full overflow-hidden bg-black">
         {movie.trailer_url ? (
           (() => {
             const yt = getYouTubeId(movie.trailer_url);
             if (yt) {
               return (
                 <iframe
-                  className="detail-hero-media"
+                  className="absolute inset-0 h-full w-full object-cover"
                   src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&modestbranding=1&rel=0`}
                   title={`${movie.title} trailer`}
                   allow="autoplay; encrypted-media; fullscreen"
@@ -97,78 +97,77 @@ const MovieDetail = () => {
             }
             if (isVideoFile(movie.trailer_url)) {
               return (
-                <video className="detail-hero-media" src={movie.trailer_url} autoPlay muted loop playsInline />
+                <video className="absolute inset-0 h-full w-full object-cover" src={movie.trailer_url} autoPlay muted loop playsInline />
               );
             }
-            return <img className="detail-hero-media" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />;
+            return <img className="absolute inset-0 h-full w-full object-cover" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />;
           })()
         ) : (
-          <img className="detail-hero-media" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />
+          <img className="absolute inset-0 h-full w-full object-cover" src={movie.backdrop_url || movie.poster_url} alt={movie.title} />
         )}
 
-        <div className="detail-content">
-          <div className="detail-poster-col">
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+
+        <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6">
             {movie.poster_url && (
-              <div className="detail-poster-wrapper">
-                <img src={movie.poster_url} alt={movie.title} className="detail-poster" />
+              <div className="shrink-0">
+                <img
+                  src={movie.poster_url}
+                  alt={movie.title}
+                  className="w-28 sm:w-36 md:w-48 aspect-[2/3] rounded-xl object-cover shadow-2xl"
+                />
               </div>
             )}
-          </div>
-          <div className="detail-info">
-            <div className="detail-title-wrapper">
+            <div className="flex flex-col gap-3 max-w-2xl">
               {movie.title_logo_url ? (
-                <img className="detail-title-logo" src={movie.title_logo_url} alt={movie.title} />
+                <img className="max-w-[240px] w-full" src={movie.title_logo_url} alt={movie.title} />
               ) : (
-                <h1 className="detail-title">{movie.title}</h1>
+                <h1 className="text-2xl sm:text-3xl font-semibold">{movie.title}</h1>
               )}
-            </div>
-            <div className="detail-meta">
-              {year}
-              {runtime ? (
-                <>
-                  <span className="meta-sep" aria-hidden="true">
-                    <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
-                      <circle cx="3" cy="3" r="3" />
-                    </svg>
-                  </span>
-                  {runtime}
-                </>
-              ) : null}
-              {movie.genres?.length > 0 ? (
-                <>
-                  <span className="meta-sep" aria-hidden="true">
-                    <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor">
-                      <circle cx="3" cy="3" r="3" />
-                    </svg>
-                  </span>
-                  {movie.genres.join(' � ')}
-                </>
-              ) : null}
-            </div>
+              <div className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2">
+                <span>{year}</span>
+                {runtime ? (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-gray-400" aria-hidden="true" />
+                    <span>{runtime}</span>
+                  </>
+                ) : null}
+                {movie.genres?.length > 0 ? (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-gray-400" aria-hidden="true" />
+                    <span>{movie.genres.join(' • ')}</span>
+                  </>
+                ) : null}
+              </div>
 
-            {movie.overview && (
-              <div className="detail-overview">
-                <p>
-                  {showFullOverview ? movie.overview : movie.overview.slice(0, 300)}
-                  {movie.overview.length > 300 && !showFullOverview ? '...' : ''}
-                </p>
-                {movie.overview.length > 300 && (
-                  <button className="btn-secondary" onClick={() => setShowFullOverview(!showFullOverview)}>
-                    {showFullOverview ? 'Less' : 'More'}
+              {movie.overview && (
+                <div className="text-sm text-gray-300 leading-relaxed">
+                  <p>
+                    {showFullOverview ? movie.overview : movie.overview.slice(0, 300)}
+                    {movie.overview.length > 300 && !showFullOverview ? '...' : ''}
+                  </p>
+                  {movie.overview.length > 300 && (
+                    <button
+                      className="mt-2 text-xs text-white/80 hover:text-white transition"
+                      onClick={() => setShowFullOverview(!showFullOverview)}
+                    >
+                      {showFullOverview ? 'Less' : 'More'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-3">
+                {movie.trailer_url && (
+                  <button className="px-4 py-2 rounded-full bg-white text-black text-sm font-medium" onClick={() => window.open(movie.trailer_url, '_blank')}>
+                    Watch Trailer
                   </button>
                 )}
-              </div>
-            )}
-
-            <div className="detail-actions">
-              {movie.trailer_url && (
-                <button className="btn-primary" onClick={() => window.open(movie.trailer_url, '_blank')}>
-                  Watch Trailer
+                <button className="px-4 py-2 rounded-full bg-white/15 text-white text-sm font-medium" onClick={toggleWatchlist}>
+                  {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
                 </button>
-              )}
-              <button className="btn-secondary watchlist-btn" onClick={toggleWatchlist}>
-                {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -288,4 +287,5 @@ const MovieDetail = () => {
   );
 };
 
-export default MovieDetail;
+export default MovieDetail;
+

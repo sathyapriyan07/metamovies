@@ -131,7 +131,7 @@ const Home = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="poster-row">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {trendingMovies.map((movie) => (
               <PosterCard key={movie.id} item={movie} type="movie" />
             ))}
@@ -142,7 +142,7 @@ const Home = () => {
       {collections.map((collection) => (
         <section key={collection.id} className="section">
           <h2 className="section-title">{collection.name}</h2>
-          <div className="poster-row">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {collection.items.map((item) => (
               <PosterCard key={item.id} item={item} type={item.type || 'movie'} />
             ))}

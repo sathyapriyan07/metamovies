@@ -550,7 +550,7 @@ const ManageMovies = () => {
                     className="w-14 h-20 object-cover rounded-md shadow-md flex-shrink-0"
                     loading="lazy"
                   />
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1">
                     <h3 className="text-base font-semibold truncate">{movie.title}</h3>
                     <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
                     <p className="text-xs text-gray-400 line-clamp-2 mt-1">{movie.overview}</p>
