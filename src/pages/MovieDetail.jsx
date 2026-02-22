@@ -19,6 +19,13 @@ const MovieDetail = () => {
     loadMovie();
   }, [id]);
 
+  useEffect(() => {
+    if (!movie) return;
+    console.log('MOVIE DATA:', movie);
+    console.log('LOGO URL:', movie.logo_url);
+    console.log('FORCE TEXT:', movie.force_text_title);
+  }, [movie]);
+
   const loadMovie = async () => {
     setLoading(true);
     const { data } = await getMovieById(id);
@@ -86,6 +93,10 @@ const MovieDetail = () => {
   const reviewItems = Array.isArray(movie.reviews) ? movie.reviews : [];
   const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
   const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
+  const shouldShowLogo =
+    movie?.logo_url &&
+    movie.logo_url.trim() !== '' &&
+    !movie.force_text_title;
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
@@ -123,13 +134,14 @@ const MovieDetail = () => {
                 />
               )}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center min-h-[40px]">
-                  {movie.logo_url && movie.logo_url.trim() !== '' ? (
+                <div className="flex items-center min-h-[48px]">
+                  {shouldShowLogo ? (
                     <img
                       src={movie.logo_url}
                       alt={movie.title}
-                      className="max-h-10 w-auto object-contain"
+                      className="max-h-12 w-auto object-contain"
                       onError={(e) => {
+                        console.error('Logo failed to load');
                         e.currentTarget.style.display = 'none';
                       }}
                     />
