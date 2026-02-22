@@ -64,7 +64,7 @@ const Home = () => {
   const isVideoFile = (url) => /\.(mp4|webm|ogg|m3u8)(\?|#|$)/i.test(url || '');
 
   return (
-    <div className="pt-14 pb-20 bg-black text-white min-h-screen overflow-x-hidden">
+    <div className="pb-20 bg-black text-white min-h-screen overflow-x-hidden">
       {hero ? (
         <section className="relative w-full h-[85vh] overflow-hidden bg-black">
           {hero.trailer_url ? (
@@ -138,59 +138,61 @@ const Home = () => {
         </section>
       )}
 
-      <section className="max-w-7xl mx-auto px-6 mt-8">
-        <h2 className="text-xl font-semibold mb-4">Streaming Now</h2>
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {trendingMovies.map((movie) => (
-              <div
-                key={movie.id}
-                className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
-                onClick={() => navigate(`/movie/${movie.id}`)}
-              >
-                <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
-                  <img
-                    src={movie.poster_url || movie.backdrop_url}
-                    alt={movie.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
+      <div className="max-w-7xl mx-auto px-6 pt-16">
+        <section className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Streaming Now</h2>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {trendingMovies.map((movie) => (
+                <div
+                  key={movie.id}
+                  className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
+                  onClick={() => navigate(`/movie/${movie.id}`)}
+                >
+                  <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
+                    <img
+                      src={movie.poster_url || movie.backdrop_url}
+                      alt={movie.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="mt-3 text-sm font-medium truncate">{movie.title}</p>
+                  <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
                 </div>
-                <p className="mt-3 text-sm font-medium truncate">{movie.title}</p>
-                <p className="text-xs text-gray-400">{movie.release_date?.split('-')[0]}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {collections.map((collection) => (
-        <section key={collection.id} className="max-w-7xl mx-auto px-6 mt-8">
-          <h2 className="text-xl font-semibold mb-4">{collection.name}</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {collection.items.map((item) => (
-              <div
-                key={item.id}
-                className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
-                onClick={() => navigate(`/movie/${item.id}`)}
-              >
-                <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
-                  <img
-                    src={item.poster_url || item.backdrop_url}
-                    alt={item.title || item.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <p className="mt-3 text-sm font-medium truncate">{item.title || item.name}</p>
-                <p className="text-xs text-gray-400">{item.release_date?.split('-')[0]}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
-      ))}
+
+        {collections.map((collection) => (
+          <section key={collection.id} className="mt-8">
+            <h2 className="text-xl font-semibold mb-4">{collection.name}</h2>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {collection.items.map((item) => (
+                <div
+                  key={item.id}
+                  className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
+                  onClick={() => navigate(`/movie/${item.id}`)}
+                >
+                  <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
+                    <img
+                      src={item.poster_url || item.backdrop_url}
+                      alt={item.title || item.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="mt-3 text-sm font-medium truncate">{item.title || item.name}</p>
+                  <p className="text-xs text-gray-400">{item.release_date?.split('-')[0]}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   );
 };
