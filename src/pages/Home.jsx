@@ -143,11 +143,11 @@ const Home = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {trendingMovies.map((movie) => (
               <div
                 key={movie.id}
-                className="min-w-[180px] sm:min-w-[200px] cursor-pointer"
+                className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
                 onClick={() => navigate(`/movie/${movie.id}`)}
               >
                 <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
@@ -169,11 +169,11 @@ const Home = () => {
       {collections.map((collection) => (
         <section key={collection.id} className="max-w-7xl mx-auto px-6 mt-8">
           <h2 className="text-xl font-semibold mb-4">{collection.name}</h2>
-          <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
             {collection.items.map((item) => (
               <div
                 key={item.id}
-                className="min-w-[180px] sm:min-w-[200px] cursor-pointer"
+                className="min-w-[120px] sm:min-w-[160px] cursor-pointer"
                 onClick={() => navigate(`/movie/${item.id}`)}
               >
                 <div className="aspect-[2/3] rounded-2xl overflow-hidden bg-white/5">
