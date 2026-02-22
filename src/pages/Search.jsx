@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { searchAll, getTrendingMovies, getMovies } from '../services/supabase';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PosterCard from '../components/PosterCard';
@@ -12,6 +12,7 @@ const Search = () => {
   const [popularMovies, setPopularMovies] = useState([]);
   const [homeLoading, setHomeLoading] = useState(true);
   const navigate = useNavigate();
+  const debounceRef = useRef(null);
 
   useEffect(() => {
     loadHomeContent();
@@ -50,11 +51,15 @@ const Search = () => {
     const value = e.target.value;
     setQuery(value);
 
-    const timeoutId = setTimeout(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
       handleSearch(value);
     }, 300);
+  };
 
-    return (
+  return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
       <div className="max-w-7xl mx-auto px-4 pt-12 pb-10">
         <div className="sticky top-[50px] z-10 bg-[#0f0f0f] pb-3">
