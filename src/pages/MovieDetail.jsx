@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMovieById } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,10 @@ const MovieDetail = () => {
   const [loading, setLoading] = useState(true);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const playerRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     loadMovie();
@@ -72,33 +76,145 @@ const MovieDetail = () => {
   };
   const trailerId = getYouTubeId(movie.trailer_url);
 
+  const bullet = '\u2022';
   const metaLine = [
     year,
     runtime,
-    movie.genres?.length ? movie.genres.join(' • ') : null
+    movie.genres?.length ? movie.genres.join(` ${bullet} `) : null
   ]
     .filter(Boolean)
-    .join(' • ');
+    .join(` ${bullet} `);
 
   const reviewItems = Array.isArray(movie.reviews) ? movie.reviews : [];
   const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
   const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
+
+  useEffect(() => {
+    if (!trailerId) return;
+
+    const initPlayer = () => {
+      if (!window.YT || !window.YT.Player) return;
+      if (playerRef.current?.destroy) {
+        playerRef.current.destroy();
+      }
+      playerRef.current = new window.YT.Player('yt-player', {
+        videoId: trailerId,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          playsinline: 1,
+          loop: 1,
+          playlist: trailerId,
+        },
+        events: {
+          onReady: (event) => {
+            event.target.mute();
+            event.target.playVideo();
+            setIsPlaying(true);
+            setIsMuted(true);
+          },
+        },
+      });
+    };
+
+    if (window.YT && window.YT.Player) {
+      initPlayer();
+      return () => {
+        if (playerRef.current?.destroy) {
+          playerRef.current.destroy();
+          playerRef.current = null;
+        }
+      };
+    }
+
+    window.onYouTubeIframeAPIReady = initPlayer;
+    if (!document.getElementById('yt-iframe-api')) {
+      const tag = document.createElement('script');
+      tag.id = 'yt-iframe-api';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.body.appendChild(tag);
+    }
+
+    return () => {
+      if (playerRef.current?.destroy) {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+    };
+  }, [trailerId]);
+
+  useEffect(() => {
+    if (!trailerId) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!playerRef.current) return;
+        if (!entry.isIntersecting) {
+          playerRef.current.pauseVideo();
+          setIsPlaying(false);
+        }
+      },
+      { threshold: 0.4 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [trailerId]);
+
+  const togglePlay = () => {
+    if (!playerRef.current) return;
+    if (isPlaying) {
+      playerRef.current.pauseVideo();
+      setIsPlaying(false);
+    } else {
+      playerRef.current.playVideo();
+      setIsPlaying(true);
+    }
+  };
+
+  const toggleMute = () => {
+    if (!playerRef.current) return;
+    if (isMuted) {
+      playerRef.current.unMute();
+      setIsMuted(false);
+    } else {
+      playerRef.current.mute();
+      setIsMuted(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
       <div className="max-w-2xl mx-auto px-4 pb-10">
         <div className="px-4 pt-4">
           {trailerId ? (
-            <div className="relative w-full h-[200px] rounded-md overflow-hidden">
-              <iframe
+            <div ref={containerRef} className="relative w-full h-[200px] rounded-md overflow-hidden">
+              <div
+                id="yt-player"
                 className="absolute top-0 left-0 w-[130%] h-[130%] -translate-x-[15%] -translate-y-[15%]"
-                src={`https://www.youtube.com/embed/${trailerId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&playsinline=1&loop=1&playlist=${trailerId}`}
-                title="Trailer"
-                frameBorder="0"
-                allow="autoplay; encrypted-media"
-                allowFullScreen
               />
               <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute bottom-3 right-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  className="w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center"
+                >
+                  {isPlaying ? '||' : '>'}
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  className="w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm text-white flex items-center justify-center"
+                >
+                  {isMuted ? 'M' : 'U'}
+                </button>
+              </div>
             </div>
           ) : (
             <img
