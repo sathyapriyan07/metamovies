@@ -109,15 +109,19 @@ const MovieDetail = () => {
         <div className="detail-content">
           <div className="detail-poster-col">
             {movie.poster_url && (
-              <img src={movie.poster_url} alt={movie.title} className="detail-poster" />
+              <div className="detail-poster-wrapper">
+                <img src={movie.poster_url} alt={movie.title} className="detail-poster" />
+              </div>
             )}
           </div>
           <div className="detail-info">
-            {movie.title_logo_url ? (
-              <img className="detail-title-logo" src={movie.title_logo_url} alt={movie.title} />
-            ) : (
-              <h1 className="detail-title">{movie.title}</h1>
-            )}
+            <div className="detail-title-wrapper">
+              {movie.title_logo_url ? (
+                <img className="detail-title-logo" src={movie.title_logo_url} alt={movie.title} />
+              ) : (
+                <h1 className="detail-title">{movie.title}</h1>
+              )}
+            </div>
             <div className="detail-meta">
               {year}
               {runtime ? (
@@ -137,7 +141,7 @@ const MovieDetail = () => {
                       <circle cx="3" cy="3" r="3" />
                     </svg>
                   </span>
-                  {movie.genres.join(' • ')}
+                  {movie.genres.join(' ï¿½ ')}
                 </>
               ) : null}
             </div>
@@ -162,7 +166,7 @@ const MovieDetail = () => {
                   Watch Trailer
                 </button>
               )}
-              <button className="btn-secondary" onClick={toggleWatchlist}>
+              <button className="btn-secondary watchlist-btn" onClick={toggleWatchlist}>
                 {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
               </button>
             </div>
@@ -284,4 +288,4 @@ const MovieDetail = () => {
   );
 };
 
-export default MovieDetail;
+export default MovieDetail;

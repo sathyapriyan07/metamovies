@@ -1125,11 +1125,11 @@ main {
 
 .detail-hero {
   position: relative;
-  height: 80vh;
-  min-height: 520px;
+  min-height: 75vh;
+  padding: 80px 20px 40px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 0 6%;
   overflow: hidden;
   background: #000000;
 }
@@ -1139,11 +1139,10 @@ main {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.98) 10%,
-    rgba(0,0,0,0.85) 35%,
-    rgba(0,0,0,0.5) 65%,
-    rgba(0,0,0,0.2) 90%
+    to bottom,
+    rgba(0,0,0,0.4) 0%,
+    rgba(0,0,0,0.7) 50%,
+    rgba(0,0,0,0.95) 100%
   );
 }
 
@@ -1172,15 +1171,30 @@ main {
   width: 100%;
 }
 
+.detail-poster-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+}
+
 .detail-poster {
-  width: 180px;
-  border-radius: 22px;
-  box-shadow: 0 35px 80px rgba(0,0,0,0.85);
+  width: 160px;
+  border-radius: 18px;
+  margin-top: -60px;
+  margin-bottom: 20px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+}
+
+.detail-title-wrapper {
+  text-align: center;
+  z-index: 2;
 }
 
 .detail-title-logo {
-  max-width: 300px;
-  margin-bottom: 18px;
+  max-width: 220px;
+  width: 75%;
+  margin: 12px 0;
 }
 
 .detail-title {
@@ -1190,15 +1204,18 @@ main {
 
 .detail-meta {
   font-size: 14px;
-  color: #aab3c2;
-  margin-bottom: 12px;
+  color: #b0b0b0;
+  text-align: center;
+  margin: 8px 0 16px;
 }
 
 .detail-overview {
-  font-size: 16px;
-  line-height: 1.7;
+  max-width: 500px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
   color: #d1d5db;
-  margin-top: 20px;
+  padding: 0 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1210,6 +1227,16 @@ main {
   margin-top: 20px;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+.watchlist-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #ffffff;
+  width: auto;
 }
 
 @media (min-width: 1024px) {
@@ -1225,6 +1252,33 @@ main {
     justify-content: flex-start;
   }
 
+  .detail-poster {
+    width: 260px;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 22px;
+    box-shadow: 0 35px 80px rgba(0,0,0,0.85);
+  }
+
+  .detail-title-wrapper {
+    text-align: left;
+  }
+
+  .detail-title-logo {
+    max-width: 300px;
+    width: auto;
+    margin-bottom: 18px;
+  }
+
+  .detail-meta {
+    text-align: left;
+  }
+
+  .detail-overview {
+    text-align: left;
+    padding: 0;
+  }
+
   .detail-actions {
     justify-content: flex-start;
   }
@@ -1232,14 +1286,7 @@ main {
 
 @media (max-width: 768px) {
   .detail-hero {
-    height: auto;
-    padding-top: 60px;
-    flex-direction: column;
-  }
-
-  .detail-poster {
-    width: 180px;
-    margin-bottom: 20px;
+    min-height: 75vh;
   }
 
   .hero-buttons,
