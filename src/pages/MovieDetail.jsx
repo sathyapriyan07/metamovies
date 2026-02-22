@@ -123,12 +123,12 @@ const MovieDetail = () => {
                 />
               )}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center">
-                  {movie?.title_logo ? (
+                <div className="flex items-center min-h-[40px]">
+                  {movie.logo_url && movie.logo_url.trim() !== '' ? (
                     <img
-                      src={movie.title_logo}
+                      src={movie.logo_url}
                       alt={movie.title}
-                      className="max-h-10 md:max-h-12 w-auto object-contain"
+                      className="max-h-10 w-auto object-contain"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
