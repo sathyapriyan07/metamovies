@@ -124,11 +124,14 @@ const MovieDetail = () => {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center">
-                  {movie.title_logo ? (
+                  {movie?.title_logo ? (
                     <img
                       src={movie.title_logo}
                       alt={movie.title}
                       className="max-h-10 md:max-h-12 w-auto object-contain"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
                   ) : (
                     <h1 className="text-xl font-bold text-white">{movie.title}</h1>
