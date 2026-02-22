@@ -73,7 +73,7 @@ const Home = () => {
               if (yt) {
                 return (
                   <iframe
-                    className="absolute inset-0 w-full h-full object-contain bg-black"
+                    className="absolute inset-0 w-full h-full object-cover"
                     src={`https://www.youtube-nocookie.com/embed/${yt}?autoplay=1&mute=1&controls=0&loop=1&playlist=${yt}&playsinline=1&modestbranding=1&rel=0`}
                     title={`${hero.title} trailer`}
                     allow="autoplay; encrypted-media; fullscreen"
@@ -83,24 +83,24 @@ const Home = () => {
               }
               if (isVideoFile(hero.trailer_url)) {
                 return (
-                  <video className="absolute inset-0 w-full h-full object-contain bg-black" src={hero.trailer_url} autoPlay muted loop playsInline />
+                  <video className="absolute inset-0 w-full h-full object-cover" src={hero.trailer_url} autoPlay muted loop playsInline />
                 );
               }
-              return <img className="absolute inset-0 w-full h-full object-contain bg-black" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />;
+              return <img className="absolute inset-0 w-full h-full object-cover" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />;
             })()
           ) : (
-            <img className="absolute inset-0 w-full h-full object-contain bg-black" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />
+            <img className="absolute inset-0 w-full h-full object-cover" src={hero.backdrop_url || hero.poster_url} alt={hero.title} />
           )}
 
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
 
-          <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16">
+          <div className="relative z-10 h-full flex flex-col justify-end px-6 pb-16 max-w-7xl mx-auto">
             {hero.title_logo_url ? (
               <img className="max-w-[360px] w-full mb-4" src={hero.title_logo_url} alt={hero.title} />
             ) : (
-              <h1 className="text-4xl sm:text-5xl font-semibold mb-4">{hero.title}</h1>
+              <h1 className="text-4xl font-bold mb-4">{hero.title}</h1>
             )}
-            <div className="text-xs text-gray-400 flex flex-wrap items-center gap-2">
+            <div className="text-sm text-gray-400 flex flex-wrap items-center gap-2 mt-3">
               <span>{hero.release_date?.split('-')[0]}</span>
               {hero.runtime ? (
                 <>
@@ -116,13 +116,13 @@ const Home = () => {
               ) : null}
             </div>
             {hero.overview && (
-              <p className="mt-3 max-w-xl text-sm sm:text-base text-gray-300">
+              <p className="mt-4 max-w-xl text-gray-300">
                 {hero.overview}
               </p>
             )}
-            <div className="mt-4 flex gap-4">
-              <button className="px-5 py-2.5 rounded-full bg-white text-black text-sm font-medium">Watch Trailer</button>
-              <button className="px-5 py-2.5 rounded-full bg-white/20 backdrop-blur text-white text-sm font-medium" onClick={() => navigate(`/movie/${hero.id}`)}>Details</button>
+            <div className="mt-6 flex gap-4">
+              <button className="bg-white text-black px-6 py-2 rounded-full font-medium">Watch Trailer</button>
+              <button className="bg-white/20 backdrop-blur-md px-6 py-2 rounded-full" onClick={() => navigate(`/movie/${hero.id}`)}>Details</button>
             </div>
           </div>
         </section>
@@ -138,7 +138,7 @@ const Home = () => {
         </section>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 pt-16">
+      <div className="max-w-7xl mx-auto px-6 mt-8">
         <section className="mt-8">
           <h2 className="text-xl font-semibold mb-4">Streaming Now</h2>
           {loading ? (

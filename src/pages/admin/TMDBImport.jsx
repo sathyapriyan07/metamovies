@@ -382,278 +382,268 @@ const TMDBImport = () => {
 
   return (
     <AdminLayout title="TMDB Import" subtitle="Import movies and people from TMDB.">
-      <div className="glass-card rounded-2xl p-6">
-
-        <div className="tab-container admin-tabs" style={{ marginBottom: 16 }}>
-          <button
-            onClick={() => document.getElementById('single-import').scrollIntoView({ behavior: 'smooth' })}
-            className="tab tab-admin-toggle"
-          >
-            Single Import
-          </button>
-          <button
-            onClick={() => document.getElementById('bulk-import').scrollIntoView({ behavior: 'smooth' })}
-            className="tab tab-admin-toggle"
-          >
-            Bulk Import
-          </button>
-        </div>
-
-        {success && (
-          <div className="bg-green-500/20 border border-green-500 text-green-500 px-4 py-3 rounded-lg mb-6">
-            {success}
+      <div className="pt-16 pb-20 min-h-screen bg-black text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="flex gap-3 mb-6">
+            <button
+              onClick={() => document.getElementById('single-import').scrollIntoView({ behavior: 'smooth' })}
+              className="px-4 py-2 rounded-full bg-white text-black"
+            >
+              Single Import
+            </button>
+            <button
+              onClick={() => document.getElementById('bulk-import').scrollIntoView({ behavior: 'smooth' })}
+              className="px-4 py-2 rounded-full bg-white/10"
+            >
+              Bulk Import
+            </button>
           </div>
-        )}
 
-        {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
+          {success && (
+            <div className="bg-green-500/20 border border-green-500 text-green-500 px-4 py-3 rounded-lg mb-6">
+              {success}
+            </div>
+          )}
 
-        <div id="bulk-import" className="admin-section">
-          <h3>Bulk Import</h3>
-          <p className="text-gray-400 text-sm mb-4">Import multiple movies at once using comma-separated TMDB IDs</p>
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-6">
+              {error}
+            </div>
+          )}
 
-          <div className="admin-grid">
-            <div className="admin-field">
-              <label className="block text-sm font-medium">Type</label>
-              <select
-                value={type}
-                onChange={(e) => { setType(e.target.value); setBulkSearchResults([]); setSelectedItems([]); }}
-                className="w-full px-4 py-3 glass-input"
-                disabled={bulkLoading}
-              >
-                <option value="movie" className="bg-black">Movies</option>
-                <option value="person" className="bg-black">Persons</option>
-              </select>
+          <div id="bulk-import" className="bg-white/5 rounded-2xl p-6 space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold">Bulk Import</h3>
+              <p className="text-gray-400 text-sm mt-1">Import multiple items using comma-separated TMDB IDs</p>
             </div>
 
-            <div className="admin-field admin-full">
-              <label className="block text-sm font-medium">Search & Select Multiple</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={bulkSearchQuery}
-                  onChange={(e) => setBulkSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleBulkSearch()}
-                  placeholder="Search to add multiple items..."
-                  className="flex-1 px-4 py-3 glass-input"
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Type</label>
+                <select
+                  value={type}
+                  onChange={(e) => { setType(e.target.value); setBulkSearchResults([]); setSelectedItems([]); }}
+                  className="w-full bg-white/10 rounded-lg px-4 py-2 focus:outline-none"
+                  disabled={bulkLoading}
+                >
+                  <option value="movie" className="bg-black">Movies</option>
+                  <option value="person" className="bg-black">Persons</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Search & Select</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={bulkSearchQuery}
+                    onChange={(e) => setBulkSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleBulkSearch()}
+                    placeholder="Search to add multiple items..."
+                    className="w-full bg-white/10 rounded-lg px-4 py-2 focus:outline-none"
+                    disabled={bulkLoading}
+                  />
+                  <button
+                    onClick={handleBulkSearch}
+                    className="btn-secondary"
+                    disabled={loading || bulkLoading || !bulkSearchQuery.trim()}
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+
+              {bulkSearchResults.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-400">{selectedItems.length} selected</p>
+                    {selectedItems.length > 0 && (
+                      <button onClick={addSelectedToBulk} className="btn-primary text-sm px-3 py-1">
+                        Add {selectedItems.length} to List
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-96 overflow-y-auto space-y-2">
+                    {bulkSearchResults.map((item) => {
+                      const isSelected = selectedItems.find(i => i.id === item.id);
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => toggleSelectItem(item)}
+                          className={`flex items-center gap-4 rounded-xl p-3 cursor-pointer transition ${
+                            isSelected ? 'bg-white/10 border border-white/20' : 'bg-white/5 hover:bg-white/10'
+                          }`}
+                        >
+                          <input type="checkbox" checked={!!isSelected} onChange={() => {}} className="mt-1" />
+                          <img
+                            src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
+                            alt={item.title || item.name}
+                            className="w-12 h-16 object-cover rounded-md"
+                            onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
+                          />
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm">{item.title || item.name}</p>
+                            <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
+                            <p className="text-xs text-gray-500">ID: {item.id}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">TMDB IDs (comma-separated)</label>
+                <textarea
+                  value={bulkIds}
+                  onChange={(e) => setBulkIds(e.target.value)}
+                  placeholder="e.g., 550, 680, 13, 155, 497"
+                  rows="4"
+                  className="w-full bg-white/10 rounded-lg px-4 py-2 focus:outline-none"
                   disabled={bulkLoading}
                 />
+                <p className="text-xs text-gray-500 mt-1">Enter TMDB IDs separated by commas</p>
+              </div>
+
+              {bulkLoading && (
+                <div className="bg-blue-500/20 border border-blue-500 text-blue-400 px-4 py-3 rounded-lg">
+                  <p className="font-semibold">Progress: {bulkProgress.current} / {bulkProgress.total}</p>
+                  <p className="text-sm">{bulkProgress.status}</p>
+                  <div className="w-full bg-white/10 rounded-full h-2 mt-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-center">
                 <button
-                  onClick={handleBulkSearch}
-                  className="btn-secondary"
-                  disabled={loading || bulkLoading || !bulkSearchQuery.trim()}
+                  onClick={handleBulkImport}
+                  className="btn-primary"
+                  disabled={bulkLoading || !bulkIds.trim()}
                 >
-                  Search
+                  {bulkLoading ? 'Importing...' : 'Start Bulk Import'}
                 </button>
               </div>
             </div>
+          </div>
 
-            {bulkSearchResults.length > 0 && (
-              <div className="admin-field admin-full">
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-400">{selectedItems.length} selected</p>
-                  {selectedItems.length > 0 && (
-                    <button
-                      onClick={addSelectedToBulk}
-                      className="btn-primary text-sm px-3 py-1"
-                    >
-                      Add {selectedItems.length} to List
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-96 overflow-y-auto space-y-2">
-                  {bulkSearchResults.map((item) => {
-                    const isSelected = selectedItems.find(i => i.id === item.id);
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => toggleSelectItem(item)}
-                        className={`flex gap-3 p-3 rounded-lg cursor-pointer transition ${
-                          isSelected ? 'bg-blue-500/30 border border-blue-500' : 'bg-white/5 hover:bg-white/10 border border-transparent'
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={!!isSelected}
-                          onChange={() => {}}
-                          className="mt-1"
-                        />
-                        <img
-                          src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
-                          alt={item.title || item.name}
-                          className="w-12 h-18 object-cover rounded"
-                          onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
-                        />
-                        <div className="flex-1">
-                          <p className="font-semibold text-sm">{item.title || item.name}</p>
-                          <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
-                          <p className="text-xs text-gray-500">ID: {item.id}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            <div className="admin-field admin-full">
-              <label className="block text-sm font-medium">TMDB IDs (comma-separated)</label>
-              <textarea
-                value={bulkIds}
-                onChange={(e) => setBulkIds(e.target.value)}
-                placeholder="e.g., 550, 680, 13, 155, 497"
-                rows="4"
-                className="w-full px-4 py-3 glass-input"
-                disabled={bulkLoading}
-              />
-              <p className="text-xs text-gray-500 mt-1">Enter TMDB IDs separated by commas</p>
+          <div id="single-import" className="bg-white/5 rounded-2xl p-6 space-y-5 mt-8">
+            <div>
+              <h3 className="text-lg font-semibold">Single Import</h3>
             </div>
 
-            {bulkLoading && (
-              <div className="bg-blue-500/20 border border-blue-500 text-blue-400 px-4 py-3 rounded-lg">
-                <p className="font-semibold">Progress: {bulkProgress.current} / {bulkProgress.total}</p>
-                <p className="text-sm">{bulkProgress.status}</p>
-                <div className="w-full bg-white/10 rounded-full h-2 mt-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }}
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Type</label>
+                <select
+                  value={type}
+                  onChange={(e) => { setType(e.target.value); setSearchResults([]); }}
+                  className="w-full bg-white/10 rounded-lg px-4 py-2 focus:outline-none"
+                >
+                  <option value="movie" className="bg-black">Movie</option>
+                  <option value="person" className="bg-black">Person</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Search TMDB</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    placeholder="Search for movies..."
+                    className="w-full bg-white/10 rounded-lg px-4 py-2 focus:outline-none"
                   />
+                  <button
+                    onClick={handleSearch}
+                    className="btn-secondary"
+                    disabled={loading || !searchQuery.trim()}
+                  >
+                    Search
+                  </button>
                 </div>
               </div>
-            )}
 
-          </div>
-          <div className="admin-actions" style={{ marginTop: 12 }}>
-            <button
-              onClick={handleBulkImport}
-              className="btn-primary"
-              disabled={bulkLoading || !bulkIds.trim()}
-            >
-              {bulkLoading ? 'Importing...' : 'Start Bulk Import'}
-            </button>
-          </div>
-        </div>
+              {searchResults.length > 0 && (
+                <div className="max-h-80 overflow-y-auto space-y-2">
+                  {searchResults.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSelectFromSearch(item)}
+                      className="flex items-center gap-4 bg-white/5 hover:bg-white/10 rounded-xl p-3 cursor-pointer transition"
+                    >
+                      <img
+                        src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
+                        alt={item.title || item.name}
+                        className="w-12 h-16 object-cover rounded-md"
+                        onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
+                      />
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm">{item.title || item.name}</p>
+                        <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
+                        <p className="text-xs text-gray-500">ID: {item.id}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-        <div id="single-import" className="admin-section">
-          <h3>Single Import</h3>
-          <div className="admin-grid">
-            <div className="admin-field">
-              <label className="block text-sm font-medium">Type</label>
-              <select
-                value={type}
-                onChange={(e) => { setType(e.target.value); setSearchResults([]); }}
-                className="w-full px-4 py-3 glass-input"
-              >
-                <option value="movie" className="bg-black">Movie</option>
-                <option value="person" className="bg-black">Person</option>
-              </select>
-            </div>
-
-            <div className="admin-field admin-full">
-              <label className="block text-sm font-medium">Search TMDB</label>
-              <div className="flex gap-2">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Or Enter TMDB ID Manually</label>
                 <input
                   type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="Search for movies..."
-                  className="flex-1 px-4 py-3 glass-input"
+                  value={tmdbId}
+                  onChange={(e) => setTmdbId(e.target.value)}
+                  placeholder="Enter TMDB ID (e.g., 550 for Fight Club)"
+                  className="w-full bg-white/10 rounded-lg px-4 py-2 focus:outline-none"
                 />
-                <button
-                  onClick={handleSearch}
-                  className="btn-secondary"
-                  disabled={loading || !searchQuery.trim()}
-                >
-                  Search
-                </button>
-              </div>
-            </div>
-
-            {searchResults.length > 0 && (
-              <div className="admin-field admin-full">
-                <div className="max-h-80 overflow-y-auto space-y-2">
-                {searchResults.map((item) => (
-                  <div
-                    key={item.id}
-                    onClick={() => handleSelectFromSearch(item)}
-                    className="flex gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg cursor-pointer transition"
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => handleFetch()}
+                    className="btn-primary"
+                    disabled={loading || !tmdbId}
                   >
-                    <img
-                      src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
-                      alt={item.title || item.name}
-                      className="w-12 h-18 object-cover rounded"
-                      onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">{item.title || item.name}</p>
-                      <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
-                      <p className="text-xs text-gray-500">ID: {item.id}</p>
-                    </div>
-                  </div>
-                ))}
+                    {loading ? 'Fetching...' : 'Fetch from TMDB'}
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
+          </div>
 
-            <div className="admin-field admin-full">
-              <label className="block text-sm font-medium">Or Enter TMDB ID Manually</label>
-              <input
-                type="text"
-                value={tmdbId}
-                onChange={(e) => setTmdbId(e.target.value)}
-                placeholder="Enter TMDB ID (e.g., 550 for Fight Club)"
-                className="w-full px-4 py-3 glass-input"
-              />
-              <div className="admin-actions" style={{ marginTop: 12 }}>
-                <button
-                  onClick={() => handleFetch()}
-                  className="btn-primary"
-                  disabled={loading || !tmdbId}
-                >
-                  {loading ? 'Fetching...' : 'Fetch from TMDB'}
+          {preview && (
+            <div className="bg-white/5 rounded-2xl p-6 space-y-5 mt-8">
+              <h3 className="text-lg font-semibold">Preview</h3>
+              <div className="flex gap-6">
+                <img
+                  src={type === 'person' ? getImageUrl(preview.profile_path, 'w300') : getImageUrl(preview.poster_path, 'w300')}
+                  alt={preview.title || preview.name}
+                  className="w-28 sm:w-32 rounded-lg"
+                />
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-2">{preview.title || preview.name}</h3>
+                  <p className="text-gray-400 text-sm mb-2">
+                    {type === 'person' ? preview.known_for_department : (preview.release_date || preview.first_air_date)}
+                  </p>
+                  <p className="text-sm line-clamp-3">{type === 'person' ? preview.biography : preview.overview}</p>
+                </div>
+              </div>
+              <div className="flex justify-center">
+                <button onClick={handleImport} className="btn-primary" disabled={loading}>
+                  {loading ? 'Importing...' : 'Import to Database'}
                 </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
-
-        {preview && (
-          <div className="admin-section">
-            <h3>Preview</h3>
-            
-            <div className="flex gap-6 mb-6">
-              <img
-                src={type === 'person' ? getImageUrl(preview.profile_path, 'w300') : getImageUrl(preview.poster_path, 'w300')}
-                alt={preview.title || preview.name}
-                className="w-32 rounded-lg"
-              />
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">{preview.title || preview.name}</h3>
-                <p className="text-gray-400 text-sm mb-2">
-                  {type === 'person' ? preview.known_for_department : (preview.release_date || preview.first_air_date)}
-                </p>
-                <p className="text-sm line-clamp-3">{type === 'person' ? preview.biography : preview.overview}</p>
-              </div>
-            </div>
-
-            <button
-              onClick={handleImport}
-              className="btn-primary"
-              disabled={loading}
-            >
-              {loading ? 'Importing...' : 'Import to Database'}
-            </button>
-          </div>
-        )}
       </div>
     </AdminLayout>
   );
 };
 
 export default TMDBImport;
-
-
