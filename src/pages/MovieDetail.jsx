@@ -77,13 +77,10 @@ const MovieDetail = () => {
   const trailerId = getYouTubeId(movie.trailer_url);
 
   const bullet = '\u2022';
-  const metaLine = [
-    year,
-    runtime,
-    movie.genres?.length ? movie.genres.join(` ${bullet} `) : null
-  ]
-    .filter(Boolean)
-    .join(` ${bullet} `);
+  const genresText = Array.isArray(movie.genres)
+    ? movie.genres.join(` ${bullet} `)
+    : movie.genres;
+  const metaLine = [year, runtime, genresText].filter(Boolean).join(` ${bullet} `);
 
   const reviewItems = Array.isArray(movie.reviews) ? movie.reviews : [];
   const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
@@ -236,7 +233,17 @@ const MovieDetail = () => {
                 />
               )}
               <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold">{movie.title}</h1>
+                <div className="flex items-center">
+                  {movie.title_logo ? (
+                    <img
+                      src={movie.title_logo}
+                      alt={movie.title}
+                      className="max-h-10 md:max-h-12 w-auto object-contain"
+                    />
+                  ) : (
+                    <h1 className="text-xl font-bold text-white">{movie.title}</h1>
+                  )}
+                </div>
                 <div className="mt-2 text-sm text-gray-400">{metaLine || 'Details unavailable'}</div>
                 <div className="mt-3 inline-flex items-center justify-center w-11 h-11 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
                   {typeof movie.rating === 'number' ? movie.rating.toFixed(1) : 'NR'}
