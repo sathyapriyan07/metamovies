@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { searchAll, getTrendingMovies, getMovies, getPersons } from '../services/supabase';
+import { searchAll, getTrendingMovies, getMovies, getPersons, recordSearchEvent } from '../services/supabase';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PosterCard from '../components/PosterCard';
 
@@ -47,6 +47,9 @@ const Search = () => {
     setLoading(true);
     const data = await searchAll(searchQuery);
     setResults(data);
+    if (searchQuery.trim().length >= 2) {
+      await recordSearchEvent(searchQuery.trim());
+    }
     setLoading(false);
   };
 

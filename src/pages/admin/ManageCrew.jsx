@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getMovies, createCrew, supabase } from '../../services/supabase';
+import { getMovies, createCrew, supabase, getFollowersForEntity, createNotifications } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const ManageCrew = () => {
@@ -84,6 +84,23 @@ const ManageCrew = () => {
           };
 
     await createCrew(crewData);
+    const { data: followers } = await getFollowersForEntity('person', formData.person_id);
+    const followerIds = (followers || []).map((f) => f.user_id).filter(Boolean);
+    if (followerIds.length > 0) {
+      const notifications = followerIds.map((userId) => ({
+        user_id: userId,
+        type: 'new_movie_for_followed_person',
+        entity_type: 'movie',
+        entity_id: String(selectedItem.id),
+        payload: {
+          title: 'New movie added',
+          message: `${selectedItem.title} has a new credit for a person you follow.`,
+          movie_id: selectedItem.id,
+          person_id: Number(formData.person_id)
+        }
+      }));
+      await createNotifications(notifications);
+    }
     alert('Crew member added successfully!');
     setFormData({ person_id: '', job: '' });
     handleSelectItem(selectedItem);

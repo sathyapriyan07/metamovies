@@ -1,17 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getUnreadNotificationsCount } from '../services/supabase';
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+    const loadUnread = async () => {
+      const { count } = await getUnreadNotificationsCount(user.id);
+      setUnreadCount(count || 0);
+    };
+    loadUnread();
+  }, [user]);
 
   const navItems = [
     { label: 'Home', to: '/' },
     { label: 'Movies', to: '/movies' },
     { label: 'People', to: '/search' },
     { label: 'Platforms', to: '/platforms' },
+    { label: 'Trending', to: '/trending' },
+    { label: 'Calendar', to: '/calendar/releases' },
     { label: 'Watchlist', to: '/watchlist' },
   ];
 
@@ -44,6 +60,21 @@ const Header = () => {
                   <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
                   <path d="M4 20c2.2-3.5 13.8-3.5 16 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
+              </button>
+              <button
+                className="relative text-white/80 hover:text-white transition"
+                onClick={() => navigate('/notifications')}
+                aria-label="Notifications"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 16h12l-1.5-2v-4a4.5 4.5 0 10-9 0v4L6 16z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M10 18a2 2 0 004 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#F5C518] text-black text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
               <button
                 className="text-white/80 hover:text-white transition"

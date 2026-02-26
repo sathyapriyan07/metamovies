@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getMovieById } from '../services/supabase';
+import { getMovieById, resolveSlug, getPageMeta } from '../services/supabase';
+import SeoHead from '../components/SeoHead';
 
 const CastCrew = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pageMeta, setPageMeta] = useState(null);
 
   useEffect(() => {
     loadMovie();
@@ -14,8 +16,17 @@ const CastCrew = () => {
 
   const loadMovie = async () => {
     setLoading(true);
-    const { data } = await getMovieById(id);
+    let resolvedId = id;
+    if (!/^\d+$/.test(id)) {
+      const { data: slugData } = await resolveSlug(id, 'movie');
+      resolvedId = slugData?.entity_id || id;
+    }
+    const { data } = await getMovieById(resolvedId);
     setMovie(data);
+    if (data?.id) {
+      const { data: meta } = await getPageMeta('movie', String(data.id));
+      setPageMeta(meta || null);
+    }
     setLoading(false);
   };
 
@@ -39,6 +50,11 @@ const CastCrew = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <SeoHead
+        title={pageMeta?.title ? `${pageMeta.title} - Cast & Crew` : `${movie.title} - Cast & Crew`}
+        description={pageMeta?.description || movie.overview?.slice(0, 160)}
+        jsonLd={pageMeta?.jsonld || null}
+      />
       <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
         <button className="text-sm text-gray-400 hover:text-white" onClick={() => navigate(-1)}>Back</button>
         <h1 className="text-lg font-semibold mt-2">{movie.title} • Cast and Crew</h1>

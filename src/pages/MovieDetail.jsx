@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getMovieById } from '../services/supabase';
+import {
+  getMovieById,
+  getMovieRatingsSummary,
+  getReviewsByMovie,
+  getSoundtrackByMovie,
+  getPageMeta,
+  recordViewEvent,
+  resolveSlug
+} from '../services/supabase';
+import SeoHead from '../components/SeoHead';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 
@@ -14,6 +23,10 @@ const MovieDetail = () => {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showFullOverview, setShowFullOverview] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [soundtrack, setSoundtrack] = useState([]);
+  const [reviewSummary, setReviewSummary] = useState({ avg: null, count: 0 });
+  const [reviews, setReviews] = useState([]);
+  const [pageMeta, setPageMeta] = useState(null);
 
   useEffect(() => {
     loadMovie();
@@ -21,8 +34,28 @@ const MovieDetail = () => {
 
   const loadMovie = async () => {
     setLoading(true);
-    const { data } = await getMovieById(id);
+    let resolvedId = id;
+    if (!/^\d+$/.test(id)) {
+      const { data: slugData } = await resolveSlug(id, 'movie');
+      resolvedId = slugData?.entity_id || id;
+    }
+    const [{ data }, summary, reviewsResp, soundtrackResp] = await Promise.all([
+      getMovieById(resolvedId),
+      getMovieRatingsSummary(resolvedId),
+      getReviewsByMovie(resolvedId, 'latest'),
+      getSoundtrackByMovie(resolvedId)
+    ]);
     setMovie(data);
+    setReviewSummary(summary || { avg: null, count: 0 });
+    setReviews(reviewsResp.data || []);
+    setSoundtrack(soundtrackResp.data || []);
+    if (data?.id) {
+      const { data: meta } = await getPageMeta('movie', String(data.id));
+      setPageMeta(meta || null);
+    }
+    if (data?.id) {
+      await recordViewEvent('movie', data.id, user?.id || null);
+    }
     if (user && data) {
       const isIn = await checkInWatchlist(data.id, 'movie');
       setInWatchlist(isIn);
@@ -83,7 +116,7 @@ const MovieDetail = () => {
     : movie.genres;
   const metaLine = [year, runtime, genresText].filter(Boolean).join(` ${bullet} `);
 
-  const reviewItems = Array.isArray(movie.reviews) ? movie.reviews : [];
+  const reviewItems = Array.isArray(reviews) ? reviews : [];
   const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
   const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
   const ottPlatforms = movie.watch_links
@@ -110,6 +143,12 @@ const MovieDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <SeoHead
+        title={pageMeta?.title || `${movie.title} - MetaMovies+`}
+        description={pageMeta?.description || movie.overview?.slice(0, 160)}
+        image={movie.poster_url || movie.backdrop_url}
+        jsonLd={pageMeta?.jsonld || null}
+      />
       <div className="max-w-2xl mx-auto px-4 pb-10">
         <div className="px-4 pt-4">
           <div className="relative w-full h-[220px] rounded-md overflow-hidden bg-black">
@@ -179,6 +218,9 @@ const MovieDetail = () => {
                 Watch Trailer
               </button>
             )}
+            <button className="btn-secondary h-11 w-full" onClick={() => navigate(`/share/${movie.id}`)}>
+              Share Movie Card
+            </button>
             <button className="btn-secondary h-11 w-full" onClick={toggleWatchlist}>
               {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
             </button>
@@ -335,20 +377,18 @@ const MovieDetail = () => {
           <h2 className="text-lg font-semibold mb-3">Ratings & Reviews</h2>
           <div className="text-sm text-gray-300 mb-3">
             <span className="text-[#F5C518] font-semibold">User Rating:</span>{' '}
-            {typeof movie.rating === 'number' ? `${movie.rating.toFixed(1)} / 10` : 'NR'}
+            {reviewSummary.avg ? `${reviewSummary.avg.toFixed(1)} / 5` : 'NR'}
+            {reviewSummary.count ? ` • ${reviewSummary.count} ratings` : ''}
           </div>
           <div className="space-y-3">
             {reviewItems.length > 0 ? (
               reviewItems.slice(0, 2).map((review, idx) => (
                 <div key={`review-${idx}`} className="bg-[#1a1a1a] border border-gray-800 rounded-md p-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{review.username || 'User'}</span>
+                    <span className="font-medium">{review.user?.username || 'User'}</span>
                     <span className="text-[#F5C518]">{review.rating || 'NR'}</span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2 line-clamp-2">{review.text || 'Review unavailable.'}</p>
-                  {review.spoiler && (
-                    <span className="mt-2 inline-block text-xs bg-[#2a2a2a] px-2 py-0.5 rounded-md">Spoiler</span>
-                  )}
+                  <p className="text-xs text-gray-400 mt-2 line-clamp-2">{review.body || 'Review unavailable.'}</p>
                 </div>
               ))
             ) : (
@@ -357,8 +397,36 @@ const MovieDetail = () => {
               </div>
             )}
           </div>
-          <button className="mt-3 text-sm text-gray-400 hover:text-white transition">See All Reviews</button>
+          <button
+            className="mt-3 text-sm text-gray-400 hover:text-white transition"
+            onClick={() => navigate(`/movie/${movie.id}/reviews`)}
+          >
+            See All Reviews
+          </button>
         </section>
+
+        {soundtrack.length > 0 && (
+          <section className="py-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold">Soundtrack</h2>
+              <button className="text-sm text-[#F5C518]" onClick={() => navigate(`/albums/${soundtrack[0]?.id}`)}>
+                View Album
+              </button>
+            </div>
+            <div className="space-y-2">
+              {soundtrack.flatMap((album) => (album.tracks || []).slice(0, 3)).map((song) => (
+                <button
+                  key={`song-${song.id}`}
+                  className="w-full text-left bg-[#1a1a1a] border border-gray-800 rounded-md p-3"
+                  onClick={() => navigate(`/songs/${song.id}`)}
+                >
+                  <div className="text-sm font-medium">{song.title}</div>
+                  <div className="text-xs text-gray-400">Track {song.track_no || '-'}</div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {(mediaVideos.length > 0 || mediaPhotos.length > 0) && (
           <section className="py-6">

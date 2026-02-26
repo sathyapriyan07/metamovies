@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getPlatformById, getMoviesByPlatform } from '../services/supabase';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getPlatformById, getMoviesByPlatform, resolveSlug, followEntity, unfollowEntity, getFollowStatus, getPageMeta } from '../services/supabase';
 import PosterCard from '../components/PosterCard';
+import SeoHead from '../components/SeoHead';
+import { useAuth } from '../context/AuthContext';
 
 const PlatformDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [platform, setPlatform] = useState(null);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [pageMeta, setPageMeta] = useState(null);
 
   useEffect(() => {
     loadPlatform();
@@ -15,13 +21,37 @@ const PlatformDetail = () => {
 
   const loadPlatform = async () => {
     setLoading(true);
+    let resolvedId = id;
+    if (!/^\d+$/.test(id)) {
+      const { data: slugData } = await resolveSlug(id, 'platform');
+      resolvedId = slugData?.entity_id || id;
+    }
     const [{ data: platformData }, { data: moviesData }] = await Promise.all([
-      getPlatformById(id),
-      getMoviesByPlatform(id, 60, 0)
+      getPlatformById(resolvedId),
+      getMoviesByPlatform(resolvedId, 60, 0)
     ]);
     setPlatform(platformData);
     setMovies(moviesData || []);
+    if (platformData?.id && user) {
+      const status = await getFollowStatus(user.id, 'platform', platformData.id);
+      setIsFollowing(status);
+    }
+    if (platformData?.id) {
+      const { data: meta } = await getPageMeta('platform', String(platformData.id));
+      setPageMeta(meta || null);
+    }
     setLoading(false);
+  };
+
+  const toggleFollow = async () => {
+    if (!user) return navigate('/login');
+    if (isFollowing) {
+      await unfollowEntity(user.id, 'platform', platform.id);
+      setIsFollowing(false);
+    } else {
+      await followEntity(user.id, 'platform', platform.id);
+      setIsFollowing(true);
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -29,6 +59,11 @@ const PlatformDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <SeoHead
+        title={pageMeta?.title || `${platform.name} - Platform`}
+        description={pageMeta?.description || platform.description || ''}
+        jsonLd={pageMeta?.jsonld || null}
+      />
       <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
         <div className="flex flex-col items-center text-center gap-3">
           {platform.logo_url ? (
@@ -40,6 +75,9 @@ const PlatformDetail = () => {
           )}
           <h1 className="text-lg font-semibold">{platform.name}</h1>
           {platform.description && <p className="text-sm text-gray-400">{platform.description}</p>}
+          <button className="btn-secondary h-9 px-4" onClick={toggleFollow}>
+            {isFollowing ? 'Following' : 'Follow'}
+          </button>
         </div>
 
         <section className="py-6">

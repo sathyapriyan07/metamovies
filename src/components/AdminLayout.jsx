@@ -20,6 +20,12 @@ const AdminLayout = ({ title, subtitle, children }) => {
     { label: 'Manage Persons', to: '/admin/manage-persons' },
     { label: 'Manage Crew', to: '/admin/manage-crew' },
     { label: 'Manage Platforms', to: '/admin/manage-platforms' },
+    { label: 'Music', to: '/admin/soundtracks' },
+    { label: 'Releases', to: '/admin/releases' },
+    { label: 'Reviews', to: '/admin/reviews' },
+    { label: 'Trending', to: '/admin/trending' },
+    { label: 'Deezer Import', to: '/admin/deezer-import' },
+    { label: 'SEO', to: '/admin/seo' },
     { label: 'Hero Banner', to: '/admin/manage-hero-banner' },
     { label: 'Manage Users', to: '/admin/manage-users' },
     { label: 'Manage Avatars', to: '/admin/manage-avatars' }

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../services/supabase';
+import { supabase, getFollowersForEntity, createNotifications } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const AddNews = () => {
@@ -135,6 +135,26 @@ const AddNews = () => {
           .insert(personLinks);
         
         if (linkError) throw linkError;
+
+        for (const person of linkedPersons) {
+          const { data: followers } = await getFollowersForEntity('person', person.id);
+          const followerIds = (followers || []).map((f) => f.user_id).filter(Boolean);
+          if (followerIds.length > 0) {
+            const notifications = followerIds.map((userId) => ({
+              user_id: userId,
+              type: 'news_for_followed_person',
+              entity_type: 'news',
+              entity_id: String(newsData.id),
+              payload: {
+                title: 'News update',
+                message: `${person.name} is mentioned in a new article.`,
+                news_id: newsData.id,
+                person_id: person.id
+              }
+            }));
+            await createNotifications(notifications);
+          }
+        }
       }
       
       setToast({ message: 'News article added successfully', type: 'success' });

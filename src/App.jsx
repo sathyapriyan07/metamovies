@@ -21,6 +21,13 @@ import Watchlist from './pages/Watchlist';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import AlbumDetail from './pages/AlbumDetail';
+import SongDetail from './pages/SongDetail';
+import MovieReviews from './pages/MovieReviews';
+import ReleaseCalendar from './pages/ReleaseCalendar';
+import Trending from './pages/Trending';
+import Notifications from './pages/Notifications';
+import ShareCard from './pages/ShareCard';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import TMDBImport from './pages/admin/TMDBImport';
@@ -40,6 +47,12 @@ import ManageHeroBanner from './pages/admin/ManageHeroBanner';
 import ManageUsers from './pages/admin/ManageUsers';
 import ManageAvatars from './pages/admin/ManageAvatars';
 import ManagePlatforms from './pages/admin/ManagePlatforms';
+import ManageSoundtracks from './pages/admin/ManageSoundtracks';
+import ManageReleases from './pages/admin/ManageReleases';
+import ManageReviews from './pages/admin/ManageReviews';
+import ManageTrending from './pages/admin/ManageTrending';
+import ManageSEO from './pages/admin/ManageSEO';
+import DeezerImport from './pages/admin/DeezerImport';
 
 function AppRoutes() {
   const Layout = ({ children }) => (
@@ -65,6 +78,20 @@ function AppRoutes() {
         <Route path="/news" element={<News />} />
         <Route path="/news/:id" element={<NewsDetail />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/albums/:id" element={<AlbumDetail />} />
+        <Route path="/songs/:id" element={<SongDetail />} />
+        <Route path="/movie/:id/reviews" element={<MovieReviews />} />
+        <Route path="/calendar/releases" element={<ReleaseCalendar />} />
+        <Route path="/trending" element={<Trending />} />
+        <Route
+          path="/notifications"
+          element={(
+            <ProtectedRoute>
+              <Notifications />
+            </ProtectedRoute>
+          )}
+        />
+        <Route path="/share/:movieId" element={<ShareCard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -244,6 +271,60 @@ function AppRoutes() {
           element={(
             <ProtectedRoute adminOnly>
               <ManagePlatforms />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/admin/soundtracks"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageSoundtracks />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/admin/releases"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageReleases />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/admin/reviews"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageReviews />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/admin/trending"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageTrending />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/admin/seo"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageSEO />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/admin/deezer-import"
+          element={(
+            <ProtectedRoute adminOnly>
+              <DeezerImport />
             </ProtectedRoute>
           )}
         />

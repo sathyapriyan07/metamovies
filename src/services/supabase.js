@@ -811,3 +811,420 @@ export const getHeroBanners = async () => {
     .order('display_order', { ascending: true });
   return { data, error };
 };
+
+// Soundtrack (albums/tracks mapped to movies)
+export const getAlbumsByMovie = async (movieId) => {
+  const { data, error } = await supabase
+    .from('albums')
+    .select('*')
+    .eq('movie_id', movieId)
+    .order('release_date', { ascending: true });
+  return { data, error };
+};
+
+export const getSoundtrackByMovie = async (movieId) => {
+  const { data, error } = await supabase
+    .from('albums')
+    .select(`
+      *,
+      tracks (
+        *,
+        song_artists (
+          role,
+          person:persons (*)
+        )
+      )
+    `)
+    .eq('movie_id', movieId)
+    .order('release_date', { ascending: true });
+  return { data, error };
+};
+
+export const getSongById = async (id) => {
+  const { data, error } = await supabase
+    .from('tracks')
+    .select(`
+      *,
+      album:albums(*),
+      song_artists (
+        role,
+        person:persons (*)
+      )
+    `)
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
+export const getSongsByAlbum = async (albumId) => {
+  const { data, error } = await supabase
+    .from('tracks')
+    .select(`
+      *,
+      song_artists (
+        role,
+        person:persons (*)
+      )
+    `)
+    .eq('album_id', albumId)
+    .order('track_no', { ascending: true });
+  return { data, error };
+};
+
+export const setSongArtists = async (songId, artists = []) => {
+  const { error: deleteError } = await supabase
+    .from('song_artists')
+    .delete()
+    .eq('song_id', songId);
+  if (deleteError) return { data: null, error: deleteError };
+  if (!artists.length) return { data: [], error: null };
+
+  const rows = artists
+    .filter((row) => row && row.person_id)
+    .map((row) => ({
+      song_id: songId,
+      person_id: row.person_id,
+      role: row.role || 'composer'
+    }));
+  const { data, error } = await supabase.from('song_artists').insert(rows).select();
+  return { data, error };
+};
+
+// Ratings & Reviews
+export const getMovieRatingsSummary = async (movieId) => {
+  const { data: ratings } = await supabase
+    .from('ratings')
+    .select('rating')
+    .eq('movie_id', movieId);
+  const values = (ratings || []).map((r) => r.rating).filter(Boolean);
+  if (values.length === 0) return { avg: null, count: 0 };
+  const total = values.reduce((acc, v) => acc + v, 0);
+  return { avg: total / values.length, count: values.length };
+};
+
+export const getUserRating = async (movieId, userId) => {
+  const { data, error } = await supabase
+    .from('ratings')
+    .select('*')
+    .eq('movie_id', movieId)
+    .eq('user_id', userId)
+    .single();
+  return { data, error };
+};
+
+export const upsertRating = async (movieId, userId, rating) => {
+  const { data, error } = await supabase
+    .from('ratings')
+    .upsert({ movie_id: movieId, user_id: userId, rating })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const getReviewsByMovie = async (movieId, sortBy = 'latest') => {
+  const query = supabase
+    .from('reviews')
+    .select(`
+      *,
+      user:users ( id, username ),
+      review_likes ( id, user_id )
+    `)
+    .eq('movie_id', movieId);
+
+  if (sortBy === 'top') {
+    query.order('rating', { ascending: false }).order('created_at', { ascending: false });
+  } else {
+    query.order('created_at', { ascending: false });
+  }
+
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const addReview = async (movieId, userId, body, rating = null) => {
+  const { data, error } = await supabase
+    .from('reviews')
+    .insert({ movie_id: movieId, user_id: userId, body, rating })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteReview = async (reviewId, userId) => {
+  const { error } = await supabase
+    .from('reviews')
+    .delete()
+    .eq('id', reviewId)
+    .eq('user_id', userId);
+  return { error };
+};
+
+export const likeReview = async (reviewId, userId) => {
+  const { data, error } = await supabase
+    .from('review_likes')
+    .insert({ review_id: reviewId, user_id: userId })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const unlikeReview = async (reviewId, userId) => {
+  const { error } = await supabase
+    .from('review_likes')
+    .delete()
+    .eq('review_id', reviewId)
+    .eq('user_id', userId);
+  return { error };
+};
+
+// Trending
+export const recordViewEvent = async (entityType, entityId, userId = null) => {
+  const { error } = await supabase
+    .from('view_events')
+    .insert({ entity_type: entityType, entity_id: String(entityId), user_id: userId });
+  return { error };
+};
+
+export const recordSearchEvent = async (query, userId = null) => {
+  const { error } = await supabase
+    .from('search_events')
+    .insert({ query, user_id: userId });
+  return { error };
+};
+
+export const getWeeklyTrending = async (weekStart) => {
+  const { data, error } = await supabase
+    .from('trending_weekly')
+    .select('*')
+    .eq('week_start', weekStart)
+    .order('score', { ascending: false });
+  return { data, error };
+};
+
+export const getMostWatchlistedMovies = async (limit = 12) => {
+  const { data, error } = await supabase
+    .from('watchlist')
+    .select('movie_id, movie:movies(*)')
+    .not('movie_id', 'is', null);
+  if (error) return { data: [], error };
+  const counts = new Map();
+  (data || []).forEach((row) => {
+    if (!row.movie_id) return;
+    counts.set(row.movie_id, {
+      movie: row.movie,
+      count: (counts.get(row.movie_id)?.count || 0) + 1
+    });
+  });
+  const sorted = [...counts.values()].sort((a, b) => b.count - a.count).slice(0, limit);
+  return { data: sorted, error: null };
+};
+
+export const getMostSearched = async (limit = 12) => {
+  const { data, error } = await supabase
+    .from('search_events')
+    .select('query');
+  if (error) return { data: [], error };
+  const counts = new Map();
+  (data || []).forEach((row) => {
+    const key = (row.query || '').toLowerCase().trim();
+    if (!key) return;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  const sorted = [...counts.entries()]
+    .map(([query, count]) => ({ query, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+  return { data: sorted, error: null };
+};
+
+// Release Calendar
+export const getReleasesByRange = async (startDate, endDate, { language, platformId } = {}) => {
+  let query = supabase
+    .from('releases')
+    .select(`
+      *,
+      movie:movies(*),
+      platform:platforms(*)
+    `)
+    .gte('release_date', startDate)
+    .lte('release_date', endDate)
+    .order('release_date', { ascending: true });
+
+  if (language) query = query.eq('language', language);
+  if (platformId) query = query.eq('platform_id', platformId);
+  const { data, error } = await query;
+  return { data, error };
+};
+
+// Follows + Notifications
+export const followEntity = async (userId, entityType, entityId) => {
+  const { data, error } = await supabase
+    .from('follows')
+    .insert({ user_id: userId, entity_type: entityType, entity_id: String(entityId) })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const unfollowEntity = async (userId, entityType, entityId) => {
+  const { error } = await supabase
+    .from('follows')
+    .delete()
+    .eq('user_id', userId)
+    .eq('entity_type', entityType)
+    .eq('entity_id', entityId);
+  return { error };
+};
+
+export const getFollowStatus = async (userId, entityType, entityId) => {
+  const { data } = await supabase
+    .from('follows')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('entity_type', entityType)
+    .eq('entity_id', String(entityId))
+    .single();
+  return !!data;
+};
+
+export const getNotifications = async (userId) => {
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const getUnreadNotificationsCount = async (userId) => {
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .is('read_at', null);
+  return { count: count || 0, error };
+};
+
+export const markNotificationRead = async (notificationId, userId) => {
+  const { error } = await supabase
+    .from('notifications')
+    .update({ read_at: new Date().toISOString() })
+    .eq('id', notificationId)
+    .eq('user_id', userId);
+  return { error };
+};
+
+export const markAllNotificationsRead = async (userId) => {
+  const { error } = await supabase
+    .from('notifications')
+    .update({ read_at: new Date().toISOString() })
+    .eq('user_id', userId)
+    .is('read_at', null);
+  return { error };
+};
+
+export const getFollowersForEntity = async (entityType, entityId) => {
+  const { data, error } = await supabase
+    .from('follows')
+    .select('user_id')
+    .eq('entity_type', entityType)
+    .eq('entity_id', String(entityId));
+  return { data, error };
+};
+
+export const createNotifications = async (rows = []) => {
+  if (!rows.length) return { data: [], error: null };
+  const { data, error } = await supabase.from('notifications').insert(rows).select();
+  return { data, error };
+};
+
+// SEO helpers
+export const resolveSlug = async (slug, entityType = null) => {
+  let query = supabase
+    .from('slugs')
+    .select('*')
+    .eq('slug', slug);
+  if (entityType) query = query.eq('entity_type', entityType);
+  const { data, error } = await query.single();
+  return { data, error };
+};
+
+export const getPageMeta = async (entityType, entityId) => {
+  const { data, error } = await supabase
+    .from('page_meta')
+    .select('*')
+    .eq('entity_type', entityType)
+    .eq('entity_id', entityId)
+    .single();
+  return { data, error };
+};
+
+// Share cards
+export const getShareCardByMovie = async (movieId) => {
+  const { data, error } = await supabase
+    .from('share_cards')
+    .select('*')
+    .eq('movie_id', movieId)
+    .single();
+  return { data, error };
+};
+
+export const getMoviesByIds = async (ids = []) => {
+  if (!ids.length) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('movies')
+    .select('*')
+    .in('id', ids);
+  return { data, error };
+};
+
+export const getPersonsByIds = async (ids = []) => {
+  if (!ids.length) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('persons')
+    .select('*')
+    .in('id', ids);
+  return { data, error };
+};
+
+export const getSongsByIds = async (ids = []) => {
+  if (!ids.length) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('tracks')
+    .select('*, album:albums(*)')
+    .in('id', ids);
+  return { data, error };
+};
+
+// Admin helpers
+export const adminDeleteReview = async (reviewId) => {
+  const { error } = await supabase.from('reviews').delete().eq('id', reviewId);
+  return { error };
+};
+
+export const upsertTrendingWeekly = async (payload) => {
+  const { data, error } = await supabase
+    .from('trending_weekly')
+    .upsert(payload)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const upsertSlug = async (payload) => {
+  const { data, error } = await supabase
+    .from('slugs')
+    .upsert(payload)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const upsertPageMeta = async (payload) => {
+  const { data, error } = await supabase
+    .from('page_meta')
+    .upsert(payload)
+    .select()
+    .single();
+  return { data, error };
+};

@@ -1,15 +1,29 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPersonById, getFeaturedVideosByPerson } from '../services/supabase';
+import {
+  getPersonById,
+  getFeaturedVideosByPerson,
+  getPageMeta,
+  recordViewEvent,
+  resolveSlug,
+  followEntity,
+  unfollowEntity,
+  getFollowStatus
+} from '../services/supabase';
+import { useAuth } from '../context/AuthContext';
+import SeoHead from '../components/SeoHead';
 
 const PersonDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [videosLoading, setVideosLoading] = useState(true);
   const [featuredVideos, setFeaturedVideos] = useState([]);
   const [showFullBio, setShowFullBio] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [pageMeta, setPageMeta] = useState(null);
 
   useEffect(() => {
     loadPerson();
@@ -18,14 +32,39 @@ const PersonDetail = () => {
   const loadPerson = async () => {
     setLoading(true);
     setVideosLoading(true);
+    let resolvedId = id;
+    if (!/^\d+$/.test(id)) {
+      const { data: slugData } = await resolveSlug(id, 'person');
+      resolvedId = slugData?.entity_id || id;
+    }
     const [{ data }, { data: videos }] = await Promise.all([
-      getPersonById(id),
-      getFeaturedVideosByPerson(id, 8)
+      getPersonById(resolvedId),
+      getFeaturedVideosByPerson(resolvedId, 8)
     ]);
     setPerson(data);
     setFeaturedVideos(videos || []);
+    if (data?.id) {
+      await recordViewEvent('person', data.id, user?.id || null);
+      if (user) {
+        const status = await getFollowStatus(user.id, 'person', data.id);
+        setIsFollowing(status);
+      }
+      const { data: meta } = await getPageMeta('person', String(data.id));
+      setPageMeta(meta || null);
+    }
     setLoading(false);
     setVideosLoading(false);
+  };
+
+  const toggleFollow = async () => {
+    if (!user) return navigate('/login');
+    if (isFollowing) {
+      await unfollowEntity(user.id, 'person', person.id);
+      setIsFollowing(false);
+    } else {
+      await followEntity(user.id, 'person', person.id);
+      setIsFollowing(true);
+    }
   };
 
   const movieCredits = useMemo(() => {
@@ -63,6 +102,11 @@ const PersonDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white">
+      <SeoHead
+        title={pageMeta?.title || `${person.name} - MetaMovies+`}
+        description={pageMeta?.description || person.biography?.slice(0, 160)}
+        jsonLd={pageMeta?.jsonld || null}
+      />
       <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
         <section className="flex flex-col items-center text-center gap-3">
           <div className="w-28 h-28 rounded-full overflow-hidden bg-[#1a1a1a] border border-gray-800">
@@ -75,6 +119,9 @@ const PersonDetail = () => {
               {person.birthday || ''}{person.birthday && person.place_of_birth ? ' • ' : ''}{person.place_of_birth || ''}
             </p>
           )}
+          <button className="btn-secondary h-10 px-4" onClick={toggleFollow}>
+            {isFollowing ? 'Following' : 'Follow'}
+          </button>
         </section>
 
         {person.biography && (

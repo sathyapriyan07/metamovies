@@ -82,9 +82,17 @@ const AdminDashboard = () => {
               <h3 className="text-base font-semibold mb-2">Add Person</h3>
               <p className="text-gray-400 text-sm">Add cast or crew member</p>
             </Link>
+            <Link to="/admin/soundtracks" className="bg-[#1a1a1a] border border-gray-800 rounded-md p-4 hover:bg-[#222] transition">
+              <h3 className="text-base font-semibold mb-2">Music</h3>
+              <p className="text-gray-400 text-sm">Manage albums and songs</p>
+            </Link>
             <Link to="/admin/tmdb-import" className="bg-[#1a1a1a] border border-gray-800 rounded-md p-4 hover:bg-[#222] transition">
               <h3 className="text-base font-semibold mb-2">TMDB Import</h3>
               <p className="text-gray-400 text-sm">Import from TMDB database</p>
+            </Link>
+            <Link to="/admin/deezer-import" className="bg-[#1a1a1a] border border-gray-800 rounded-md p-4 hover:bg-[#222] transition">
+              <h3 className="text-base font-semibold mb-2">Deezer Import</h3>
+              <p className="text-gray-400 text-sm">Import music metadata from Deezer</p>
             </Link>
           </div>
         </section>
