@@ -81,7 +81,7 @@ const AdminLayout = ({ title, subtitle, children }) => {
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu"
           />
-          <aside className="absolute left-0 top-0 h-full w-72 bg-[#111] border-r border-gray-800 p-4">
+          <aside className="absolute left-0 top-0 h-full w-72 bg-[#111] border-r border-gray-800 p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <div className="text-[#F5C518] font-semibold text-sm">Admin Menu</div>
               <button
