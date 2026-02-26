@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { searchDeezer, getDeezerAlbum, getDeezerTrack, getDeezerArtist } from '../../services/deezer';
+import { getSonglinkLinks, extractLinksByPlatform } from '../../services/songlink';
 import { supabase } from '../../services/supabase';
 
 const TYPES = ['album', 'track', 'artist'];
@@ -128,7 +129,7 @@ const DeezerImport = () => {
       } else {
         await importTrack(selected.edit);
       }
-      setToast({ type: 'success', message: 'Imported successfully.' });
+      setToast({ type: 'success', message: 'Imported successfully. Powered by Songlink.' });
       await search(query);
       setSelected(null);
     } catch (err) {
@@ -182,6 +183,18 @@ const DeezerImport = () => {
       artistId = artist.id;
     }
 
+    let platformLinks = null;
+    try {
+      const songlink = await getSonglinkLinks({
+        platform: 'deezer',
+        type: 'album',
+        id: String(album.deezer_album_id)
+      });
+      platformLinks = extractLinksByPlatform(songlink);
+    } catch {
+      platformLinks = null;
+    }
+
     const { data: created, error } = await supabase
       .from('albums')
       .insert({
@@ -190,7 +203,8 @@ const DeezerImport = () => {
         cover_url: album.cover_url || null,
         cover_image_url: album.cover_image_url || null,
         release_date: album.release_date || null,
-        deezer_album_id: album.deezer_album_id
+        deezer_album_id: album.deezer_album_id,
+        platform_links: platformLinks
       })
       .select()
       .single();
@@ -227,6 +241,18 @@ const DeezerImport = () => {
       }
     }
 
+    let platformLinks = null;
+    try {
+      const songlink = await getSonglinkLinks({
+        platform: 'deezer',
+        type: 'song',
+        id: String(track.deezer_track_id)
+      });
+      platformLinks = extractLinksByPlatform(songlink);
+    } catch {
+      platformLinks = null;
+    }
+
     const { data: created, error } = await supabase
       .from('tracks')
       .insert({
@@ -234,7 +260,8 @@ const DeezerImport = () => {
         album_id: albumId,
         duration_seconds: track.duration_seconds || null,
         preview_url: track.preview_url || null,
-        deezer_track_id: track.deezer_track_id
+        deezer_track_id: track.deezer_track_id,
+        platform_links: platformLinks
       })
       .select()
       .single();
@@ -378,6 +405,9 @@ const DeezerImport = () => {
           {!loading && results.length === 0 && query && (
             <div className="text-sm text-gray-400">No results found.</div>
           )}
+        </div>
+        <div className="text-xs text-gray-500 mt-4">
+          Results and links powered by Songlink.
         </div>
       </div>
 

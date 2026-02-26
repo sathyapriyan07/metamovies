@@ -13,6 +13,10 @@ ALTER TABLE albums ADD COLUMN IF NOT EXISTS cover_url TEXT;
 
 -- Tracks
 ALTER TABLE tracks ADD COLUMN IF NOT EXISTS deezer_track_id BIGINT UNIQUE;
+ALTER TABLE tracks ADD COLUMN IF NOT EXISTS platform_links JSONB;
+
+-- Albums
+ALTER TABLE albums ADD COLUMN IF NOT EXISTS platform_links JSONB;
 
 -- Track artists (many-to-many for Deezer artists)
 CREATE TABLE IF NOT EXISTS track_artists (
