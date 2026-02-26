@@ -12,15 +12,19 @@ const buildUrl = (path) => {
 
 const fetchJson = async (path) => {
   const res = await fetch(buildUrl(path));
+  const json = await res.json().catch(() => null);
   if (!res.ok) {
-    throw new Error(`Deezer error ${res.status}`);
+    const msg = json?.error?.message || `Deezer error ${res.status}`;
+    throw new Error(msg);
   }
-  return res.json();
+  return json;
 };
 
 export const searchDeezer = async (type, query) => {
-  const q = encodeURIComponent(query);
-  return fetchJson(`/search/${type}?q=${q}`);
+  const cleaned = String(query || '').trim();
+  if (!cleaned) return { data: [] };
+  const safeType = ['album', 'track', 'artist'].includes(type) ? type : 'track';
+  return fetchJson(`/search/${safeType}?q=${encodeURIComponent(cleaned)}`);
 };
 
 export const getDeezerAlbum = async (id) => fetchJson(`/album/${id}`);
