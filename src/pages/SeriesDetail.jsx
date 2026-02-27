@@ -14,6 +14,7 @@ const SeriesDetail = () => {
   const [showAllEpisodes, setShowAllEpisodes] = useState({});
   const [cast, setCast] = useState([]);
   const [crew, setCrew] = useState([]);
+  const [overviewExpanded, setOverviewExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,23 +91,49 @@ const SeriesDetail = () => {
     <div className="min-h-screen bg-[#0f0f0f] text-white">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
       <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
-        <div className="flex gap-4 rounded-md overflow-hidden border border-gray-800 bg-[#1a1a1a] p-4">
-          <div className="w-[120px] aspect-[2/3] rounded-md overflow-hidden bg-[#111] shrink-0">
-            <img src={series.poster_url} alt={series.name} className="w-full h-full object-cover" />
+        <div className="bg-neutral-900 rounded-2xl p-5 flex flex-col md:flex-row gap-6 items-center md:items-start">
+          <div className="flex-shrink-0">
+            <img
+              src={series.poster_url}
+              alt={series.name}
+              className="w-32 md:w-48 aspect-[2/3] object-cover rounded-xl shadow-lg"
+            />
           </div>
-          <div className="p-3 rounded-md">
+          <div className="flex-1 text-center md:text-left">
             {series.title_logo_url && !series.use_text_title ? (
               <img
                 src={series.title_logo_url}
                 alt={series.name}
-                className="max-h-12 w-auto object-contain"
+                className="max-h-12 w-auto object-contain mx-auto md:mx-0"
               />
             ) : (
               <h1 className="text-2xl font-bold">{series.name}</h1>
             )}
-                        <p className="text-sm text-gray-300 mt-3">{series.overview}</p>
+            {series.overview && (() => {
+              const MAX_LENGTH = 180;
+              const isLong = series.overview.length > MAX_LENGTH;
+              const displayText = overviewExpanded
+                ? series.overview
+                : series.overview.slice(0, MAX_LENGTH);
+              return (
+                <>
+                  <p className="text-sm text-gray-400 leading-relaxed transition-all duration-300 ease-in-out mt-3">
+                    {displayText}
+                    {!overviewExpanded && isLong && '...'}
+                  </p>
+                  {isLong && (
+                    <button
+                      onClick={() => setOverviewExpanded(!overviewExpanded)}
+                      className="text-yellow-400 text-sm mt-2"
+                    >
+                      {overviewExpanded ? 'Show less' : 'Load more'}
+                    </button>
+                  )}
+                </>
+              );
+            })()}
             {(series.tmdb_rating || series.imdb_rating) && (
-              <div className="mt-3 flex items-center gap-3">
+              <div className="mt-3 flex items-center gap-3 justify-center md:justify-start">
                 {series.tmdb_rating && (
                   <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
                     {Number(series.tmdb_rating).toFixed(1)}

@@ -4,9 +4,6 @@ import {
   getHeroBanners,
   getCollections,
   getCollectionWithItems,
-  getWeeklyTrending,
-  getMoviesByIds,
-  getMostWatchlistedMovies,
   getSeries
 } from '../services/supabase';
 
@@ -14,7 +11,6 @@ const Home = () => {
   const navigate = useNavigate();
   const [heroBanners, setHeroBanners] = useState([]);
   const [collections, setCollections] = useState([]);
-  const [trendingMovies, setTrendingMovies] = useState([]);
   const [seriesItems, setSeriesItems] = useState([]);
   const [homeTab, setHomeTab] = useState('movies');
   const [loading, setLoading] = useState(true);
@@ -47,7 +43,7 @@ const Home = () => {
       })
     );
     setCollections(collectionsWithItems);
-    await Promise.all([loadTrending(), loadSeries()]);
+    await Promise.all([loadSeries()]);
     setLoading(false);
   };
 
@@ -56,29 +52,6 @@ const Home = () => {
     setSeriesItems(data || []);
   };
 
-  const loadTrending = async () => {
-    const weekStart = (() => {
-      const now = new Date();
-      const day = now.getDay();
-      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      const monday = new Date(now.setDate(diff));
-      return monday.toISOString().split('T')[0];
-    })();
-
-    const { data: weekly } = await getWeeklyTrending(weekStart);
-    const movieIds = (weekly || [])
-      .filter((item) => item.entity_type === 'movie')
-      .map((item) => item.entity_id);
-    if (movieIds.length > 0) {
-      const { data } = await getMoviesByIds(movieIds);
-      const sorted = (data || []).slice(0, 10);
-      setTrendingMovies(sorted);
-      return;
-    }
-
-    const { data: fallback } = await getMostWatchlistedMovies(10);
-    setTrendingMovies((fallback || []).map((entry) => entry.movie).filter(Boolean));
-  };
 
   const hero = heroBanners[0]?.movie || null;
   const formatRuntime = (mins) => {
@@ -164,36 +137,6 @@ const Home = () => {
                 </button>
               </div>
             </section>
-
-            {trendingMovies.length > 0 && (
-              <section className={`py-6 ${homeTab !== 'movies' ? 'hidden' : ''}`}>
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold">Trending Now</h2>
-                  <button className="text-sm text-[#F5C518]" onClick={() => navigate('/trending')}>See All</button>
-                </div>
-                <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                  {trendingMovies.map((item) => (
-                    <div key={item.id} className="min-w-[140px] cursor-pointer" onClick={() => navigate(`/movie/${item.id}`)}>
-                      <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
-                        {typeof item.rating === 'number' && (
-                          <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
-                            {item.rating.toFixed(1)}
-                          </div>
-                        )}
-                        <img
-                          src={item.poster_url || item.backdrop_url}
-                          alt={item.title || item.name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                      <p className="mt-2 text-sm font-medium truncate">{item.title || item.name}</p>
-                      <p className="text-xs text-gray-400">{item.release_date?.split('-')[0]}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
 
             {homeTab === 'movies' && collections.length > 0 ? (
               collections.map((collection) => (
