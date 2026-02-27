@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { searchAll, getTrendingMovies, getMovies, getPersons, recordSearchEvent } from '../services/supabase';
+import { searchAllContent, getTrendingMovies, getMovies, getPersons, getSeries, recordSearchEvent } from '../services/supabase';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PosterCard from '../components/PosterCard';
 
 const Search = () => {
   const location = useLocation();
   const [query, setQuery] = useState(location.state?.q || '');
-  const [results, setResults] = useState({ movies: [], persons: [] });
+  const [results, setResults] = useState({ movies: [], persons: [], series: [] });
   const [loading, setLoading] = useState(false);
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularMovies, setPopularMovies] = useState([]);
   const [trendingPeople, setTrendingPeople] = useState([]);
+  const [latestSeries, setLatestSeries] = useState([]);
+  const [tab, setTab] = useState('all');
   const [homeLoading, setHomeLoading] = useState(true);
   const navigate = useNavigate();
   const debounceRef = useRef(null);
@@ -27,14 +29,16 @@ const Search = () => {
 
   const loadHomeContent = async () => {
     setHomeLoading(true);
-    const [trending, movies, people] = await Promise.all([
+    const [trending, movies, people, series] = await Promise.all([
       getTrendingMovies(),
       getMovies(20, 0),
       getPersons(12),
+      getSeries(12, 0),
     ]);
     setTrendingMovies(trending.data || []);
     setPopularMovies(movies.data || []);
     setTrendingPeople(people.data || []);
+    setLatestSeries(series.data || []);
     setHomeLoading(false);
   };
 
@@ -45,7 +49,7 @@ const Search = () => {
     }
 
     setLoading(true);
-    const data = await searchAll(searchQuery);
+    const data = await searchAllContent(searchQuery);
     setResults(data);
     if (searchQuery.trim().length >= 2) {
       await recordSearchEvent(searchQuery.trim());
@@ -73,11 +77,47 @@ const Search = () => {
             type="text"
             value={query}
             onChange={handleInputChange}
-            placeholder="Search movies and people"
+            placeholder="Search movies, series and people"
             className="w-full h-12 bg-[#1a1a1a] border border-gray-800 rounded-md px-4 text-sm text-white placeholder:text-gray-500"
           />
-          {query && (results.movies.length > 0 || results.persons.length > 0) && (
+          <div className="mt-3 tab-container">
+            {['all', 'movies', 'series', 'people'].map((t) => (
+              <button
+                key={t}
+                className={`tab ${tab === t ? 'active' : ''}`}
+                onClick={() => setTab(t)}
+              >
+                {t === 'all' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+          {query && (results.movies.length > 0 || results.persons.length > 0 || results.series.length > 0) && (
             <div className="mt-2 bg-[#1a1a1a] border border-gray-800 rounded-md p-3 space-y-3">
+              {results.series.slice(0, 4).length > 0 && (
+                <div>
+                  <p className="text-xs text-gray-400 mb-2">Series</p>
+                  <div className="space-y-2">
+                    {results.series.slice(0, 4).map((item) => (
+                      <button
+                        key={`series-${item.id}`}
+                        className="w-full flex items-center gap-3 text-left"
+                        onClick={() => navigate(`/series/${item.id}`)}
+                      >
+                        <img loading="lazy"
+                          src={item.poster_url || item.backdrop_url}
+                          alt={item.name}
+                          className="w-10 h-14 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{item.name}</p>
+                          <p className="text-xs text-gray-400">{item.first_air_date?.split('-')[0]}</p>
+                        </div>
+                        <span className="text-xs text-gray-400">Series</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {results.movies.slice(0, 4).length > 0 && (
                 <div>
                   <p className="text-xs text-gray-400 mb-2">Movies</p>
@@ -160,7 +200,8 @@ const Search = () => {
               )}
             </section>
 
-            <section>
+            {tab !== 'series' && (
+              <section>
               <h2 className="text-lg font-semibold mb-3">Trending Movies</h2>
               {homeLoading ? (
                 <p>Loading...</p>
@@ -186,9 +227,41 @@ const Search = () => {
                   ))}
                 </div>
               )}
-            </section>
+              </section>
+            )}
 
-            <section>
+            {tab !== 'movies' && (
+              <section>
+                <h2 className="text-lg font-semibold mb-3">Latest Series</h2>
+                {homeLoading ? (
+                  <p>Loading...</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {latestSeries.slice(0, 6).map((series) => (
+                      <button
+                        key={series.id}
+                        className="text-left"
+                        onClick={() => navigate(`/series/${series.id}`)}
+                      >
+                        <div className="aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                          <img
+                            src={series.poster_url || series.backdrop_url}
+                            alt={series.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <p className="mt-2 text-sm font-medium truncate">{series.name}</p>
+                        <p className="text-xs text-gray-400">{series.first_air_date?.split('-')[0]}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {tab !== 'series' && (
+              <section>
               <h2 className="text-lg font-semibold mb-3">Trending People</h2>
               {homeLoading ? (
                 <p>Loading...</p>
@@ -215,7 +288,8 @@ const Search = () => {
                   ))}
                 </div>
               )}
-            </section>
+              </section>
+            )}
           </div>
         ) : (
           <div className="mt-6">
@@ -223,7 +297,17 @@ const Search = () => {
               <p>Loading...</p>
             ) : (
               <>
-                {results.movies.length > 0 && (
+                {results.series.length > 0 && (tab === 'all' || tab === 'series') && (
+                  <section className="py-6">
+                    <h2 className="text-lg font-semibold mb-3">Series</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {results.series.map((series) => (
+                        <PosterCard key={series.id} item={series} type="series" />
+                      ))}
+                    </div>
+                  </section>
+                )}
+                {results.movies.length > 0 && (tab === 'all' || tab === 'movies') && (
                   <section className="py-6">
                     <h2 className="text-lg font-semibold mb-3">Movies</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -234,7 +318,7 @@ const Search = () => {
                   </section>
                 )}
 
-                {results.persons.length > 0 && (
+                {results.persons.length > 0 && (tab === 'all' || tab === 'people') && (
                   <section className="py-6">
                     <h2 className="text-lg font-semibold mb-3">People</h2>
                     <div className="space-y-2">
@@ -257,7 +341,7 @@ const Search = () => {
                   </section>
                 )}
 
-                {results.movies.length === 0 && results.persons.length === 0 && (
+                {results.movies.length === 0 && results.persons.length === 0 && results.series.length === 0 && (
                   <p>No results found for "{query}"</p>
                 )}
               </>

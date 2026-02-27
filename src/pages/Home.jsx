@@ -6,7 +6,8 @@ import {
   getCollectionWithItems,
   getWeeklyTrending,
   getMoviesByIds,
-  getMostWatchlistedMovies
+  getMostWatchlistedMovies,
+  getSeries
 } from '../services/supabase';
 
 const Home = () => {
@@ -14,6 +15,8 @@ const Home = () => {
   const [heroBanners, setHeroBanners] = useState([]);
   const [collections, setCollections] = useState([]);
   const [trendingMovies, setTrendingMovies] = useState([]);
+  const [seriesItems, setSeriesItems] = useState([]);
+  const [homeTab, setHomeTab] = useState('movies');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,8 +47,13 @@ const Home = () => {
       })
     );
     setCollections(collectionsWithItems);
-    await loadTrending();
+    await Promise.all([loadTrending(), loadSeries()]);
     setLoading(false);
+  };
+
+  const loadSeries = async () => {
+    const { data } = await getSeries(12, 0);
+    setSeriesItems(data || []);
   };
 
   const loadTrending = async () => {
@@ -140,8 +148,25 @@ const Home = () => {
           <p className="py-6">Loading...</p>
         ) : (
           <>
+            <section className="py-6">
+              <div className="tab-container">
+                <button
+                  className={`tab ${homeTab === 'movies' ? 'active' : ''}`}
+                  onClick={() => setHomeTab('movies')}
+                >
+                  Movies
+                </button>
+                <button
+                  className={`tab ${homeTab === 'series' ? 'active' : ''}`}
+                  onClick={() => setHomeTab('series')}
+                >
+                  Series
+                </button>
+              </div>
+            </section>
+
             {trendingMovies.length > 0 && (
-              <section className="py-6">
+              <section className={`py-6 ${homeTab !== 'movies' ? 'hidden' : ''}`}>
                 <div className="flex items-center justify-between mb-3">
                   <h2 className="text-lg font-semibold">Trending Now</h2>
                   <button className="text-sm text-[#F5C518]" onClick={() => navigate('/trending')}>See All</button>
@@ -170,7 +195,7 @@ const Home = () => {
               </section>
             )}
 
-            {collections.length > 0 ? (
+            {homeTab === 'movies' && collections.length > 0 ? (
               collections.map((collection) => (
                 <section key={collection.id} className="py-6">
                   <div className="flex items-center justify-between mb-3">
@@ -201,7 +226,37 @@ const Home = () => {
                 </section>
               ))
             ) : (
-              <div className="py-6 text-sm text-gray-400">No featured content added yet.</div>
+              homeTab === 'movies' && <div className="py-6 text-sm text-gray-400">No featured content added yet.</div>
+            )}
+
+            {homeTab === 'series' && (
+              <section className="py-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold">Latest Series</h2>
+                  <button className="text-sm text-[#F5C518]" onClick={() => navigate('/series')}>See All</button>
+                </div>
+                <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                  {seriesItems.map((item) => (
+                    <div key={item.id} className="min-w-[140px] cursor-pointer" onClick={() => navigate(`/series/${item.id}`)}>
+                      <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                        {typeof item.rating === 'number' && (
+                          <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
+                            {item.rating.toFixed(1)}
+                          </div>
+                        )}
+                        <img
+                          src={item.poster_url || item.backdrop_url}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                      <p className="mt-2 text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-gray-400">{item.first_air_date?.split('-')[0]}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
           </>
         )}

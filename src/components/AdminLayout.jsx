@@ -12,6 +12,7 @@ const AdminLayout = ({ title, subtitle, children }) => {
     { label: 'Add Video', to: '/admin/add-video' },
     { label: 'Add News', to: '/admin/add-news' },
     { label: 'Manage Movies', to: '/admin/manage-movies' },
+    { label: 'Manage Series', to: '/admin/manage-series' },
     { label: 'Manage Videos', to: '/admin/videos' },
     { label: 'Manage News', to: '/admin/news' },
     { label: 'Manage Collections', to: '/admin/manage-collections' },

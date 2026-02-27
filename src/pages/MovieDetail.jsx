@@ -10,6 +10,7 @@ import {
   resolveSlug
 } from '../services/supabase';
 import SeoHead from '../components/SeoHead';
+import { supabase } from '../services/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useWatchlist } from '../hooks/useWatchlist';
 
@@ -27,6 +28,7 @@ const MovieDetail = () => {
   const [reviewSummary, setReviewSummary] = useState({ avg: null, count: 0 });
   const [reviews, setReviews] = useState([]);
   const [pageMeta, setPageMeta] = useState(null);
+  const [musicDirector, setMusicDirector] = useState(null);
 
   useEffect(() => {
     loadMovie();
@@ -52,6 +54,17 @@ const MovieDetail = () => {
     if (data?.id) {
       const { data: meta } = await getPageMeta('movie', String(data.id));
       setPageMeta(meta || null);
+    }
+    if (data?.composer_name) {
+      const { data: person } = await supabase
+        .from('persons')
+        .select('id, name, profile_url, profile_path, profile_image')
+        .ilike('name', data.composer_name)
+        .limit(1)
+        .single();
+      setMusicDirector(person || null);
+    } else {
+      setMusicDirector(null);
     }
     if (data?.id) {
       await recordViewEvent('movie', data.id, user?.id || null);
@@ -81,7 +94,7 @@ const MovieDetail = () => {
     return match ? match[1] : null;
   };
   const videoId = useMemo(() => {
-    if (!movie?.trailer_url) return null;
+    if (!movie?.trailer_url) return null;;
     return extractYouTubeId(movie.trailer_url);
   }, [movie?.trailer_url]);
 
@@ -102,7 +115,7 @@ const MovieDetail = () => {
 
   const year = movie.release_date?.split('-')[0];
   const formatRuntime = (mins) => {
-    if (!mins || mins <= 0) return null;
+    if (!mins || mins <= 0) return null;;
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     if (h === 0) return `${m}m`;
@@ -117,7 +130,10 @@ const MovieDetail = () => {
   const metaLine = [year, runtime, genresText].filter(Boolean).join(` ${bullet} `);
 
   const reviewItems = Array.isArray(reviews) ? reviews : [];
-  const mediaVideos = movie.trailer_url ? [movie.trailer_url] : [];
+  const mediaVideos = [
+    ...(Array.isArray(movie.media_videos) ? movie.media_videos : []),
+    ...(movie.trailer_url ? [movie.trailer_url] : [])
+  ].filter(Boolean);
   const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
   const ottPlatforms = movie.watch_links
     ? Object.entries(movie.watch_links).filter(([, url]) => url)
@@ -151,7 +167,14 @@ const MovieDetail = () => {
       />
       <div className="max-w-2xl mx-auto px-4 pb-10">
         <div className="px-4 pt-4">
-          <div className="relative w-full h-[220px] rounded-md overflow-hidden bg-black">
+          <div
+            className="relative w-full h-[220px] rounded-md overflow-hidden bg-black"
+            style={{
+              backgroundImage: `linear-gradient(180deg, rgba(15,15,15,0.15) 0%, rgba(15,15,15,0.7) 60%, rgba(15,15,15,0.95) 100%), url(${movie.backdrop_url || movie.poster_url || ''})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
             {videoId && !videoError ? (
               <iframe
                 className="w-full h-full"
@@ -163,14 +186,7 @@ const MovieDetail = () => {
                 onError={() => setVideoError(true)}
                 loading="lazy"
               />
-            ) : (
-              <img
-                loading="lazy"
-                src={movie.backdrop_url || movie.poster_url}
-                alt={movie.title}
-                className="w-full h-full object-cover"
-              />
-            )}
+            ) : null}
           </div>
         </div>
         <section className="rounded-md overflow-hidden border border-gray-800 bg-[#1a1a1a] mt-4">
@@ -297,11 +313,37 @@ const MovieDetail = () => {
                 </button>
               ))}
             </div>
-            {movie.composer_name && (
-              <div className="mt-4 text-sm text-gray-300">
-                <span className="text-gray-400">Music:</span> {movie.composer_name}
+          </section>
+        )}
+        
+        {movie.composer_name && (
+          <section className="py-6">
+            <h2 className="text-lg font-semibold mb-3">Music Director</h2>
+            <button
+              className="w-full flex items-center gap-3 text-left"
+              onClick={() => {
+                if (musicDirector?.id) {
+                  navigate(`/person/${musicDirector.id}`);
+                }
+              }}
+            >
+              {musicDirector?.profile_url ? (
+                <img
+                  loading="lazy"
+                  src={musicDirector.profile_url}
+                  alt={movie.composer_name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center text-xs">
+                  {movie.composer_name?.[0] || '?'}
+                </div>
+              )}
+              <div>
+                <p className="text-sm text-white">{movie.composer_name}</p>
+                <p className="text-xs text-gray-400">Music Director</p>
               </div>
-            )}
+            </button>
           </section>
         )}
 
@@ -432,15 +474,25 @@ const MovieDetail = () => {
           <section className="py-6">
             <h2 className="text-lg font-semibold mb-3">Media</h2>
             <div className="grid grid-cols-2 gap-3">
-              {mediaVideos.map((url) => (
-                <button
-                  key={url}
-                  className="aspect-video rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800 flex items-center justify-center text-sm"
-                  onClick={() => window.open(url, '_blank')}
-                >
-                  Play Video
-                </button>
-              ))}
+              {mediaVideos.map((url) => {
+                const videoId = extractYouTubeId(url);
+                const thumb = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+                return (
+                  <a
+                    key={url}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="aspect-video rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800 block"
+                  >
+                    {thumb ? (
+                      <img loading="lazy" src={thumb} alt="Media" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-sm text-gray-400">Play Video</div>
+                    )}
+                  </a>
+                );
+              })}
               {mediaPhotos.map((url) => (
                 <div key={url} className="aspect-video rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800">
                   <img loading="lazy" src={url} alt="Media" className="w-full h-full object-cover" />

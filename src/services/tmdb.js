@@ -17,6 +17,18 @@ export const getMovieDetails = async (tmdbId) => {
   return data;
 };
 
+export const getSeriesDetails = async (tmdbId) => {
+  const { data } = await tmdbApi.get(`/tv/${tmdbId}`, {
+    params: { append_to_response: 'credits,videos,external_ids' }
+  });
+  return data;
+};
+
+export const getSeasonDetails = async (tmdbId, seasonNumber) => {
+  const { data } = await tmdbApi.get(`/tv/${tmdbId}/season/${seasonNumber}`);
+  return data;
+};
+
 export const getPersonDetails = async (tmdbId) => {
   const { data } = await tmdbApi.get(`/person/${tmdbId}`, {
     params: { append_to_response: 'combined_credits,external_ids' }
@@ -33,6 +45,13 @@ export const searchMulti = async (query) => {
 
 export const searchMovies = async (query) => {
   const { data } = await tmdbApi.get('/search/movie', {
+    params: { query }
+  });
+  return data.results;
+};
+
+export const searchSeries = async (query) => {
+  const { data } = await tmdbApi.get('/search/tv', {
     params: { query }
   });
   return data.results;

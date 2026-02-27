@@ -85,6 +85,63 @@ export const getMovieById = async (id) => {
   return { data, error };
 };
 
+// Series
+export const getSeries = async (limit = 20, offset = 0) => {
+  const { data, error } = await supabase
+    .from('series')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+  return { data, error };
+};
+
+export const getSeriesById = async (id) => {
+  const { data, error } = await supabase
+    .from('series')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return { data, error };
+};
+
+export const getSeriesByTmdbId = async (tmdbId) => {
+  const { data, error } = await supabase
+    .from('series')
+    .select('*')
+    .eq('tmdb_id', tmdbId)
+    .single();
+  return { data, error };
+};
+
+export const getSeasonsBySeries = async (seriesId) => {
+  const { data, error } = await supabase
+    .from('seasons')
+    .select('*')
+    .eq('series_id', seriesId)
+    .order('season_number', { ascending: true });
+  return { data, error };
+};
+
+
+export const getEpisodesBySeries = async (seriesId) => {
+  const { data, error } = await supabase
+    .from('episodes')
+    .select('*')
+    .eq('series_id', seriesId)
+    .order('season_id', { ascending: true })
+    .order('episode_number', { ascending: true });
+  return { data, error };
+};
+
+export const getEpisodesBySeason = async (seasonId) => {
+  const { data, error } = await supabase
+    .from('episodes')
+    .select('*')
+    .eq('season_id', seasonId)
+    .order('episode_number', { ascending: true });
+  return { data, error };
+};
+
 export const getTrendingMovies = async () => {
   const { data, error } = await supabase
     .from('movies')
@@ -307,7 +364,9 @@ export const getPersonById = async (id) => {
     .select(`
       *,
       cast_roles:"cast"(*, movie:movies(*)),
-      crew_roles:crew(*, movie:movies(*))
+      crew_roles:crew(*, movie:movies(*)),
+      series_cast_roles:series_cast(*, series:series(*)),
+      series_crew_roles:series_crew(*, series:series(*))
     `)
     .eq('id', id)
     .single();
@@ -321,6 +380,78 @@ export const searchAll = async (query) => {
     supabase.from('persons').select('*').ilike('name', `%${query}%`).limit(100)
   ]);
   return { movies: movies.data, persons: persons.data };
+};
+
+export const searchSeries = async (query) => {
+  const { data, error } = await supabase
+    .from('series')
+    .select('*')
+    .ilike('name', `%${query}%`)
+    .limit(100);
+  return { data, error };
+};
+
+export const searchAllContent = async (query) => {
+  const [movies, persons, series] = await Promise.all([
+    supabase.from('movies').select('*').ilike('title', `%${query}%`).limit(100),
+    supabase.from('persons').select('*').ilike('name', `%${query}%`).limit(100),
+    supabase.from('series').select('*').ilike('name', `%${query}%`).limit(100),
+  ]);
+  return { movies: movies.data, persons: persons.data, series: series.data };
+};
+
+export const createSeries = async (payload) => {
+  const { data, error } = await supabase
+    .from('series')
+    .upsert(payload, { onConflict: 'tmdb_id' })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const createSeason = async (payload) => {
+  const { data, error } = await supabase
+    .from('seasons')
+    .upsert(payload, { onConflict: 'series_id,season_number' })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const createEpisode = async (payload) => {
+  const { data, error } = await supabase
+    .from('episodes')
+    .upsert(payload, { onConflict: 'season_id,episode_number' })
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const createSeriesCast = async (payload) => {
+  const { data, error } = await supabase
+    .from('series_cast')
+    .insert(payload)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const createSeriesCrew = async (payload) => {
+  const { data, error } = await supabase
+    .from('series_crew')
+    .insert(payload)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const getPersonsByTmdbIds = async (tmdbIds = []) => {
+  if (!tmdbIds.length) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('persons')
+    .select('*')
+    .in('tmdb_id', tmdbIds);
+  return { data, error };
 };
 
 // Watchlist
@@ -528,6 +659,24 @@ export const setFeaturedVideoPersons = async (videoId, persons = []) => {
     personVideoCache.clear();
   }
   return { data, error };
+};
+
+export const removeFeaturedVideoPersonLink = async (videoId, personId) => {
+  const relationConfig = await resolveVideoPersonRelationConfig();
+  if (!relationConfig) {
+    return { data: null, error: new Error('No video-person relation table found') };
+  }
+
+  const { error } = await supabase
+    .from(relationConfig.table)
+    .delete()
+    .eq(relationConfig.videoForeignKey, videoId)
+    .eq('person_id', personId);
+
+  if (!error) {
+    personVideoCache.clear();
+  }
+  return { data: null, error };
 };
 
 const resolveVideoPersonRelationConfig = async () => {

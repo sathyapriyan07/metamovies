@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../services/supabase';
+import { supabase, getFeaturedVideosByPerson, setFeaturedVideoPersons, removeFeaturedVideoPersonLink } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const ManagePersons = () => {
@@ -8,6 +8,12 @@ const ManagePersons = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [featuredVideos, setFeaturedVideos] = useState([]);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoTitle, setVideoTitle] = useState('');
+  const [videoRole, setVideoRole] = useState('');
+  const [videoSaving, setVideoSaving] = useState(false);
+  const [videoMessage, setVideoMessage] = useState('');
   const [formData, setFormData] = useState({ 
     profile_url: '', 
     biography: '',
@@ -45,6 +51,95 @@ const ManagePersons = () => {
     setLoading(false);
   };
 
+
+  const extractYouTubeId = (url) => {
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname.includes('youtu.be')) {
+        return parsed.pathname.replace('/', '') || null;
+      }
+      if (parsed.searchParams.get('v')) return parsed.searchParams.get('v');
+      const pathMatch = parsed.pathname.match(/\/(embed|v)\/([^/?#]+)/);
+      return pathMatch ? pathMatch[2] : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const loadFeaturedVideos = async (personId) => {
+    const { data } = await getFeaturedVideosByPerson(personId, 12);
+    setFeaturedVideos(data || []);
+  };
+
+  const handleAddFeaturedVideo = async () => {
+    if (!selectedPerson) return;
+    setVideoMessage('');
+    const youtubeId = extractYouTubeId(videoUrl);
+    if (!youtubeId) {
+      setVideoMessage('Invalid YouTube URL.');
+      return;
+    }
+    const title = videoTitle.trim() || `${selectedPerson.name} - Featured Video`;
+    setVideoSaving(true);
+    const { data: video, error } = await supabase
+      .from('videos')
+      .insert({
+        title,
+        youtube_url: videoUrl.trim(),
+        youtube_id: youtubeId,
+        thumbnail_url: `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`,
+        is_featured: true
+      })
+      .select()
+      .single();
+
+    if (error || !video?.id) {
+      setVideoMessage(error?.message || 'Failed to add video.');
+      setVideoSaving(false);
+      return;
+    }
+
+    const { error: linkError } = await setFeaturedVideoPersons(video.id, [
+      { id: selectedPerson.id, role: videoRole.trim() || null }
+    ]);
+
+    if (linkError) {
+      setVideoMessage(linkError.message || 'Failed to link video.');
+      setVideoSaving(false);
+      return;
+    }
+
+    setVideoUrl('');
+    setVideoTitle('');
+    setVideoRole('');
+    setVideoMessage('Video added.');
+    await loadFeaturedVideos(selectedPerson.id);
+    setVideoSaving(false);
+  };
+
+  const handleRemoveFeaturedVideoLink = async (videoId) => {
+    if (!selectedPerson) return;
+    setVideoMessage('');
+    const { error } = await removeFeaturedVideoPersonLink(videoId, selectedPerson.id);
+    if (error) {
+      setVideoMessage(error.message || 'Failed to remove link.');
+      return;
+    }
+    setVideoMessage('Link removed.');
+    await loadFeaturedVideos(selectedPerson.id);
+  };
+
+  const handleDeleteFeaturedVideo = async (videoId) => {
+    if (!selectedPerson) return;
+    setVideoMessage('');
+    const { error } = await supabase.from('videos').delete().eq('id', videoId);
+    if (error) {
+      setVideoMessage(error.message || 'Failed to delete video.');
+      return;
+    }
+    setVideoMessage('Video deleted.');
+    await loadFeaturedVideos(selectedPerson.id);
+  };
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (!query.trim()) {
@@ -67,6 +162,8 @@ const ManagePersons = () => {
       youtube_music: person.music_links?.youtube_music || '',
       amazon_music: person.music_links?.amazon_music || ''
     });
+    setVideoMessage('');
+    loadFeaturedVideos(person.id);
   };
 
   const handleUpdate = async (e) => {
@@ -218,6 +315,78 @@ const ManagePersons = () => {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  <div className="border-t border-white/20 pt-4">
+                    <h3 className="text-lg font-bold mb-3">Featured Videos</h3>
+                    <div className="space-y-3">
+                      <input
+                        type="url"
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                        placeholder="YouTube URL"
+                        className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                      />
+                      <input
+                        type="text"
+                        value={videoTitle}
+                        onChange={(e) => setVideoTitle(e.target.value)}
+                        placeholder="Video title (optional)"
+                        className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                      />
+                      <input
+                        type="text"
+                        value={videoRole}
+                        onChange={(e) => setVideoRole(e.target.value)}
+                        placeholder="Role (optional)"
+                        className="w-full px-4 py-3 bg-white/10 rounded-lg border border-white/20"
+                      />
+                      <button
+                        type="button"
+                        disabled={videoSaving}
+                        onClick={handleAddFeaturedVideo}
+                        className="w-full btn-primary py-3"
+                      >
+                        {videoSaving ? 'Saving...' : 'Add Featured Video'}
+                      </button>
+                      {videoMessage && (
+                        <div className="text-xs text-gray-300">{videoMessage}</div>
+                      )}
+                    </div>
+
+                    {featuredVideos.length > 0 && (
+                      <div className="mt-4 space-y-2">
+                        {featuredVideos.map((video) => (
+                          <div key={video.id} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-lg p-3">
+                            <img
+                              src={video.thumbnail_url || 'https://via.placeholder.com/120x68'}
+                              alt={video.title}
+                              className="w-20 h-12 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <div className="text-sm font-medium">{video.title}</div>
+                              {video.person_role && (
+                                <div className="text-xs text-gray-400">{video.person_role}</div>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFeaturedVideoLink(video.id)}
+                              className="text-xs text-red-400 hover:text-red-300 border border-red-500/40 rounded px-2 py-1"
+                            >
+                              Remove Link
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteFeaturedVideo(video.id)}
+                              className="text-xs text-red-300 hover:text-red-200 border border-red-500/60 rounded px-2 py-1"
+                            >
+                              Delete Video
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {formData.profile_url && (

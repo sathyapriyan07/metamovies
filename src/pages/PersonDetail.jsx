@@ -85,6 +85,29 @@ const PersonDetail = () => {
     ].sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
   }, [person]);
 
+  const seriesCredits = useMemo(() => {
+    if (!person) return [];
+    return [
+      ...(person.series_cast_roles?.filter((c) => c.series)?.map((c) => ({
+        ...(c.series || {}),
+        type: 'series',
+        role: c.character,
+        year: c.series?.first_air_date?.split('-')[0]
+      })) || []),
+      ...(person.series_crew_roles?.filter((c) => c.series)?.map((c) => ({
+        ...(c.series || {}),
+        type: 'series',
+        role: c.job,
+        year: c.series?.first_air_date?.split('-')[0]
+      })) || [])
+    ].sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
+  }, [person]);
+
+  const allCredits = useMemo(() => {
+    return [...movieCredits, ...seriesCredits]
+      .sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
+  }, [movieCredits, seriesCredits]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0f0f0f] text-white">
@@ -139,16 +162,20 @@ const PersonDetail = () => {
           </section>
         )}
 
-        {movieCredits.length > 0 && (
+        {allCredits.length > 0 && (
           <section className="py-6">
             <h2 className="text-lg font-semibold mb-3">Known For</h2>
             <div className="flex gap-3 overflow-x-auto pb-2">
-              {movieCredits.slice(0, 10).map((credit, i) => (
-                <button key={`known-${i}`} className="min-w-[120px] text-left" onClick={() => navigate(`/movie/${credit.id}`)}>
+              {allCredits.slice(0, 10).map((credit, i) => (
+                <button
+                  key={`known-${i}`}
+                  className="min-w-[120px] text-left"
+                  onClick={() => navigate(`/${credit.type}/${credit.id}`)}
+                >
                   <div className="aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a] border border-gray-800">
-                    <img loading="lazy" src={credit.poster_url || credit.backdrop_url} alt={credit.title} className="w-full h-full object-cover" />
+                    <img loading="lazy" src={credit.poster_url || credit.backdrop_url} alt={credit.title || credit.name} className="w-full h-full object-cover" />
                   </div>
-                  <p className="mt-2 text-sm font-medium truncate">{credit.title}</p>
+                  <p className="mt-2 text-sm font-medium truncate">{credit.title || credit.name}</p>
                 </button>
               ))}
             </div>
@@ -158,18 +185,18 @@ const PersonDetail = () => {
         <section className="py-6">
           <h2 className="text-lg font-semibold mb-3">Filmography</h2>
           <div className="space-y-3">
-            {movieCredits.map((credit, i) => (
+            {allCredits.map((credit, i) => (
               <button
                 key={`film-${i}`}
                 className="w-full flex items-center gap-3 text-left bg-[#1a1a1a] rounded-md p-3 border border-gray-800"
-                onClick={() => navigate(`/movie/${credit.id}`)}
+                onClick={() => navigate(`/${credit.type}/${credit.id}`)}
               >
                 <div className="w-12 h-16 rounded-md overflow-hidden bg-[#111] shrink-0">
-                  <img loading="lazy" src={credit.poster_url || credit.backdrop_url} alt={credit.title} className="w-full h-full object-cover" />
+                  <img loading="lazy" src={credit.poster_url || credit.backdrop_url} alt={credit.title || credit.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">{credit.title}</p>
-                  <p className="text-xs text-gray-400">{credit.year || 'Year'} • {credit.role || 'Role'}</p>
+                  <p className="text-sm font-medium">{credit.title || credit.name}</p>
+                  <p className="text-xs text-gray-400">{credit.year || 'Year'} • {credit.role || 'Role'} • {credit.type === 'series' ? 'Series' : 'Movie'}</p>
                 </div>
               </button>
             ))}
@@ -180,14 +207,27 @@ const PersonDetail = () => {
           <h2 className="text-lg font-semibold mb-3">Featured Videos</h2>
           {videosLoading ? (
             <p>Loading...</p>
-          ) : (
-            <div className="space-y-2">
+          ) : featuredVideos.length ? (
+            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
               {featuredVideos.map((video) => (
-                <button key={video.id} className="w-full text-left bg-[#1a1a1a] rounded-md p-3" onClick={() => navigate(`/videos/${video.id}`)}>
-                  <p className="text-sm font-medium">{video.title}</p>
-                </button>
+                <a
+                  key={video.id}
+                  href={video.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="min-w-[180px] bg-[#1a1a1a] border border-gray-800 rounded-md overflow-hidden block"
+                  aria-label={video.title}
+                >
+                  <img
+                    src={video.thumbnail_url}
+                    alt={video.title}
+                    className="w-full h-28 object-cover"
+                  />
+                </a>
               ))}
             </div>
+          ) : (
+            <div className="text-sm text-gray-400">No featured videos.</div>
           )}
         </section>
       </div>

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { getUnreadNotificationsCount } from '../services/supabase';
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -24,6 +26,7 @@ const Header = () => {
   const navItems = [
     { label: 'Home', to: '/' },
     { label: 'Movies', to: '/movies' },
+    { label: 'Series', to: '/series' },
     { label: 'People', to: '/search' },
     { label: 'Platforms', to: '/platforms' },
     { label: 'Trending', to: '/trending' },
@@ -74,6 +77,22 @@ const Header = () => {
                   <span className="absolute -top-2 -right-2 bg-[#F5C518] text-black text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
+                )}
+              </button>
+              <button
+                className="text-white/80 hover:text-white transition"
+                onClick={() => toggleTheme(theme === 'dark' ? 'light' : 'dark')}
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 14.5A8.5 8.5 0 119.5 3 7 7 0 0021 14.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 )}
               </button>
               <button

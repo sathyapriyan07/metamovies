@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { getMovieDetails, getImageUrl, getPersonDetails, searchMovies, searchPerson } from '../../services/tmdb';
-import { createMovie, createPerson, createCast, createCrew, supabase } from '../../services/supabase';
+import { getMovieDetails, getSeriesDetails, getSeasonDetails, getImageUrl, getPersonDetails, searchMovies, searchSeries, searchPerson } from '../../services/tmdb';
+import { createMovie, createPerson, createCast, createCrew, createSeries, createSeason, createEpisode, createSeriesCast, createSeriesCrew, supabase } from '../../services/supabase';
 import AdminLayout from '../../components/AdminLayout';
 
 const TMDBImport = () => {
@@ -51,7 +51,11 @@ const TMDBImport = () => {
     setError('');
 
     try {
-      const results = type === 'movie' ? await searchMovies(searchQuery) : await searchPerson(searchQuery);
+      const results = type === 'movie'
+        ? await searchMovies(searchQuery)
+        : type === 'series'
+          ? await searchSeries(searchQuery)
+          : await searchPerson(searchQuery);
       setSearchResults(results.slice(0, 20));
     } catch (err) {
       setError('Search failed. Please try again.');
@@ -66,7 +70,11 @@ const TMDBImport = () => {
     setError('');
 
     try {
-      const results = type === 'movie' ? await searchMovies(bulkSearchQuery) : await searchPerson(bulkSearchQuery);
+      const results = type === 'movie'
+        ? await searchMovies(bulkSearchQuery)
+        : type === 'series'
+          ? await searchSeries(bulkSearchQuery)
+          : await searchPerson(bulkSearchQuery);
       setBulkSearchResults(results.slice(0, 20));
     } catch (err) {
       setError('Search failed. Please try again.');
@@ -81,7 +89,11 @@ const TMDBImport = () => {
     setSuccess('');
 
     try {
-      const data = type === 'movie' ? await getMovieDetails(tmdbId) : await getPersonDetails(tmdbId);
+      const data = type === 'movie'
+        ? await getMovieDetails(tmdbId)
+        : type === 'series'
+          ? await getSeriesDetails(tmdbId)
+          : await getPersonDetails(tmdbId);
       setPreview(data);
     } catch (err) {
       setError('Failed to fetch from TMDB. Check the ID and try again.');
@@ -95,7 +107,11 @@ const TMDBImport = () => {
     setError('');
     setSuccess('');
     try {
-      const data = type === 'movie' ? await getMovieDetails(item.id) : await getPersonDetails(item.id);
+      const data = type === 'movie'
+        ? await getMovieDetails(item.id)
+        : type === 'series'
+          ? await getSeriesDetails(item.id)
+          : await getPersonDetails(item.id);
       setPreview(data);
     } catch (err) {
       setError('Failed to fetch details. Please try again.');
@@ -196,6 +212,112 @@ const TMDBImport = () => {
           }));
         }
         setSuccess('Movie imported successfully.');
+      } else if (type === 'series') {
+        const seriesPayload = {
+          tmdb_id: preview.id,
+          name: preview.name,
+          overview: preview.overview || null,
+          first_air_date: preview.first_air_date || null,
+          last_air_date: preview.last_air_date || null,
+          status: preview.status || null,
+          number_of_seasons: preview.number_of_seasons || null,
+          number_of_episodes: preview.number_of_episodes || null,
+          rating: typeof preview.vote_average === 'number' ? Number(preview.vote_average.toFixed(1)) : null,
+          tmdb_rating: typeof preview.vote_average === 'number' ? Number(preview.vote_average.toFixed(1)) : null,
+          poster_url: getImageUrl(preview.poster_path, 'w500'),
+          backdrop_url: getImageUrl(preview.backdrop_path, 'original'),
+          genres: preview.genres?.map((g) => g.name) || []
+        };
+        const { data: series } = await createSeries(seriesPayload);
+
+        if (series?.id) {
+          await supabase.from('series_cast').delete().eq('series_id', series.id);
+          await supabase.from('series_crew').delete().eq('series_id', series.id);
+
+          const credits = preview.credits || { cast: [], crew: [] };
+          const cast = (credits.cast || []).slice(0, 20);
+          const crew = (credits.crew || []).filter((c) => crewJobs.has(c.job)).slice(0, 20);
+          const personIds = Array.from(new Set([
+            ...cast.map((c) => c.id),
+            ...crew.map((c) => c.id)
+          ]));
+
+          const personCache = new Map();
+          await mapWithConcurrency(personIds, 5, async (personId) => {
+            if (personCache.has(personId)) return personCache.get(personId);
+            const details = await getPersonDetails(personId);
+            const payload = {
+              tmdb_id: details.id,
+              name: details.name,
+              biography: details.biography || null,
+              birthday: details.birthday || null,
+              place_of_birth: details.place_of_birth || null,
+              profile_url: getImageUrl(details.profile_path, 'w500'),
+              social_links: {
+                instagram: details.external_ids?.instagram_id ? `https://www.instagram.com/${details.external_ids.instagram_id}` : null,
+                twitter: details.external_ids?.twitter_id ? `https://x.com/${details.external_ids.twitter_id}` : null,
+                facebook: details.external_ids?.facebook_id ? `https://www.facebook.com/${details.external_ids.facebook_id}` : null,
+                imdb: details.external_ids?.imdb_id ? `https://www.imdb.com/name/${details.external_ids.imdb_id}` : null
+              }
+            };
+            const { data: person } = await supabase
+              .from('persons')
+              .upsert(payload, { onConflict: 'tmdb_id' })
+              .select()
+              .single();
+            personCache.set(personId, person);
+            return person;
+          });
+
+          await Promise.all(cast.map(async (member) => {
+            const person = personCache.get(member.id);
+            if (!person?.id) return;
+            await createSeriesCast({
+              series_id: series.id,
+              person_id: person.id,
+              character: member.character || null
+            });
+          }));
+
+          await Promise.all(crew.map(async (member) => {
+            const person = personCache.get(member.id);
+            if (!person?.id) return;
+            await createSeriesCrew({
+              series_id: series.id,
+              person_id: person.id,
+              job: member.job || null
+            });
+          }));
+
+          const seasons = preview.seasons || [];
+          for (const season of seasons) {
+            const seasonDetails = await getSeasonDetails(preview.id, season.season_number);
+            const { data: createdSeason } = await createSeason({
+              series_id: series.id,
+              season_number: seasonDetails.season_number,
+              name: seasonDetails.name,
+              overview: seasonDetails.overview || null,
+              air_date: seasonDetails.air_date || null,
+              episode_count: seasonDetails.episodes?.length || seasonDetails.episode_count || null,
+              poster_url: getImageUrl(seasonDetails.poster_path, 'w500')
+            });
+
+            for (const episode of seasonDetails.episodes || []) {
+              await createEpisode({
+                series_id: series.id,
+                season_id: createdSeason.id,
+                episode_number: episode.episode_number,
+                name: episode.name,
+                overview: episode.overview || null,
+                air_date: episode.air_date || null,
+                runtime: episode.runtime || null,
+                still_url: getImageUrl(episode.still_path, 'w500'),
+                tmdb_rating: typeof episode.vote_average === 'number' ? Number(episode.vote_average.toFixed(1)) : null
+              });
+            }
+          }
+        }
+        setSuccess('Series imported successfully.');
       } else {
         const personPayload = {
           tmdb_id: preview.id,
@@ -243,7 +365,11 @@ const TMDBImport = () => {
         current += 1;
         setBulkProgress({ current, total: ids.length, status: `Importing ${id}...` });
 
-        const data = type === 'movie' ? await getMovieDetails(id) : await getPersonDetails(id);
+        const data = type === 'movie'
+          ? await getMovieDetails(id)
+          : type === 'series'
+            ? await getSeriesDetails(id)
+            : await getPersonDetails(id);
 
         if (type === 'movie') {
           const moviePayload = {
@@ -330,6 +456,111 @@ const TMDBImport = () => {
                 job: member.job || null
               });
             }));
+          }
+        } else if (type === 'series') {
+          const seriesPayload = {
+            tmdb_id: data.id,
+            name: data.name,
+            overview: data.overview || null,
+            first_air_date: data.first_air_date || null,
+            last_air_date: data.last_air_date || null,
+            status: data.status || null,
+            number_of_seasons: data.number_of_seasons || null,
+            number_of_episodes: data.number_of_episodes || null,
+            rating: typeof data.vote_average === 'number' ? Number(data.vote_average.toFixed(1)) : null,
+            tmdb_rating: typeof data.vote_average === 'number' ? Number(data.vote_average.toFixed(1)) : null,
+            poster_url: getImageUrl(data.poster_path, 'w500'),
+            backdrop_url: getImageUrl(data.backdrop_path, 'original'),
+            genres: data.genres?.map((g) => g.name) || []
+          };
+          const { data: series } = await createSeries(seriesPayload);
+
+          if (series?.id) {
+            await supabase.from('series_cast').delete().eq('series_id', series.id);
+            await supabase.from('series_crew').delete().eq('series_id', series.id);
+
+            const credits = data.credits || { cast: [], crew: [] };
+            const cast = (credits.cast || []).slice(0, 20);
+            const crew = (credits.crew || []).filter((c) => crewJobs.has(c.job)).slice(0, 20);
+            const personIds = Array.from(new Set([
+              ...cast.map((c) => c.id),
+              ...crew.map((c) => c.id)
+            ]));
+
+            const personCache = new Map();
+            await mapWithConcurrency(personIds, 5, async (personId) => {
+              if (personCache.has(personId)) return personCache.get(personId);
+              const details = await getPersonDetails(personId);
+              const payload = {
+                tmdb_id: details.id,
+                name: details.name,
+                biography: details.biography || null,
+                birthday: details.birthday || null,
+                place_of_birth: details.place_of_birth || null,
+                profile_url: getImageUrl(details.profile_path, 'w500'),
+                social_links: {
+                  instagram: details.external_ids?.instagram_id ? `https://www.instagram.com/${details.external_ids.instagram_id}` : null,
+                  twitter: details.external_ids?.twitter_id ? `https://x.com/${details.external_ids.twitter_id}` : null,
+                  facebook: details.external_ids?.facebook_id ? `https://www.facebook.com/${details.external_ids.facebook_id}` : null,
+                  imdb: details.external_ids?.imdb_id ? `https://www.imdb.com/name/${details.external_ids.imdb_id}` : null
+                }
+              };
+              const { data: person } = await supabase
+                .from('persons')
+                .upsert(payload, { onConflict: 'tmdb_id' })
+                .select()
+                .single();
+              personCache.set(personId, person);
+              return person;
+            });
+
+            await Promise.all(cast.map(async (member) => {
+              const person = personCache.get(member.id);
+              if (!person?.id) return;
+              await createSeriesCast({
+                series_id: series.id,
+                person_id: person.id,
+                character: member.character || null
+              });
+            }));
+
+            await Promise.all(crew.map(async (member) => {
+              const person = personCache.get(member.id);
+              if (!person?.id) return;
+              await createSeriesCrew({
+                series_id: series.id,
+                person_id: person.id,
+                job: member.job || null
+              });
+            }));
+
+            const seasons = data.seasons || [];
+            for (const season of seasons) {
+              const seasonDetails = await getSeasonDetails(data.id, season.season_number);
+              const { data: createdSeason } = await createSeason({
+                series_id: series.id,
+                season_number: seasonDetails.season_number,
+                name: seasonDetails.name,
+                overview: seasonDetails.overview || null,
+                air_date: seasonDetails.air_date || null,
+                episode_count: seasonDetails.episodes?.length || seasonDetails.episode_count || null,
+                poster_url: getImageUrl(seasonDetails.poster_path, 'w500')
+              });
+
+              for (const episode of seasonDetails.episodes || []) {
+                await createEpisode({
+                  series_id: series.id,
+                  season_id: createdSeason.id,
+                  episode_number: episode.episode_number,
+                  name: episode.name,
+                  overview: episode.overview || null,
+                  air_date: episode.air_date || null,
+                  runtime: episode.runtime || null,
+                  still_url: getImageUrl(episode.still_path, 'w500'),
+                  tmdb_rating: typeof episode.vote_average === 'number' ? Number(episode.vote_average.toFixed(1)) : null
+                });
+              }
+            }
           }
         } else {
           const personPayload = {
@@ -427,6 +658,7 @@ const TMDBImport = () => {
                   disabled={bulkLoading}
                 >
                   <option value="movie" className="bg-black">Movies</option>
+                  <option value="series" className="bg-black">Series</option>
                   <option value="person" className="bg-black">Persons</option>
                 </select>
               </div>
@@ -475,18 +707,18 @@ const TMDBImport = () => {
                           }`}
                         >
                           <input type="checkbox" checked={!!isSelected} onChange={() => {}} className="mt-1" />
-                          <img loading="lazy"
-                            src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
-                            alt={item.title || item.name}
-                            className="w-12 h-16 object-cover rounded-md"
-                            onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
-                          />
-                          <div className="flex-1">
-                            <p className="font-semibold text-sm">{item.title || item.name}</p>
-                            <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
-                            <p className="text-xs text-gray-500">ID: {item.id}</p>
-                          </div>
-                        </div>
+                  <img loading="lazy"
+                    src={type === 'person' ? getImageUrl(item.profile_path, 'w92') : getImageUrl(item.poster_path, 'w92')}
+                    alt={item.title || item.name}
+                    className="w-12 h-16 object-cover rounded-md"
+                    onError={(e) => e.target.src = 'https://via.placeholder.com/92x138'}
+                  />
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm">{item.title || item.name}</p>
+                    <p className="text-xs text-gray-400">{type === 'person' ? item.known_for_department : (item.release_date || item.first_air_date)}</p>
+                    <p className="text-xs text-gray-500">ID: {item.id}</p>
+                  </div>
+                </div>
                       );
                     })}
                   </div>
@@ -545,6 +777,7 @@ const TMDBImport = () => {
                   className="w-full bg-white/10 rounded-lg px-4 py-2 focus:outline-none"
                 >
                   <option value="movie" className="bg-black">Movie</option>
+                  <option value="series" className="bg-black">Series</option>
                   <option value="person" className="bg-black">Person</option>
                 </select>
               </div>
@@ -619,20 +852,20 @@ const TMDBImport = () => {
           {preview && (
             <div className="bg-white/5 rounded-2xl p-6 space-y-5 mt-8">
               <h3 className="text-lg font-semibold">Preview</h3>
-              <div className="flex gap-6">
-                <img loading="lazy"
-                  src={type === 'person' ? getImageUrl(preview.profile_path, 'w300') : getImageUrl(preview.poster_path, 'w300')}
-                  alt={preview.title || preview.name}
-                  className="w-28 sm:w-32 rounded-lg"
-                />
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-2">{preview.title || preview.name}</h3>
-                  <p className="text-gray-400 text-sm mb-2">
-                    {type === 'person' ? preview.known_for_department : (preview.release_date || preview.first_air_date)}
-                  </p>
-                  <p className="text-sm line-clamp-3">{type === 'person' ? preview.biography : preview.overview}</p>
-                </div>
-              </div>
+          <div className="flex gap-6">
+            <img loading="lazy"
+              src={type === 'person' ? getImageUrl(preview.profile_path, 'w300') : getImageUrl(preview.poster_path, 'w300')}
+              alt={preview.title || preview.name}
+              className="w-28 sm:w-32 rounded-lg"
+            />
+            <div className="flex-1">
+              <h3 className="text-xl font-bold mb-2">{preview.title || preview.name}</h3>
+              <p className="text-gray-400 text-sm mb-2">
+                {type === 'person' ? preview.known_for_department : (preview.release_date || preview.first_air_date)}
+              </p>
+              <p className="text-sm line-clamp-3">{type === 'person' ? preview.biography : preview.overview}</p>
+            </div>
+          </div>
               <div className="flex justify-center">
                 <button onClick={handleImport} className="btn-primary" disabled={loading}>
                   {loading ? 'Importing...' : 'Import to Database'}

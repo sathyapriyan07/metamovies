@@ -36,6 +36,10 @@ const ManageMovies = () => {
   const [savingBooking, setSavingBooking] = useState(false);
 
   const [editingHeroVideo, setEditingHeroVideo] = useState(null);
+  const [editingMediaVideos, setEditingMediaVideos] = useState(null);
+  const [mediaVideosInput, setMediaVideosInput] = useState('');
+  const [mediaVideosError, setMediaVideosError] = useState('');
+  const [savingMediaVideos, setSavingMediaVideos] = useState(false);
   const [heroTrailerUrl, setHeroTrailerUrl] = useState('');
   const [heroVideoStartTime, setHeroVideoStartTime] = useState('0');
   const [heroAutoplayToggle, setHeroAutoplayToggle] = useState(true);
@@ -337,6 +341,13 @@ const ManageMovies = () => {
     setTitleLogoError('');
   };
 
+  const handleEditMediaVideos = (movie) => {
+    setEditingMediaVideos(movie);
+    const urls = Array.isArray(movie.media_videos) ? movie.media_videos : [];
+    setMediaVideosInput(urls.join('\n'));
+    setMediaVideosError('');
+  };
+
   const handleEditHeroVideo = (movie) => {
     setEditingHeroVideo(movie);
     setHeroTrailerUrl(movie.trailer_url || '');
@@ -374,6 +385,40 @@ const ManageMovies = () => {
       setTitleLogoError(error.message || 'Failed to update title logo');
     } finally {
       setSavingTitleLogo(false);
+    }
+  };
+
+  const handleSaveMediaVideos = async () => {
+    if (!editingMediaVideos) return;
+    setMediaVideosError('');
+
+    const urls = mediaVideosInput
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const invalidUrl = urls.find((url) => !validateUrl(url));
+    if (invalidUrl) {
+      setMediaVideosError('All URLs must start with https://');
+      return;
+    }
+
+    try {
+      setSavingMediaVideos(true);
+      const { error } = await updateMovie(editingMediaVideos.id, {
+        media_videos: urls.length ? urls : null
+      });
+      if (error) throw error;
+
+      showToast('Media videos updated successfully', 'success');
+      setEditingMediaVideos(null);
+      setMediaVideosInput('');
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating media videos:', error);
+      setMediaVideosError(error.message || 'Failed to update media videos');
+    } finally {
+      setSavingMediaVideos(false);
     }
   };
 
@@ -581,6 +626,12 @@ const ManageMovies = () => {
                     className="px-3 py-2 bg-white/12 hover:bg-white/18 border border-white/16 hover:scale-[1.02] will-change-transform rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
                     Hero Video
+                  </button>
+                  <button
+                    onClick={() => handleEditMediaVideos(movie)}
+                    className="px-3 py-2 bg-white/12 hover:bg-white/18 border border-white/16 hover:scale-[1.02] will-change-transform rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                  >
+                    Media Videos
                   </button>
                   <button
                     onClick={() => handleEditRatings(movie)}
@@ -951,6 +1002,43 @@ const ManageMovies = () => {
                 >
                   Cancel
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Media Videos Modal */}
+        {editingMediaVideos && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-[#111] border border-white/10 rounded-2xl p-6 w-full max-w-lg">
+              <h2 className="text-2xl font-bold mb-4">Edit Media Videos - {editingMediaVideos.title}</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Video URLs (one per line)</label>
+                  <textarea
+                    value={mediaVideosInput}
+                    onChange={(e) => setMediaVideosInput(e.target.value)}
+                    rows={6}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="w-full px-4 py-3 bg-white/5 rounded-lg border border-white/10"
+                  />
+                  {mediaVideosError && <p className="text-red-400 text-sm mt-2">{mediaVideosError}</p>}
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEditingMediaVideos(null)}
+                    className="flex-1 px-4 py-2 rounded-lg border border-white/20 hover:bg-white/10 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveMediaVideos}
+                    disabled={savingMediaVideos}
+                    className="flex-1 btn-primary"
+                  >
+                    {savingMediaVideos ? 'Saving...' : 'Save Media Videos'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

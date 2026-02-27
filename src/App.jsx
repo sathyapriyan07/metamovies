@@ -9,6 +9,8 @@ import Movies from './pages/Movies';
 import Platforms from './pages/Platforms';
 import PlatformDetail from './pages/PlatformDetail';
 import MovieDetail from './pages/MovieDetail';
+import Series from './pages/Series';
+import SeriesDetail from './pages/SeriesDetail';
 import CastCrew from './pages/CastCrew';
 import PersonDetail from './pages/PersonDetail';
 import Videos from './pages/Videos';
@@ -53,6 +55,7 @@ import ManageReviews from './pages/admin/ManageReviews';
 import ManageTrending from './pages/admin/ManageTrending';
 import ManageSEO from './pages/admin/ManageSEO';
 import DeezerImport from './pages/admin/DeezerImport';
+import ManageSeries from './pages/admin/ManageSeries';
 
 function AppRoutes() {
   const Layout = ({ children }) => (
@@ -67,9 +70,11 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
+        <Route path="/series" element={<Series />} />
         <Route path="/platforms" element={<Platforms />} />
         <Route path="/platforms/:id" element={<PlatformDetail />} />
         <Route path="/movie/:id" element={<MovieDetail />} />
+        <Route path="/series/:id" element={<SeriesDetail />} />
         <Route path="/watch/:id" element={<Watch />} />
         <Route path="/movie/:id/cast-crew" element={<CastCrew />} />
         <Route path="/person/:id" element={<PersonDetail />} />
@@ -325,6 +330,15 @@ function AppRoutes() {
           element={(
             <ProtectedRoute adminOnly>
               <DeezerImport />
+            </ProtectedRoute>
+          )}
+        />
+
+        <Route
+          path="/admin/manage-series"
+          element={(
+            <ProtectedRoute adminOnly>
+              <ManageSeries />
             </ProtectedRoute>
           )}
         />

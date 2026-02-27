@@ -17,6 +17,15 @@
   --space-xl: 32px;
 }
 
+.theme-light {
+  --bg: #f7f7f8;
+  --bg-deep: #ffffff;
+  --panel: #ffffff;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --accent: #f5c518;
+}
+
 *,
 *::before,
 *::after {
@@ -57,6 +66,11 @@ body {
   line-height: 1.6;
 }
 
+.theme-light body {
+  background: var(--bg);
+  color: var(--text);
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -72,6 +86,111 @@ video {
 img[loading="lazy"] {
   background-color: #1a1a1a;
 }
+
+.theme-light img[loading="lazy"] {
+  background-color: #e5e7eb;
+}
+
+.theme-light .bg-\[\#0f0f0f\],
+.theme-light .bg-\[\#000\],
+.theme-light .bg-\[\#000000\] {
+  background-color: #f7f7f8 !important;
+}
+
+.theme-light .bg-black,
+.theme-light .bg-black\/80,
+.theme-light .bg-black\/60,
+.theme-light .bg-black\/70 {
+  background-color: #f7f7f8 !important;
+}
+
+.theme-light .bg-white\/5,
+.theme-light .bg-white\/10,
+.theme-light .bg-white\/20 {
+  background-color: #ffffff !important;
+}
+
+.theme-light .text-black {
+  color: #0f172a !important;
+}
+
+.theme-light .bg-\[\#111\],
+.theme-light .bg-\[\#111111\],
+.theme-light .bg-\[\#121212\],
+.theme-light .bg-\[\#141414\],
+.theme-light .bg-\[\#1a1a1a\],
+.theme-light .bg-\[\#1f1f1f\],
+.theme-light .bg-\[\#2a2a2a\] {
+  background-color: #ffffff !important;
+}
+
+.theme-light .bg-\[\#2a2a2a\].text-white {
+  color: #0f172a !important;
+}
+
+.theme-light .bg-\[\#2a2a2a\].border-gray-800 {
+  border-color: #e5e7eb !important;
+}
+
+.theme-light .border-gray-800,
+.theme-light .border-white\/10,
+.theme-light .border-white\/20 {
+  border-color: #e5e7eb !important;
+}
+
+.theme-light .text-white {
+  color: #0f172a !important;
+}
+
+.theme-light .text-white\/80 {
+  color: rgba(15, 23, 42, 0.8) !important;
+}
+
+.theme-light .text-gray-400 {
+  color: #64748b !important;
+}
+
+.theme-light .text-gray-300 {
+  color: #6b7280 !important;
+}
+
+.theme-light .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.theme-light .glass-card {
+  background: #ffffff;
+  border-color: #e5e7eb;
+}
+
+.theme-light .glass-input {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #0f172a;
+}
+
+.theme-light .btn-secondary {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #0f172a;
+}
+
+.theme-light select,
+.theme-light input,
+.theme-light textarea {
+  color: #0f172a;
+}
+
+.theme-light select option {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.theme-light .btn-primary:hover,
+.theme-light .btn-secondary:hover {
+  background: #f2b500;
+}
+
 
 button, input, select, textarea {
   font: inherit;

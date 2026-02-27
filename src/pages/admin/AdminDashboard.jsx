@@ -90,6 +90,10 @@ const AdminDashboard = () => {
               <h3 className="text-base font-semibold mb-2">TMDB Import</h3>
               <p className="text-gray-400 text-sm">Import from TMDB database</p>
             </Link>
+            <Link to="/admin/manage-series" className="bg-[#1a1a1a] border border-gray-800 rounded-md p-4 hover:bg-[#222] transition">
+              <h3 className="text-base font-semibold mb-2">Manage Series</h3>
+              <p className="text-gray-400 text-sm">Edit series ratings and episodes</p>
+            </Link>
             <Link to="/admin/deezer-import" className="bg-[#1a1a1a] border border-gray-800 rounded-md p-4 hover:bg-[#222] transition">
               <h3 className="text-base font-semibold mb-2">Deezer Import</h3>
               <p className="text-gray-400 text-sm">Import music metadata from Deezer</p>
