@@ -8,7 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)"],
-        display: ["var(--font-playfair)"],
+        display: ["var(--font-cormorant)"],
       },
     },
   },
