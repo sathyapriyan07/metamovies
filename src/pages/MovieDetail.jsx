@@ -348,7 +348,7 @@ const MovieDetail = () => {
         )}
 
         {ottPlatforms.length > 0 && (
-          <section className="px-4 mt-8">
+          <section className="py-6">
             <h2 className="text-lg font-semibold mb-4">Watch On</h2>
             <div className="flex gap-5 overflow-x-auto pb-2 no-scrollbar">
               {ottPlatforms.map(([platform, url]) => {
@@ -382,7 +382,7 @@ const MovieDetail = () => {
         )}
 
         {musicPlatforms.length > 0 && (
-          <section className="px-4 mt-8">
+          <section className="py-6">
             <h2 className="text-lg font-semibold mb-4">Listen On</h2>
             <div className="flex gap-5 overflow-x-auto pb-2 no-scrollbar">
               {musicPlatforms.map(([platform, url]) => {
