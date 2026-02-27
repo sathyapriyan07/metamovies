@@ -91,7 +91,7 @@ const SeriesDetail = () => {
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
       <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
-        <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-5 flex flex-col md:flex-row gap-6">
+        <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-5 flex flex-col md:flex-row gap-6 items-start">
           <div className="flex-shrink-0">
             <img
               src={series.poster_url}
@@ -107,15 +107,15 @@ const SeriesDetail = () => {
                 className="max-h-12 w-auto object-contain"
               />
             ) : (
-              <h1 className="text-xl md:text-2xl font-bold mb-2">{series.name}</h1>
+              <h1 className="text-xl md:text-2xl font-bold mb-1">{series.name}</h1>
             )}
-            <p className="text-sm text-gray-500 mb-3">
+            <p className="text-sm text-gray-500 dark:text-gray-300 mb-2 leading-snug">
               {series.first_air_date?.split('-')[0] ? `${series.first_air_date.split('-')[0]} • ` : ''}
               {series.number_of_seasons ? `${series.number_of_seasons} Seasons` : ''}
               {series.genres?.length ? ` • ${series.genres.join(' • ')}` : ''}
             </p>
             {(series.tmdb_rating || series.imdb_rating) && (
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 {series.tmdb_rating && (
                   <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
                     {Number(series.tmdb_rating).toFixed(1)}
@@ -136,14 +136,14 @@ const SeriesDetail = () => {
                 : series.overview.slice(0, MAX_LENGTH);
               return (
                 <div>
-                  <p className="text-sm text-gray-600 leading-relaxed transition-all duration-300 ease-in-out">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-300 ease-in-out mt-1">
                     {displayText}
                     {!overviewExpanded && isLong && '...'}
                   </p>
                   {isLong && (
                     <button
                       onClick={() => setOverviewExpanded(!overviewExpanded)}
-                      className="text-yellow-500 text-sm mt-2"
+                      className="text-yellow-500 dark:text-yellow-400 text-sm mt-2"
                     >
                       {overviewExpanded ? 'Show less' : 'Load more'}
                     </button>
@@ -155,7 +155,7 @@ const SeriesDetail = () => {
         </div>
 
         {watchPlatforms.length > 0 && (
-          <section className="px-2 mt-6">
+          <section className="py-6">
             <h2 className="text-lg font-semibold mb-4">Watch On</h2>
             <div className="flex gap-5 overflow-x-auto pb-2 no-scrollbar">
               {watchPlatforms.map(([platform, url]) => {
@@ -168,7 +168,7 @@ const SeriesDetail = () => {
                     rel="noopener noreferrer"
                     className="min-w-[80px] flex flex-col items-center"
                   >
-                    <div className="w-16 h-16 bg-[#111] rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition">
+                    <div className="w-16 h-16 bg-neutral-100 dark:bg-[#111] rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-neutral-200 dark:border-transparent">
                       {logoSrc ? (
                         <img
                           src={logoSrc}
@@ -206,12 +206,12 @@ const SeriesDetail = () => {
                       className="w-16 h-16 rounded-full object-cover mx-auto"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs">
+                    <div className="w-16 h-16 rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
                       {member.name?.[0] || '?'}
                     </div>
                   )}
                   <div className="mt-2 text-xs font-medium">{member.name}</div>
-                  <div className="text-[10px] text-gray-400">{member.character}</div>
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400">{member.character}</div>
                 </button>
               ))}
             </div>
@@ -236,12 +236,12 @@ const SeriesDetail = () => {
                       className="w-16 h-16 rounded-full object-cover mx-auto"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs">
+                    <div className="w-16 h-16 rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
                       {member.name?.[0] || '?'}
                     </div>
                   )}
                   <div className="mt-2 text-xs font-medium">{member.name}</div>
-                  <div className="text-[10px] text-gray-400">{member.job}</div>
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400">{member.job}</div>
                 </button>
               ))}
             </div>
@@ -256,13 +256,13 @@ const SeriesDetail = () => {
               const visibleCount = visibleCounts[season.id] ?? 3;
               const visibleEpisodes = seasonEpisodes.slice(0, visibleCount);
               return (
-                <div key={season.id} className="bg-[#1a1a1a] border border-gray-800 rounded-md p-3">
+                <div key={season.id} className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-md p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{season.name || `Season ${season.season_number}`}</p>
-                      <p className="text-xs text-gray-400">{season.air_date || 'Unknown date'}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{season.air_date || 'Unknown date'}</p>
                     </div>
-                    <span className="text-xs text-gray-500">{season.episode_count || 0} episodes</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{season.episode_count || 0} episodes</span>
                   </div>
                   <div className="mt-3 space-y-2">
                     {visibleEpisodes.map((ep) => {
@@ -276,15 +276,15 @@ const SeriesDetail = () => {
                               className="w-24 h-16 object-cover rounded-md flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-24 h-16 rounded-md bg-[#1a1a1a]" />
+                            <div className="w-24 h-16 rounded-md bg-neutral-200 dark:bg-[#1a1a1a]" />
                           )}
                           <div className="flex-1">
                             <p className="text-sm font-medium">
                               {ep.episode_number}. {ep.name}
                             </p>
-                            {ep.runtime ? <p className="text-xs text-gray-500">{ep.runtime}m</p> : null}
+                            {ep.runtime ? <p className="text-xs text-gray-500 dark:text-gray-400">{ep.runtime}m</p> : null}
                             {ep.overview && (
-                              <p className="text-xs text-gray-500 line-clamp-2">
+                              <p className="text-xs text-gray-500 dark:text-gray-400 md:line-clamp-3">
                                 {ep.overview}
                               </p>
                             )}
@@ -310,7 +310,7 @@ const SeriesDetail = () => {
                             [season.id]: visibleCount + 3
                           }))
                         }
-                        className="text-yellow-500 text-sm mt-3"
+                        className="text-yellow-500 dark:text-yellow-400 text-sm mt-3"
                       >
                         Load more episodes
                       </button>
@@ -323,7 +323,7 @@ const SeriesDetail = () => {
                             [season.id]: 3
                           }))
                         }
-                        className="text-yellow-500 text-sm mt-3"
+                        className="text-yellow-500 dark:text-yellow-400 text-sm mt-3"
                       >
                         Show fewer episodes
                       </button>
