@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -61,12 +61,12 @@ body {
 
 :root {
   --font-inter: "Inter";
-  --font-cormorant: "Cormorant Garamond";
+  --font-playfair: "Playfair Display";
 }
 
 @layer base {
   h1, h2, h3, h4, h5 {
-    font-family: var(--font-cormorant), serif;
+    font-family: var(--font-playfair), serif;
     letter-spacing: -0.02em;
   }
   p, span, button, input, textarea, select, label {
