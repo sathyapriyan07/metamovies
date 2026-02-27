@@ -91,12 +91,12 @@ const SeriesDetail = () => {
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
       <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
-        <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-5 flex flex-col md:flex-row gap-6 items-start">
+        <div className="bg-gradient-to-br from-neutral-100 to-neutral-50 dark:from-neutral-900 dark:to-neutral-800 rounded-2xl p-4 flex flex-row gap-4 items-center">
           <div className="flex-shrink-0">
             <img
               src={series.poster_url}
               alt={series.name}
-              className="w-32 md:w-40 aspect-[2/3] object-cover rounded-xl shadow-md"
+              className="w-[110px] md:w-40 aspect-[2/3] object-cover rounded-xl shadow-md"
             />
           </div>
           <div className="flex-1">
@@ -104,25 +104,25 @@ const SeriesDetail = () => {
               <img
                 src={series.title_logo_url}
                 alt={series.name}
-                className="max-h-12 w-auto object-contain"
+                className="max-h-9 w-auto object-contain max-w-full mb-2"
               />
             ) : (
-              <h1 className="text-xl md:text-2xl font-bold mb-1">{series.name}</h1>
+              <h1 className="text-lg md:text-2xl font-bold mb-1">{series.name}</h1>
             )}
-            <p className="text-sm text-gray-500 dark:text-gray-300 mb-2 leading-snug">
+            <p className="text-sm text-gray-500 dark:text-gray-300 mb-2 leading-snug flex flex-wrap gap-x-2">
               {series.first_air_date?.split('-')[0] ? `${series.first_air_date.split('-')[0]} • ` : ''}
               {series.number_of_seasons ? `${series.number_of_seasons} Seasons` : ''}
               {series.genres?.length ? ` • ${series.genres.join(' • ')}` : ''}
             </p>
             {(series.tmdb_rating || series.imdb_rating) && (
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
                 {series.tmdb_rating && (
                   <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
                     {Number(series.tmdb_rating).toFixed(1)}
                   </span>
                 )}
                 {series.imdb_rating && (
-                  <span className="bg-[#F5C518] text-black font-bold px-3 py-1 rounded-md text-sm">
+                  <span className="bg-[#F5C518] text-black font-bold px-3 py-1 rounded-full text-xs">
                     IMDb {series.imdb_rating}
                   </span>
                 )}
@@ -131,14 +131,14 @@ const SeriesDetail = () => {
             {series.overview && (() => {
               const MAX_LENGTH = 160;
               const isLong = series.overview.length > MAX_LENGTH;
-              const displayText = overviewExpanded
-                ? series.overview
-                : series.overview.slice(0, MAX_LENGTH);
               return (
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-300 ease-in-out mt-1">
-                    {displayText}
-                    {!overviewExpanded && isLong && '...'}
+                  <p
+                    className={`text-sm text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-300 ease-in-out ${
+                      overviewExpanded ? '' : 'line-clamp-3'
+                    }`}
+                  >
+                    {series.overview}
                   </p>
                   {isLong && (
                     <button
@@ -203,10 +203,10 @@ const SeriesDetail = () => {
                       loading="lazy"
                       src={getImageUrl(member.profile_path, 'w185')}
                       alt={member.name}
-                      className="w-16 h-16 rounded-full object-cover mx-auto"
+                      className="w-[72px] h-[72px] rounded-full object-cover mx-auto shadow-sm"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
+                    <div className="w-[72px] h-[72px] rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
                       {member.name?.[0] || '?'}
                     </div>
                   )}
@@ -233,10 +233,10 @@ const SeriesDetail = () => {
                       loading="lazy"
                       src={getImageUrl(member.profile_path, 'w185')}
                       alt={member.name}
-                      className="w-16 h-16 rounded-full object-cover mx-auto"
+                      className="w-[72px] h-[72px] rounded-full object-cover mx-auto shadow-sm"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
+                    <div className="w-[72px] h-[72px] rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
                       {member.name?.[0] || '?'}
                     </div>
                   )}
