@@ -131,22 +131,6 @@ const SeriesDetail = () => {
           </div>
         </div>
 
-        <div className="space-y-3">
-          <button
-            className="w-full bg-yellow-500 text-black rounded-xl py-3 font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
-            onClick={() => series.trailer_url && window.open(series.trailer_url, '_blank')}
-            disabled={!series.trailer_url}
-          >
-            Watch Trailer
-          </button>
-          <button className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3 font-medium">
-            Share Movie Card
-          </button>
-          <button className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3 font-medium">
-            Add to Watchlist
-          </button>
-        </div>
-
         <section className="space-y-2">
           <h2 className="text-lg font-semibold dark:text-white">Storyline</h2>
           {series.overview ? (

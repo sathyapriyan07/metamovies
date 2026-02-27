@@ -9,18 +9,13 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('metamovies-theme') || 'dark';
-  });
+  const [theme] = useState('dark');
 
   useEffect(() => {
     document.documentElement.className = `theme-${theme}`;
-    localStorage.setItem('metamovies-theme', theme);
   }, [theme]);
 
-  const toggleTheme = (themeName) => {
-    setTheme(themeName);
-  };
+  const toggleTheme = () => {};
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
