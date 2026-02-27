@@ -11,7 +11,7 @@ const SeriesDetail = () => {
   const [seasons, setSeasons] = useState([]);
   const [episodesBySeason, setEpisodesBySeason] = useState({});
   const [dbEpisodesBySeason, setDbEpisodesBySeason] = useState({});
-  const [showAllEpisodes, setShowAllEpisodes] = useState({});
+  const [visibleCounts, setVisibleCounts] = useState({});
   const [cast, setCast] = useState([]);
   const [crew, setCrew] = useState([]);
   const [overviewExpanded, setOverviewExpanded] = useState(false);
@@ -88,52 +88,34 @@ const SeriesDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
       <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
-        <div className="bg-neutral-900 rounded-2xl p-5 flex flex-col md:flex-row gap-6 items-center md:items-start">
+        <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl p-5 flex flex-col md:flex-row gap-6">
           <div className="flex-shrink-0">
             <img
               src={series.poster_url}
               alt={series.name}
-              className="w-32 md:w-48 aspect-[2/3] object-cover rounded-xl shadow-lg"
+              className="w-32 md:w-40 aspect-[2/3] object-cover rounded-xl shadow-md"
             />
           </div>
-          <div className="flex-1 text-center md:text-left">
+          <div className="flex-1">
             {series.title_logo_url && !series.use_text_title ? (
               <img
                 src={series.title_logo_url}
                 alt={series.name}
-                className="max-h-12 w-auto object-contain mx-auto md:mx-0"
+                className="max-h-12 w-auto object-contain"
               />
             ) : (
-              <h1 className="text-2xl font-bold">{series.name}</h1>
+              <h1 className="text-xl md:text-2xl font-bold mb-2">{series.name}</h1>
             )}
-            {series.overview && (() => {
-              const MAX_LENGTH = 180;
-              const isLong = series.overview.length > MAX_LENGTH;
-              const displayText = overviewExpanded
-                ? series.overview
-                : series.overview.slice(0, MAX_LENGTH);
-              return (
-                <>
-                  <p className="text-sm text-gray-400 leading-relaxed transition-all duration-300 ease-in-out mt-3">
-                    {displayText}
-                    {!overviewExpanded && isLong && '...'}
-                  </p>
-                  {isLong && (
-                    <button
-                      onClick={() => setOverviewExpanded(!overviewExpanded)}
-                      className="text-yellow-400 text-sm mt-2"
-                    >
-                      {overviewExpanded ? 'Show less' : 'Load more'}
-                    </button>
-                  )}
-                </>
-              );
-            })()}
+            <p className="text-sm text-gray-500 mb-3">
+              {series.first_air_date?.split('-')[0] ? `${series.first_air_date.split('-')[0]} • ` : ''}
+              {series.number_of_seasons ? `${series.number_of_seasons} Seasons` : ''}
+              {series.genres?.length ? ` • ${series.genres.join(' • ')}` : ''}
+            </p>
             {(series.tmdb_rating || series.imdb_rating) && (
-              <div className="mt-3 flex items-center gap-3 justify-center md:justify-start">
+              <div className="flex items-center gap-3 mb-3">
                 {series.tmdb_rating && (
                   <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
                     {Number(series.tmdb_rating).toFixed(1)}
@@ -146,6 +128,29 @@ const SeriesDetail = () => {
                 )}
               </div>
             )}
+            {series.overview && (() => {
+              const MAX_LENGTH = 160;
+              const isLong = series.overview.length > MAX_LENGTH;
+              const displayText = overviewExpanded
+                ? series.overview
+                : series.overview.slice(0, MAX_LENGTH);
+              return (
+                <div>
+                  <p className="text-sm text-gray-600 leading-relaxed transition-all duration-300 ease-in-out">
+                    {displayText}
+                    {!overviewExpanded && isLong && '...'}
+                  </p>
+                  {isLong && (
+                    <button
+                      onClick={() => setOverviewExpanded(!overviewExpanded)}
+                      className="text-yellow-500 text-sm mt-2"
+                    >
+                      {overviewExpanded ? 'Show less' : 'Load more'}
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -248,8 +253,8 @@ const SeriesDetail = () => {
           <div className="space-y-4">
             {seasons.map((season) => {
               const seasonEpisodes = episodesBySeason[season.id] || [];
-              const isExpanded = !!showAllEpisodes[season.id];
-              const visibleEpisodes = isExpanded ? seasonEpisodes : seasonEpisodes.slice(0, 3);
+              const visibleCount = visibleCounts[season.id] ?? 3;
+              const visibleEpisodes = seasonEpisodes.slice(0, visibleCount);
               return (
                 <div key={season.id} className="bg-[#1a1a1a] border border-gray-800 rounded-md p-3">
                   <div className="flex items-center justify-between">
@@ -263,55 +268,68 @@ const SeriesDetail = () => {
                     {visibleEpisodes.map((ep) => {
                       const dbEpisode = dbEpisodesBySeason[season.id]?.get(ep.episode_number);
                       return (
-                        <div key={ep.id} className="flex gap-3 bg-[#111] rounded-md p-3">
-                      {ep.still_path ? (
-                        <img
-                          src={getImageUrl(ep.still_path, 'w300')}
-                          alt={ep.name}
-                          className="w-24 h-14 object-cover rounded-md"
-                        />
-                      ) : (
-                        <div className="w-24 h-14 rounded-md bg-[#1a1a1a]" />
-                      )}
-                      <div className="flex-1">
-                        <div className="text-xs text-gray-300">
-                          {ep.episode_number}. {ep.name}
-                          {ep.runtime ? <span className="text-gray-500"> • {ep.runtime}m</span> : null}
-                        </div>
-                        {ep.overview && (
-                          <div className="text-[11px] text-gray-400 mt-1 line-clamp-2">
-                            {ep.overview}
+                        <div key={ep.id} className="flex gap-3 py-3 border-b border-neutral-200 dark:border-neutral-800">
+                          {ep.still_path ? (
+                            <img
+                              src={getImageUrl(ep.still_path, 'w300')}
+                              alt={ep.name}
+                              className="w-24 h-16 object-cover rounded-md flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-24 h-16 rounded-md bg-[#1a1a1a]" />
+                          )}
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">
+                              {ep.episode_number}. {ep.name}
+                            </p>
+                            {ep.runtime ? <p className="text-xs text-gray-500">{ep.runtime}m</p> : null}
+                            {ep.overview && (
+                              <p className="text-xs text-gray-500 line-clamp-2">
+                                {ep.overview}
+                              </p>
+                            )}
+                            {dbEpisode?.watch_link && (
+                              <a
+                                href={dbEpisode.watch_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-black bg-[#F5C518] px-3 py-1 rounded-md w-fit"
+                              >
+                                Watch
+                              </a>
+                            )}
                           </div>
-                        )}
-                        {dbEpisode?.watch_link && (
-                          <a
-                            href={dbEpisode.watch_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-black bg-[#F5C518] px-3 py-1 rounded-md w-fit"
-                          >
-                            Watch
-                          </a>
-                        )}
-                      </div>
-                    </div>
+                        </div>
                       );
                     })}
-                  {seasonEpisodes.length > 3 && (
-                    <button
-                      className="mt-3 text-xs text-[#F5C518] hover:underline"
-                      onClick={() =>
-                        setShowAllEpisodes((prev) => ({
-                          ...prev,
-                          [season.id]: !prev[season.id]
-                        }))
-                      }
-                    >
-                      {isExpanded ? 'Show fewer episodes' : 'Show all episodes'}
-                    </button>
-                  )}
+                    {seasonEpisodes.length > visibleCount && (
+                      <button
+                        onClick={() =>
+                          setVisibleCounts((prev) => ({
+                            ...prev,
+                            [season.id]: visibleCount + 3
+                          }))
+                        }
+                        className="text-yellow-500 text-sm mt-3"
+                      >
+                        Load more episodes
+                      </button>
+                    )}
+                    {seasonEpisodes.length > 3 && visibleCount >= seasonEpisodes.length && (
+                      <button
+                        onClick={() =>
+                          setVisibleCounts((prev) => ({
+                            ...prev,
+                            [season.id]: 3
+                          }))
+                        }
+                        className="text-yellow-500 text-sm mt-3"
+                      >
+                        Show fewer episodes
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
             );
             })}
             {seasons.length === 0 && <div className="text-sm text-gray-400">No seasons found.</div>}
