@@ -88,71 +88,89 @@ const SeriesDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
-      <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
-        <div className="bg-gradient-to-br from-neutral-100 to-neutral-50 dark:from-neutral-900 dark:to-neutral-800 rounded-2xl p-4 flex flex-row gap-4 items-center">
-          <div className="flex-shrink-0">
+      <div className="max-w-2xl mx-auto px-4 pt-10 pb-10 space-y-6">
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 shadow-sm">
+          <div className="flex gap-4 items-start">
             <img
               src={series.poster_url}
               alt={series.name}
-              className="w-[110px] md:w-40 aspect-[2/3] object-cover rounded-xl shadow-md"
+              className="w-28 aspect-[2/3] object-cover rounded-xl shadow-md flex-shrink-0"
             />
-          </div>
-          <div className="flex-1">
-            {series.title_logo_url && !series.use_text_title ? (
-              <img
-                src={series.title_logo_url}
-                alt={series.name}
-                className="max-h-9 w-auto object-contain max-w-full mb-2"
-              />
-            ) : (
-              <h1 className="text-lg md:text-2xl font-bold mb-1">{series.name}</h1>
-            )}
-            <p className="text-sm text-gray-500 dark:text-gray-300 mb-2 leading-snug flex flex-wrap gap-x-2">
+            <div className="flex-1 min-w-0">
+              {series.title_logo_url && !series.use_text_title ? (
+                <img
+                  src={series.title_logo_url}
+                  alt={series.name}
+                  className="max-h-12 w-auto object-contain max-w-full mb-2"
+                />
+              ) : (
+                <h1 className="text-xl font-bold text-zinc-900 dark:text-white mb-1">{series.name}</h1>
+              )}
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-snug flex flex-wrap gap-x-2">
               {series.first_air_date?.split('-')[0] ? `${series.first_air_date.split('-')[0]} • ` : ''}
               {series.number_of_seasons ? `${series.number_of_seasons} Seasons` : ''}
               {series.genres?.length ? ` • ${series.genres.join(' • ')}` : ''}
-            </p>
-            {(series.tmdb_rating || series.imdb_rating) && (
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                {series.tmdb_rating && (
-                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
-                    {Number(series.tmdb_rating).toFixed(1)}
-                  </span>
-                )}
-                {series.imdb_rating && (
-                  <span className="bg-[#F5C518] text-black font-bold px-3 py-1 rounded-full text-xs">
-                    IMDb {series.imdb_rating}
-                  </span>
-                )}
-              </div>
-            )}
-            {series.overview && (() => {
-              const MAX_LENGTH = 160;
-              const isLong = series.overview.length > MAX_LENGTH;
-              return (
-                <div>
-                  <p
-                    className={`text-sm text-gray-600 dark:text-gray-300 leading-relaxed transition-all duration-300 ease-in-out ${
-                      overviewExpanded ? '' : 'line-clamp-3'
-                    }`}
-                  >
-                    {series.overview}
-                  </p>
-                  {isLong && (
-                    <button
-                      onClick={() => setOverviewExpanded(!overviewExpanded)}
-                      className="text-yellow-500 dark:text-yellow-400 text-sm mt-2"
-                    >
-                      {overviewExpanded ? 'Show less' : 'Load more'}
-                    </button>
+              </p>
+              {(series.tmdb_rating || series.imdb_rating) && (
+                <div className="flex items-center gap-3 mt-3">
+                  {series.tmdb_rating && (
+                    <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#F5C518] text-black text-sm font-semibold">
+                      {Number(series.tmdb_rating).toFixed(1)}
+                    </span>
+                  )}
+                  {series.imdb_rating && (
+                    <span className="bg-[#F5C518] text-black font-bold px-3 py-1 rounded-lg text-xs">
+                      IMDb {series.imdb_rating}
+                    </span>
                   )}
                 </div>
-              );
-            })()}
+              )}
+            </div>
           </div>
         </div>
+
+        <div className="space-y-3">
+          <button
+            className="w-full bg-yellow-500 text-black rounded-xl py-3 font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={() => series.trailer_url && window.open(series.trailer_url, '_blank')}
+            disabled={!series.trailer_url}
+          >
+            Watch Trailer
+          </button>
+          <button className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3 font-medium">
+            Share Movie Card
+          </button>
+          <button className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3 font-medium">
+            Add to Watchlist
+          </button>
+        </div>
+
+        <section className="space-y-2">
+          <h2 className="text-lg font-semibold dark:text-white">Storyline</h2>
+          {series.overview ? (
+            <div>
+              <p
+                className={`text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed transition-all duration-300 ease-in-out ${
+                  overviewExpanded ? '' : 'line-clamp-4'
+                }`}
+              >
+                {series.overview}
+              </p>
+              {series.overview.length > 160 && (
+                <button
+                  onClick={() => setOverviewExpanded(!overviewExpanded)}
+                  className="text-yellow-500 text-sm mt-2"
+                >
+                  {overviewExpanded ? 'Show less' : 'Load more'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">No storyline available.</p>
+          )}
+        </section>
 
         {watchPlatforms.length > 0 && (
           <section className="py-6">
@@ -168,7 +186,7 @@ const SeriesDetail = () => {
                     rel="noopener noreferrer"
                     className="min-w-[80px] flex flex-col items-center"
                   >
-                    <div className="w-16 h-16 bg-neutral-100 dark:bg-[#111] rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-neutral-200 dark:border-transparent">
+                    <div className="w-16 h-16 bg-white dark:bg-zinc-900 rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-zinc-200 dark:border-zinc-800">
                       {logoSrc ? (
                         <img
                           src={logoSrc}
@@ -176,7 +194,7 @@ const SeriesDetail = () => {
                           className="w-10 h-10 object-contain"
                         />
                       ) : (
-                        <span className="text-xs text-white capitalize">
+                        <span className="text-xs text-zinc-700 dark:text-zinc-200 capitalize">
                           {platform.replace('_', ' ')}
                         </span>
                       )}
@@ -189,13 +207,16 @@ const SeriesDetail = () => {
         )}
 
         {cast.length > 0 && (
-          <section className="py-6">
-            <h2 className="text-lg font-semibold mb-3">Cast</h2>
-            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Cast</h2>
+              <button className="text-yellow-500 text-sm">See All</button>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
               {cast.map((member) => (
                 <button
                   key={member.id}
-                  className="min-w-[90px] text-center"
+                  className="min-w-[92px] text-center"
                   onClick={() => member.person_id && navigate(`/person/${member.person_id}`)}
                 >
                   {member.profile_path ? (
@@ -203,15 +224,15 @@ const SeriesDetail = () => {
                       loading="lazy"
                       src={getImageUrl(member.profile_path, 'w185')}
                       alt={member.name}
-                      className="w-[72px] h-[72px] rounded-full object-cover mx-auto shadow-sm"
+                      className="w-20 h-20 rounded-full object-cover mx-auto"
                     />
                   ) : (
-                    <div className="w-[72px] h-[72px] rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
+                    <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center mx-auto text-xs text-zinc-600 dark:text-zinc-200">
                       {member.name?.[0] || '?'}
                     </div>
                   )}
-                  <div className="mt-2 text-xs font-medium">{member.name}</div>
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400">{member.character}</div>
+                  <div className="mt-2 text-sm font-medium">{member.name}</div>
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{member.character}</div>
                 </button>
               ))}
             </div>
@@ -219,13 +240,16 @@ const SeriesDetail = () => {
         )}
 
         {crew.length > 0 && (
-          <section className="py-6">
-            <h2 className="text-lg font-semibold mb-3">Crew</h2>
-            <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Crew</h2>
+              <button className="text-yellow-500 text-sm">See All</button>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
               {crew.map((member) => (
                 <button
                   key={`crew-${member.credit_id}`}
-                  className="min-w-[90px] text-center"
+                  className="min-w-[92px] text-center"
                   onClick={() => member.person_id && navigate(`/person/${member.person_id}`)}
                 >
                   {member.profile_path ? (
@@ -233,22 +257,22 @@ const SeriesDetail = () => {
                       loading="lazy"
                       src={getImageUrl(member.profile_path, 'w185')}
                       alt={member.name}
-                      className="w-[72px] h-[72px] rounded-full object-cover mx-auto shadow-sm"
+                      className="w-20 h-20 rounded-full object-cover mx-auto"
                     />
                   ) : (
-                    <div className="w-[72px] h-[72px] rounded-full bg-neutral-200 dark:bg-[#2a2a2a] flex items-center justify-center mx-auto text-xs text-gray-700 dark:text-gray-300">
+                    <div className="w-20 h-20 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center mx-auto text-xs text-zinc-600 dark:text-zinc-200">
                       {member.name?.[0] || '?'}
                     </div>
                   )}
-                  <div className="mt-2 text-xs font-medium">{member.name}</div>
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400">{member.job}</div>
+                  <div className="mt-2 text-sm font-medium">{member.name}</div>
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{member.job}</div>
                 </button>
               ))}
             </div>
           </section>
         )}
 
-        <section className="py-6">
+        <section className="space-y-3">
           <h2 className="text-lg font-semibold mb-3">Seasons</h2>
           <div className="space-y-4">
             {seasons.map((season) => {
@@ -256,7 +280,7 @@ const SeriesDetail = () => {
               const visibleCount = visibleCounts[season.id] ?? 3;
               const visibleEpisodes = seasonEpisodes.slice(0, visibleCount);
               return (
-                <div key={season.id} className="bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-md p-3">
+                <div key={season.id} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{season.name || `Season ${season.season_number}`}</p>
@@ -268,7 +292,7 @@ const SeriesDetail = () => {
                     {visibleEpisodes.map((ep) => {
                       const dbEpisode = dbEpisodesBySeason[season.id]?.get(ep.episode_number);
                       return (
-                        <div key={ep.id} className="flex gap-3 py-3 border-b border-neutral-200 dark:border-neutral-800">
+                        <div key={ep.id} className="flex gap-3 py-3 border-b border-zinc-200 dark:border-zinc-800">
                           {ep.still_path ? (
                             <img
                               src={getImageUrl(ep.still_path, 'w300')}
@@ -276,7 +300,7 @@ const SeriesDetail = () => {
                               className="w-24 h-16 object-cover rounded-md flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-24 h-16 rounded-md bg-neutral-200 dark:bg-[#1a1a1a]" />
+                            <div className="w-24 h-16 rounded-md bg-zinc-200 dark:bg-zinc-800" />
                           )}
                           <div className="flex-1">
                             <p className="text-sm font-medium">
