@@ -242,24 +242,18 @@ const MovieDetail = () => {
             </div>
           </div>
 
-          <div className="text-sm text-zinc-300">
-            <span className="text-amber-400 font-medium">
-              Rating: {typeof movie.rating === 'number' ? `${movie.rating.toFixed(1)}/10` : 'NR'}
-            </span>
-            {movie.imdb_rating ? (
-              <>
-                <span className="mx-2 text-zinc-500">{bullet}</span>
-                <a
-                  href={movie.imdb_url || '#'}
-                  target={movie.imdb_url ? '_blank' : undefined}
-                  rel={movie.imdb_url ? 'noopener noreferrer' : undefined}
-                  className="text-amber-400 hover:text-amber-300"
-                >
-                  IMDb {movie.imdb_rating} &gt;
-                </a>
-              </>
-            ) : null}
-          </div>
+          {movie.imdb_rating && (
+            <div className="text-sm">
+              <a
+                href={movie.imdb_url || '#'}
+                target={movie.imdb_url ? '_blank' : undefined}
+                rel={movie.imdb_url ? 'noopener noreferrer' : undefined}
+                className="bg-amber-500 text-black px-2 py-0.5 rounded text-xs font-semibold hover:bg-amber-400 transition"
+              >
+                IMDb {movie.imdb_rating}
+              </a>
+            </div>
+          )}
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
