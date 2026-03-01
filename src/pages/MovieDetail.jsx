@@ -102,14 +102,14 @@ const MovieDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100">
+      <div className="min-h-screen bg-black text-zinc-100">
         <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Loading...</div>
       </div>
     );
   }
   if (!movie) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100">
+      <div className="min-h-screen bg-black text-zinc-100">
         <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Movie not found</div>
       </div>
     );
@@ -168,7 +168,7 @@ const MovieDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100">
+    <div className="min-h-screen bg-black text-zinc-100">
       <SeoHead
         title={pageMeta?.title || `${movie.title} - MetaMovies+`}
         description={pageMeta?.description || movie.overview?.slice(0, 160)}
@@ -200,7 +200,7 @@ const MovieDetail = () => {
                 className={`whitespace-nowrap rounded-full px-4 py-2 text-sm border transition ${
                   activeTab === tab.key
                     ? 'bg-amber-600/20 border-amber-500 text-amber-400'
-                    : 'bg-zinc-800 border-zinc-700 text-zinc-300'
+                    : 'bg-black border-zinc-700 text-zinc-300'
                 }`}
               >
                 {tab.label}
@@ -211,11 +211,11 @@ const MovieDetail = () => {
 
         <section className="mt-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4">
-            <div className="rounded-xl overflow-hidden shadow-lg bg-zinc-900/80 backdrop-blur">
+            <div className="rounded-xl overflow-hidden shadow-lg bg-black backdrop-blur">
               {movie.poster_url ? (
                 <img loading="lazy" src={movie.poster_url} alt={movie.title} className="w-full aspect-[2/3] object-cover" />
               ) : (
-                <div className="w-full aspect-[2/3] bg-zinc-800" />
+                <div className="w-full aspect-[2/3] bg-black" />
               )}
             </div>
 
@@ -263,10 +263,9 @@ const MovieDetail = () => {
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-zinc-800/80 backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-black backdrop-blur rounded-2xl p-4">
+            <div className="flex items-center mb-3">
               <h3 className="font-medium">Where to Watch</h3>
-              <span className="text-zinc-400">⌄</span>
             </div>
             {ottPlatforms.length > 0 ? (
               <div className="flex gap-3 overflow-x-auto no-scrollbar">
@@ -278,7 +277,7 @@ const MovieDetail = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-lg bg-zinc-900 flex items-center justify-center flex-shrink-0"
+                      className="w-12 h-12 rounded-lg bg-black flex items-center justify-center flex-shrink-0"
                     >
                       {logoSrc ? (
                         <img src={logoSrc} alt={platform} className="w-8 h-8 object-contain" />
@@ -294,10 +293,9 @@ const MovieDetail = () => {
             )}
           </div>
 
-          <div className="bg-zinc-800/80 backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-black backdrop-blur rounded-2xl p-4">
+            <div className="flex items-center mb-3">
               <h3 className="font-medium">Cast Preview</h3>
-              <span className="text-zinc-400">⌄</span>
             </div>
             {topCast.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
@@ -332,7 +330,7 @@ const MovieDetail = () => {
           ref={(el) => {
             sectionRefs.current.overview = el;
           }}
-          className="bg-zinc-800/80 backdrop-blur rounded-2xl p-5 space-y-4"
+          className="bg-black backdrop-blur rounded-2xl p-5 space-y-4"
         >
           <h2 className="font-display text-lg">Overview</h2>
           {movie.overview ? (
@@ -409,7 +407,7 @@ const MovieDetail = () => {
                       className="w-full aspect-square rounded-xl object-cover"
                     />
                   ) : (
-                    <div className="w-full aspect-square rounded-xl bg-zinc-800 flex items-center justify-center">
+                    <div className="w-full aspect-square rounded-xl bg-black flex items-center justify-center">
                       {c.person?.name?.[0] || '?'}
                     </div>
                   )}
@@ -428,7 +426,7 @@ const MovieDetail = () => {
               {(movie.crew || []).map((member) => (
                 <button
                   key={member.id}
-                  className="w-full flex items-center gap-3 text-left bg-zinc-800/80 border border-zinc-700 rounded-xl p-3"
+                  className="w-full flex items-center gap-3 text-left bg-black border border-zinc-700 rounded-xl p-3"
                   onClick={() => navigate(`/person/${member.person?.id}`)}
                 >
                   {member.person?.profile_url ? (
@@ -457,7 +455,7 @@ const MovieDetail = () => {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Music Director</h2>
             <button
-              className="w-full flex items-center gap-3 text-left bg-zinc-800/80 border border-zinc-700 rounded-xl p-3"
+              className="w-full flex items-center gap-3 text-left bg-black border border-zinc-700 rounded-xl p-3"
               onClick={() => {
                 if (musicDirector?.id) navigate(`/person/${musicDirector.id}`);
               }}
@@ -485,7 +483,7 @@ const MovieDetail = () => {
                 const logoSrc = platformLogos[platform];
                 return (
                   <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="min-w-[80px] flex flex-col items-center">
-                    <div className="w-16 h-16 bg-zinc-800/80 rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-zinc-700">
+                    <div className="w-16 h-16 bg-black rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-zinc-700">
                       {logoSrc ? (
                         <img src={logoSrc} alt={platform} className="w-10 h-10 object-contain" />
                       ) : (
@@ -507,7 +505,7 @@ const MovieDetail = () => {
                 const logoSrc = platformLogos[platform];
                 return (
                   <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="min-w-[80px] flex flex-col items-center">
-                    <div className="w-16 h-16 bg-zinc-800/80 rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-zinc-700">
+                    <div className="w-16 h-16 bg-black rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-zinc-700">
                       {logoSrc ? (
                         <img src={logoSrc} alt={platform} className="w-10 h-10 object-contain" />
                       ) : (
@@ -536,7 +534,7 @@ const MovieDetail = () => {
           <div className="space-y-3">
             {reviewItems.length > 0 ? (
               reviewItems.slice(0, 2).map((review, idx) => (
-                <div key={`review-${idx}`} className="bg-zinc-800/80 border border-zinc-700 rounded-xl p-3">
+                <div key={`review-${idx}`} className="bg-black border border-zinc-700 rounded-xl p-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium">{review.user?.username || 'User'}</span>
                     <span className="text-amber-400">{review.rating || 'NR'}</span>
@@ -545,7 +543,7 @@ const MovieDetail = () => {
                 </div>
               ))
             ) : (
-              <div className="bg-zinc-800/80 border border-zinc-700 rounded-xl p-3 text-sm text-zinc-400">No reviews yet.</div>
+              <div className="bg-black border border-zinc-700 rounded-xl p-3 text-sm text-zinc-400">No reviews yet.</div>
             )}
           </div>
           <button className="mt-3 text-sm text-zinc-400 hover:text-zinc-100 transition" onClick={() => navigate(`/movie/${movie.id}/reviews`)}>
@@ -565,7 +563,7 @@ const MovieDetail = () => {
               {soundtrack.flatMap((album) => (album.tracks || []).slice(0, 3)).map((song) => (
                 <button
                   key={`song-${song.id}`}
-                  className="w-full text-left bg-zinc-800/80 border border-zinc-700 rounded-xl p-3"
+                  className="w-full text-left bg-black border border-zinc-700 rounded-xl p-3"
                   onClick={() => navigate(`/songs/${song.id}`)}
                 >
                   <div className="text-sm font-medium">{song.title}</div>
@@ -594,7 +592,7 @@ const MovieDetail = () => {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="aspect-video rounded-xl overflow-hidden bg-zinc-800/80 border border-zinc-700 block"
+                    className="aspect-video rounded-xl overflow-hidden bg-black border border-zinc-700 block"
                   >
                     {thumb ? (
                       <img loading="lazy" src={thumb} alt="Media" className="w-full h-full object-cover" />
@@ -605,7 +603,7 @@ const MovieDetail = () => {
                 );
               })}
               {mediaPhotos.map((url, idx) => (
-                <div key={`${url}-${idx}`} className="aspect-video rounded-xl overflow-hidden bg-zinc-800/80 border border-zinc-700">
+                <div key={`${url}-${idx}`} className="aspect-video rounded-xl overflow-hidden bg-black border border-zinc-700">
                   <img loading="lazy" src={url} alt="Media" className="w-full h-full object-cover" />
                 </div>
               ))}
@@ -619,7 +617,7 @@ const MovieDetail = () => {
             {movie.similar_movies?.length ? (
               movie.similar_movies.slice(0, 6).map((item) => (
                 <button key={`similar-${item.id}`} className="text-left" onClick={() => navigate(`/movie/${item.id}`)}>
-                  <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-800/80 border border-zinc-700">
+                  <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-black border border-zinc-700">
                     {typeof item.rating === 'number' && (
                       <div className="absolute top-2 left-2 bg-amber-500 text-black text-xs font-semibold px-2 py-0.5 rounded">
                         {item.rating.toFixed(1)}
@@ -641,3 +639,4 @@ const MovieDetail = () => {
 };
 
 export default MovieDetail;
+

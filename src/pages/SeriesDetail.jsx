@@ -61,7 +61,7 @@ const SeriesDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100">
+      <div className="min-h-screen bg-black text-zinc-100">
         <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Loading...</div>
       </div>
     );
@@ -69,7 +69,7 @@ const SeriesDetail = () => {
 
   if (!series) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100">
+      <div className="min-h-screen bg-black text-zinc-100">
         <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Series not found</div>
       </div>
     );
@@ -105,7 +105,7 @@ const SeriesDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100">
+    <div className="min-h-screen bg-black text-zinc-100">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
 
       <div className="max-w-5xl mx-auto px-4 pt-8 pb-12 space-y-6">
@@ -129,7 +129,7 @@ const SeriesDetail = () => {
                 className={`whitespace-nowrap rounded-full px-4 py-2 text-sm border transition ${
                   activeTab === tab.key
                     ? 'bg-amber-600/20 border-amber-500 text-amber-400'
-                    : 'bg-zinc-800 border-zinc-700 text-zinc-300'
+                    : 'bg-black border-zinc-700 text-zinc-300'
                 }`}
               >
                 {tab.label}
@@ -140,18 +140,18 @@ const SeriesDetail = () => {
 
         <section className="mt-4 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4">
-            <div className="rounded-xl overflow-hidden shadow-lg bg-zinc-900/80 backdrop-blur">
+            <div className="rounded-xl overflow-hidden shadow-lg bg-black backdrop-blur">
               {series.poster_url ? (
                 <img src={series.poster_url} alt={series.name} className="w-full aspect-[2/3] object-cover" />
               ) : (
-                <div className="w-full aspect-[2/3] bg-zinc-800" />
+                <div className="w-full aspect-[2/3] bg-black" />
               )}
             </div>
-            <div className="rounded-xl overflow-hidden shadow-lg bg-zinc-900/80 min-h-[220px]">
+            <div className="rounded-xl overflow-hidden shadow-lg bg-black min-h-[220px]">
               {series.backdrop_url ? (
                 <img src={series.backdrop_url} alt={series.name} className="w-full h-full min-h-[220px] object-cover" />
               ) : (
-                <div className="w-full h-full min-h-[220px] bg-zinc-800" />
+                <div className="w-full h-full min-h-[220px] bg-black" />
               )}
             </div>
           </div>
@@ -170,10 +170,9 @@ const SeriesDetail = () => {
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-zinc-800/80 backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-black backdrop-blur rounded-2xl p-4">
+            <div className="flex items-center mb-3">
               <h3 className="font-medium">Where to Watch</h3>
-              <span className="text-zinc-400">⌄</span>
             </div>
             {watchPlatforms.length > 0 ? (
               <div className="flex gap-3 overflow-x-auto no-scrollbar">
@@ -185,7 +184,7 @@ const SeriesDetail = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-lg bg-zinc-900 flex items-center justify-center flex-shrink-0"
+                      className="w-12 h-12 rounded-lg bg-black flex items-center justify-center flex-shrink-0"
                     >
                       {logoSrc ? (
                         <img src={logoSrc} alt={platform} className="w-8 h-8 object-contain" />
@@ -201,10 +200,9 @@ const SeriesDetail = () => {
             )}
           </div>
 
-          <div className="bg-zinc-800/80 backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-black backdrop-blur rounded-2xl p-4">
+            <div className="flex items-center mb-3">
               <h3 className="font-medium">Cast Preview</h3>
-              <span className="text-zinc-400">⌄</span>
             </div>
             {topCast.length > 0 ? (
               <div className="grid grid-cols-3 gap-2">
@@ -239,7 +237,7 @@ const SeriesDetail = () => {
           ref={(el) => {
             sectionRefs.current.overview = el;
           }}
-          className="bg-zinc-800/80 backdrop-blur rounded-2xl p-5 space-y-4"
+          className="bg-black backdrop-blur rounded-2xl p-5 space-y-4"
         >
           <h2 className="font-display text-lg">Overview</h2>
           {series.overview ? (
@@ -298,7 +296,7 @@ const SeriesDetail = () => {
                       className="w-full aspect-square rounded-xl object-cover"
                     />
                   ) : (
-                    <div className="w-full aspect-square rounded-xl bg-zinc-800 flex items-center justify-center">{member.name?.[0] || '?'}</div>
+                    <div className="w-full aspect-square rounded-xl bg-black flex items-center justify-center">{member.name?.[0] || '?'}</div>
                   )}
                   <div className="mt-2 text-sm font-medium truncate">{member.name}</div>
                   <div className="text-xs text-zinc-400 truncate">{member.character}</div>
@@ -326,7 +324,7 @@ const SeriesDetail = () => {
                       className="w-full aspect-square rounded-xl object-cover"
                     />
                   ) : (
-                    <div className="w-full aspect-square rounded-xl bg-zinc-800 flex items-center justify-center">{member.name?.[0] || '?'}</div>
+                    <div className="w-full aspect-square rounded-xl bg-black flex items-center justify-center">{member.name?.[0] || '?'}</div>
                   )}
                   <div className="mt-2 text-sm font-medium truncate">{member.name}</div>
                   <div className="text-xs text-zinc-400 truncate">{member.job}</div>
@@ -340,7 +338,7 @@ const SeriesDetail = () => {
           ref={(el) => {
             sectionRefs.current.reviews = el;
           }}
-          className="bg-zinc-800/80 border border-zinc-700 rounded-2xl p-5"
+          className="bg-black border border-zinc-700 rounded-2xl p-5"
         >
           <h2 className="text-lg font-semibold mb-2">Reviews</h2>
           <p className="text-sm text-zinc-400">Series reviews are not available yet.</p>
@@ -359,7 +357,7 @@ const SeriesDetail = () => {
               const visibleCount = visibleCounts[season.id] ?? 3;
               const visibleEpisodes = seasonEpisodes.slice(0, visibleCount);
               return (
-                <div key={season.id} className="bg-zinc-800/80 border border-zinc-700 rounded-2xl p-4">
+                <div key={season.id} className="bg-black border border-zinc-700 rounded-2xl p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{season.name || `Season ${season.season_number}`}</p>
@@ -436,3 +434,4 @@ const SeriesDetail = () => {
 };
 
 export default SeriesDetail;
+
