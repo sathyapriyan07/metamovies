@@ -12,7 +12,6 @@ const Home = () => {
   const [heroBanners, setHeroBanners] = useState([]);
   const [collections, setCollections] = useState([]);
   const [seriesItems, setSeriesItems] = useState([]);
-  const [homeTab, setHomeTab] = useState('movies');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -52,7 +51,6 @@ const Home = () => {
     setSeriesItems(data || []);
   };
 
-
   const hero = heroBanners[0]?.movie || null;
   const formatRuntime = (mins) => {
     if (!mins || mins <= 0) return null;
@@ -64,142 +62,153 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white pb-10">
-      <div className="max-w-2xl mx-auto px-4 pt-4">
-        {hero ? (
-          <div className="bg-[#1a1a1a] rounded-md overflow-hidden">
-            <div>
-              <img
-                src={hero.backdrop_url || hero.poster_url}
-                alt={hero.title}
-                className="w-full h-[220px] object-cover rounded-md"
-                loading="eager"
-              />
-            </div>
-            <div className="p-4">
-              <h1 className="text-2xl font-bold">{hero.title}</h1>
-              <div className="text-sm text-gray-400 mt-3 flex flex-wrap items-center gap-2">
-                <span>{hero.release_date?.split('-')[0]}</span>
-                {hero.runtime ? (
-                  <>
-                    <span className="h-1 w-1 rounded-full bg-gray-500" aria-hidden="true" />
-                    <span>{formatRuntime(hero.runtime)}</span>
-                  </>
-                ) : null}
-                {hero.genres?.length ? (
-                  <>
-                    <span className="h-1 w-1 rounded-full bg-gray-500" aria-hidden="true" />
-                    <span>{hero.genres.join(' • ')}</span>
-                  </>
-                ) : null}
-              </div>
-              {hero.overview && (
-                <p className="text-gray-300 mt-4 max-w-xl text-sm">
-                  {hero.overview}
-                </p>
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100 pb-24">
+      {/* Hero Banner */}
+      {hero && (
+        <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
+          <img
+            src={hero.backdrop_url || hero.poster_url}
+            alt={hero.title}
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 space-y-3">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{hero.title}</h1>
+            <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400">
+              <span>{hero.release_date?.split('-')[0]}</span>
+              {hero.runtime && (
+                <>
+                  <span>•</span>
+                  <span>{formatRuntime(hero.runtime)}</span>
+                </>
               )}
-              <div className="flex gap-3 mt-4">
-                <button className="bg-[#F5C518] text-black px-4 py-2 rounded-md text-sm font-medium">
-                  Watch Trailer
-                </button>
-                <button className="bg-[#1a1a1a] text-white px-4 py-2 rounded-md text-sm border border-white/10">
-                  + Watchlist
-                </button>
-              </div>
+              {hero.genres?.length > 0 && (
+                <>
+                  <span>•</span>
+                  <span>{hero.genres.slice(0, 3).join(', ')}</span>
+                </>
+              )}
+            </div>
+            {hero.overview && (
+              <p className="text-sm text-zinc-300 line-clamp-2 max-w-2xl">{hero.overview}</p>
+            )}
+            <div className="flex gap-3 pt-2">
+              <button className="bg-amber-400 text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-amber-500 transition">
+                Watch Now
+              </button>
+              <button className="bg-white/20 backdrop-blur-sm text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-white/30 transition">
+                + Watchlist
+              </button>
             </div>
           </div>
-        ) : (
-          <div className="bg-[#1a1a1a] rounded-md p-4">
-            <h1 className="text-2xl font-bold">Featured Title</h1>
-            <p className="text-sm text-gray-400 mt-2">Add a Hero Banner in admin to show it here.</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="max-w-2xl mx-auto px-4">
+      {/* Content Sections */}
+      <div className="px-4 space-y-8 mt-8">
         {loading ? (
-          <p className="py-6">Loading...</p>
+          <div className="flex items-center justify-center py-12">
+            <p className="text-zinc-400">Loading...</p>
+          </div>
         ) : (
           <>
-            <section className="py-6">
-              <div className="tab-container">
-                <button
-                  className={`tab ${homeTab === 'movies' ? 'active' : ''}`}
-                  onClick={() => setHomeTab('movies')}
-                >
-                  Movies
-                </button>
-                <button
-                  className={`tab ${homeTab === 'series' ? 'active' : ''}`}
-                  onClick={() => setHomeTab('series')}
-                >
-                  Series
-                </button>
-              </div>
-            </section>
-
-            {homeTab === 'movies' && collections.length > 0 ? (
-              collections.map((collection) => (
-                <section key={collection.id} className="py-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-lg font-semibold">{collection.name || 'Collection'}</h2>
-                    <button className="text-sm text-[#F5C518]" onClick={() => navigate('/movies')}>See All</button>
-                  </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                    {collection.items.map((item) => (
-                      <div key={item.id} className="min-w-[140px] cursor-pointer" onClick={() => navigate(`/movie/${item.id}`)}>
-                        <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
-                          {typeof item.rating === 'number' && (
-                            <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
-                              {item.rating.toFixed(1)}
-                            </div>
-                          )}
-                          <img
-                            src={item.poster_url || item.backdrop_url}
-                            alt={item.title || item.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        <p className="mt-2 text-sm font-medium truncate">{item.title || item.name}</p>
-                        <p className="text-xs text-gray-400">{item.release_date?.split('-')[0]}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ))
-            ) : (
-              homeTab === 'movies' && <div className="py-6 text-sm text-gray-400">No featured content added yet.</div>
-            )}
-
-            {homeTab === 'series' && (
-              <section className="py-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold">Latest Series</h2>
-                  <button className="text-sm text-[#F5C518]" onClick={() => navigate('/series')}>See All</button>
+            {/* Movie Collections */}
+            {collections.length > 0 && collections.map((collection) => (
+              <section key={collection.id} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg md:text-xl font-semibold tracking-tight text-zinc-200">
+                    {collection.name || 'Collection'}
+                  </h2>
+                  <button 
+                    className="text-sm text-amber-400 hover:underline"
+                    onClick={() => navigate('/movies')}
+                  >
+                    See All
+                  </button>
                 </div>
-                <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-                  {seriesItems.map((item) => (
-                    <div key={item.id} className="min-w-[140px] cursor-pointer" onClick={() => navigate(`/series/${item.id}`)}>
-                      <div className="relative aspect-[2/3] rounded-md overflow-hidden bg-[#1a1a1a]">
+                <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
+                  {collection.items.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className="w-36 flex-shrink-0 snap-start cursor-pointer group"
+                      onClick={() => navigate(`/movie/${item.id}`)}
+                    >
+                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-md bg-zinc-800">
                         {typeof item.rating === 'number' && (
-                          <div className="absolute top-2 left-2 bg-[#F5C518] text-black text-xs font-semibold px-2 py-0.5 rounded">
+                          <div className="absolute top-2 right-2 bg-amber-400 text-black text-xs font-bold px-2 py-1 rounded-md z-10">
+                            {item.rating.toFixed(1)}
+                          </div>
+                        )}
+                        <img
+                          src={item.poster_url || item.backdrop_url}
+                          alt={item.title || item.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                      </div>
+                      <p className="mt-2 text-sm text-zinc-300 line-clamp-2 leading-snug">
+                        {item.title || item.name}
+                      </p>
+                      <p className="text-xs text-zinc-500 mt-0.5">
+                        {item.release_date?.split('-')[0]}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+
+            {/* Latest Series Section */}
+            {seriesItems.length > 0 && (
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg md:text-xl font-semibold tracking-tight text-zinc-200">
+                    Latest TV Shows
+                  </h2>
+                  <button 
+                    className="text-sm text-amber-400 hover:underline"
+                    onClick={() => navigate('/series')}
+                  >
+                    See All
+                  </button>
+                </div>
+                <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
+                  {seriesItems.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className="w-36 flex-shrink-0 snap-start cursor-pointer group"
+                      onClick={() => navigate(`/series/${item.id}`)}
+                    >
+                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-md bg-zinc-800">
+                        {typeof item.rating === 'number' && (
+                          <div className="absolute top-2 right-2 bg-amber-400 text-black text-xs font-bold px-2 py-1 rounded-md z-10">
                             {item.rating.toFixed(1)}
                           </div>
                         )}
                         <img
                           src={item.poster_url || item.backdrop_url}
                           alt={item.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           loading="lazy"
                         />
                       </div>
-                      <p className="mt-2 text-sm font-medium truncate">{item.name}</p>
-                      <p className="text-xs text-gray-400">{item.first_air_date?.split('-')[0]}</p>
+                      <p className="mt-2 text-sm text-zinc-300 line-clamp-2 leading-snug">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-zinc-500 mt-0.5">
+                        {item.first_air_date?.split('-')[0]}
+                      </p>
                     </div>
                   ))}
                 </div>
               </section>
+            )}
+
+            {collections.length === 0 && seriesItems.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-zinc-400">No content available yet.</p>
+              </div>
             )}
           </>
         )}

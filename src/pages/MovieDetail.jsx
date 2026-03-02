@@ -22,7 +22,6 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [inWatchlist, setInWatchlist] = useState(false);
-  const [showFullOverview, setShowFullOverview] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [soundtrack, setSoundtrack] = useState([]);
   const [reviewSummary, setReviewSummary] = useState({ avg: null, count: 0 });
@@ -30,13 +29,12 @@ const MovieDetail = () => {
   const [pageMeta, setPageMeta] = useState(null);
   const [musicDirector, setMusicDirector] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
-  const sectionRefs = useRef({});
 
   useEffect(() => {
     loadMovie();
   }, [id]);
 
-  const loadMovie = async () => {
+  const loadData = async () => {
     setLoading(true);
     let resolvedId = id;
     if (!/^\d+$/.test(id)) {
@@ -78,6 +76,8 @@ const MovieDetail = () => {
     setLoading(false);
   };
 
+  const loadMovie = loadData;
+
   const toggleWatchlist = async () => {
     if (!user) return navigate('/login');
     if (inWatchlist) {
@@ -103,14 +103,14 @@ const MovieDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-zinc-100">
-        <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Loading...</div>
+        <div className="px-4 pt-12 pb-10">Loading...</div>
       </div>
     );
   }
   if (!movie) {
     return (
       <div className="min-h-screen bg-black text-zinc-100">
-        <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Movie not found</div>
+        <div className="px-4 pt-12 pb-10">Movie not found</div>
       </div>
     );
   }
@@ -125,50 +125,34 @@ const MovieDetail = () => {
     return `${h}h ${m}m`;
   };
   const runtime = formatRuntime(movie.runtime);
-  const bullet = '\u2022';
-  const genresText = Array.isArray(movie.genres) ? movie.genres.join(` ${bullet} `) : movie.genres;
-  const metaLine = [year, genresText, runtime].filter(Boolean).join(` ${bullet} `);
-
+  const genresText = Array.isArray(movie.genres) ? movie.genres.join(', ') : movie.genres;
   const reviewItems = Array.isArray(reviews) ? reviews : [];
   const mediaVideos = [
     ...(Array.isArray(movie.media_videos) ? movie.media_videos : []),
     ...(movie.trailer_url ? [movie.trailer_url] : [])
   ].filter(Boolean);
-  const mediaPhotos = [movie.backdrop_url, movie.poster_url].filter(Boolean);
   const ottPlatforms = movie.watch_links ? Object.entries(movie.watch_links).filter(([, url]) => url) : [];
-  const musicPlatforms = movie.music_links ? Object.entries(movie.music_links).filter(([, url]) => url) : [];
   const platformLogos = {
     prime: '/logos/prime.png',
     hotstar: '/logos/hotstar.png',
     zee5: '/logos/zee5.png',
     netflix: 'https://www.freepnglogos.com/uploads/netflix-logo-history-32.png',
     sony_liv: '/logos/sonyliv.png',
-    spotify:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/3840px-Spotify_logo_without_text.svg.png',
+    spotify: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/3840px-Spotify_logo_without_text.svg.png',
     apple_music: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Apple_Music_icon.svg/960px-Apple_Music_icon.svg.png',
     youtube_music: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/YouTubeMusic_Logo.png',
     jiosaavn: '/logos/jiosaavn.png'
   };
-  const shouldShowLogo = movie?.title_logo_url && movie.title_logo_url.trim() !== '' && !movie.use_text_title;
-  const cbfcText = movie?.cbfc || movie?.cbfc_rating || movie?.certification || 'U/A 16+';
-  const topCast = Array.isArray(movie.cast) ? movie.cast.slice(0, 3) : [];
 
   const tabs = [
     { key: 'overview', label: 'Overview' },
     { key: 'cast', label: 'Cast' },
-    { key: 'media', label: 'Trailers & Clips' },
     { key: 'reviews', label: 'Reviews' },
-    { key: 'watchlist', label: 'Watchlist' }
+    { key: 'related', label: 'Related' }
   ];
 
-  const scrollToSection = (tabKey) => {
-    setActiveTab(tabKey);
-    const section = sectionRefs.current[tabKey];
-    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   return (
-    <div className="min-h-screen bg-black text-zinc-100">
+    <div className="min-h-screen bg-black text-zinc-100 px-4 pt-4 pb-24 space-y-6">
       <SeoHead
         title={pageMeta?.title || `${movie.title} - MetaMovies+`}
         description={pageMeta?.description || movie.overview?.slice(0, 160)}
@@ -176,94 +160,132 @@ const MovieDetail = () => {
         jsonLd={pageMeta?.jsonld || null}
       />
 
-      <div className="max-w-5xl mx-auto px-4 pt-8 pb-12 space-y-6">
-        <section className="space-y-3">
-          <div className="backdrop-blur-sm">
-            <div className="min-h-[48px]">
-              {shouldShowLogo ? (
-                <img src={movie.title_logo_url} alt={movie.title} className="max-h-12 w-auto object-contain" />
-              ) : (
-                <h1 className="text-2xl md:text-3xl font-display font-semibold tracking-wide">{movie.title}</h1>
-              )}
-            </div>
-            <p className="text-sm text-zinc-400 mt-2">
-              {`CBFC: ${cbfcText}`}
-              {metaLine ? ` ${bullet} ${metaLine}` : ''}
-            </p>
-          </div>
+      {/* Hero Image */}
+      {movie.backdrop_url && (
+        <div className="relative -mx-4 h-[50vh] overflow-hidden">
+          <img
+            src={movie.backdrop_url}
+            alt={movie.title}
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        </div>
+      )}
 
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => scrollToSection(tab.key)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm border transition ${
-                  activeTab === tab.key
-                    ? 'bg-amber-600/20 border-amber-500 text-amber-400'
-                    : 'bg-black border-zinc-700 text-zinc-300'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </section>
+      {/* Title Section */}
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight">{movie.title}</h1>
+        {movie.imdb_rating && (
+          <a
+            href={movie.imdb_url || '#'}
+            target={movie.imdb_url ? '_blank' : undefined}
+            rel={movie.imdb_url ? 'noopener noreferrer' : undefined}
+            className="inline-block bg-yellow-400 text-black px-2 py-1 rounded text-xs font-bold"
+          >
+            ⭐ {movie.imdb_rating}
+          </a>
+        )}
+      </div>
 
-        <section className="mt-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4">
-            <div className="rounded-xl overflow-hidden shadow-lg bg-black backdrop-blur">
-              {movie.poster_url ? (
-                <img loading="lazy" src={movie.poster_url} alt={movie.title} className="w-full aspect-[2/3] object-cover" />
-              ) : (
-                <div className="w-full aspect-[2/3] bg-black" />
-              )}
-            </div>
+      {/* Tab Navigation */}
+      <div className="flex gap-6 overflow-x-auto border-b border-zinc-800 pb-2 scrollbar-hide">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`whitespace-nowrap text-sm relative pb-2 transition ${
+              activeTab === tab.key
+                ? 'text-yellow-400 font-medium after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:w-full after:bg-yellow-400'
+                : 'text-zinc-400'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-            <div
-              className="relative rounded-xl overflow-hidden shadow-lg bg-black min-h-[220px]"
-              style={{
-                backgroundImage: `linear-gradient(180deg, rgba(12,12,12,0.1) 0%, rgba(12,12,12,0.72) 70%, rgba(12,12,12,0.95) 100%), url(${movie.backdrop_url || movie.poster_url || ''})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            >
-              {videoId && !videoError ? (
-                <iframe
-                  className="w-full h-full min-h-[220px]"
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  title="Trailer"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  onError={() => setVideoError(true)}
-                  loading="lazy"
-                />
-              ) : null}
-            </div>
-          </div>
-
-          {movie.imdb_rating && (
-            <div className="text-sm">
-              <a
-                href={movie.imdb_url || '#'}
-                target={movie.imdb_url ? '_blank' : undefined}
-                rel={movie.imdb_url ? 'noopener noreferrer' : undefined}
-                className="bg-amber-500 text-black px-2 py-0.5 rounded text-xs font-semibold hover:bg-amber-400 transition"
-              >
-                IMDb {movie.imdb_rating}
-              </a>
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <div className="space-y-6">
+          {/* Trailer */}
+          {videoId && !videoError && (
+            <div className="aspect-video rounded-lg overflow-hidden bg-zinc-900">
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title="Trailer"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onError={() => setVideoError(true)}
+                loading="lazy"
+              />
             </div>
           )}
-        </section>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-black backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center mb-3">
-              <h3 className="font-medium">Where to Watch</h3>
+          {/* Description */}
+          {movie.overview && (
+            <div className="space-y-2">
+              <h3 className="text-zinc-200 font-semibold text-sm">Description</h3>
+              <p className="text-zinc-300 leading-relaxed text-sm">{movie.overview}</p>
             </div>
-            {ottPlatforms.length > 0 ? (
-              <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                {ottPlatforms.slice(0, 4).map(([platform, url]) => {
+          )}
+
+          {/* Release Date */}
+          {year && (
+            <div className="space-y-1">
+              <h3 className="text-zinc-200 font-semibold text-sm">Release</h3>
+              <p className="text-zinc-400 text-sm">{movie.release_date}</p>
+            </div>
+          )}
+
+          {/* Runtime */}
+          {runtime && (
+            <div className="space-y-1">
+              <h3 className="text-zinc-200 font-semibold text-sm">Runtime</h3>
+              <p className="text-zinc-400 text-sm">{runtime}</p>
+            </div>
+          )}
+
+          {/* Genre */}
+          {genresText && (
+            <div className="space-y-1">
+              <h3 className="text-zinc-200 font-semibold text-sm">Genre</h3>
+              <p className="text-zinc-400 text-sm">{genresText}</p>
+            </div>
+          )}
+
+          {/* Spoken Languages */}
+          {movie.spoken_languages && (
+            <div className="space-y-1">
+              <h3 className="text-zinc-200 font-semibold text-sm">Spoken Languages</h3>
+              <p className="text-zinc-400 text-sm">{movie.spoken_languages}</p>
+            </div>
+          )}
+
+          {/* Production Countries */}
+          {movie.production_countries && (
+            <div className="space-y-1">
+              <h3 className="text-zinc-200 font-semibold text-sm">Production Countries</h3>
+              <p className="text-zinc-400 text-sm">{movie.production_countries}</p>
+            </div>
+          )}
+
+          {/* Production Companies */}
+          {movie.production_companies && (
+            <div className="space-y-1">
+              <h3 className="text-zinc-200 font-semibold text-sm">Production Companies</h3>
+              <p className="text-zinc-400 text-sm">{movie.production_companies}</p>
+            </div>
+          )}
+
+          {/* Watch Platforms */}
+          {ottPlatforms.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-zinc-200 font-semibold text-sm">Where to Watch</h3>
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+                {ottPlatforms.map(([platform, url]) => {
                   const logoSrc = platformLogos[platform];
                   return (
                     <a
@@ -271,10 +293,10 @@ const MovieDetail = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-lg bg-black flex items-center justify-center flex-shrink-0"
+                      className="w-14 h-14 rounded-lg bg-zinc-900 flex items-center justify-center flex-shrink-0 hover:bg-zinc-800 transition"
                     >
                       {logoSrc ? (
-                        <img src={logoSrc} alt={platform} className="w-8 h-8 object-contain" />
+                        <img src={logoSrc} alt={platform} className="w-9 h-9 object-contain" />
                       ) : (
                         <span className="text-[10px] text-zinc-300 capitalize">{platform.replace('_', ' ')}</span>
                       )}
@@ -282,111 +304,31 @@ const MovieDetail = () => {
                   );
                 })}
               </div>
-            ) : (
-              <p className="text-sm text-zinc-400">Streaming links unavailable.</p>
-            )}
-          </div>
-
-          <div className="bg-black backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center mb-3">
-              <h3 className="font-medium">Cast Preview</h3>
             </div>
-            {topCast.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
-                {topCast.map((c) => (
-                  <button
-                    key={`cast-preview-${c.id}`}
-                    onClick={() => c.person?.id && navigate(`/person/${c.person.id}`)}
-                    className="text-left"
-                  >
-                    {c.person?.profile_url ? (
-                      <img
-                        loading="lazy"
-                        src={c.person.profile_url}
-                        alt={c.person.name}
-                        className="w-full aspect-square rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-full aspect-square rounded-lg bg-zinc-700 flex items-center justify-center text-xs">
-                        {c.person?.name?.[0] || '?'}
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-zinc-400">Cast data unavailable.</p>
-            )}
-          </div>
-        </section>
-
-        <section
-          ref={(el) => {
-            sectionRefs.current.overview = el;
-          }}
-          className="bg-black backdrop-blur rounded-2xl p-5 space-y-4"
-        >
-          <h2 className="font-display text-lg">Overview</h2>
-          {movie.overview ? (
-            <div>
-              <p className={`text-zinc-400 leading-relaxed ${showFullOverview ? '' : 'line-clamp-4'}`}>{movie.overview}</p>
-              {movie.overview.length > 180 && (
-                <button
-                  className="mt-2 text-sm text-amber-400 hover:text-amber-300 transition"
-                  onClick={() => setShowFullOverview(!showFullOverview)}
-                >
-                  {showFullOverview ? 'Read Less' : 'Read More'}
-                </button>
-              )}
-            </div>
-          ) : (
-            <p className="text-zinc-400">No overview available.</p>
           )}
 
-          <div
-            ref={(el) => {
-              sectionRefs.current.watchlist = el;
-            }}
-            className="flex flex-wrap gap-3 pt-2"
-          >
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 pt-2">
             <button
-              className="border border-amber-500 text-amber-400 rounded-full px-5 py-2 hover:bg-amber-500 hover:text-black transition"
+              className="bg-yellow-400 text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-yellow-500 transition"
               onClick={toggleWatchlist}
             >
-              {inWatchlist ? 'Already Watched' : 'Mark as Watched'}
+              {inWatchlist ? '✓ In Watchlist' : '+ Add to Watchlist'}
             </button>
             <button
-              className="border border-amber-500 text-amber-400 rounded-full px-5 py-2 hover:bg-amber-500 hover:text-black transition"
-              onClick={toggleWatchlist}
-            >
-              {inWatchlist ? 'In Watchlist' : 'Want to Watch'}
-            </button>
-            <button
-              className="border border-zinc-700 text-zinc-200 rounded-full px-5 py-2 hover:border-zinc-500 transition"
+              className="bg-zinc-800 text-zinc-100 px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-zinc-700 transition"
               onClick={() => navigate(`/share/${movie.id}`)}
             >
               Share
             </button>
-            {movie.trailer_url && (
-              <button
-                className="border border-zinc-700 text-zinc-200 rounded-full px-5 py-2 hover:border-zinc-500 transition"
-                onClick={() => window.open(movie.trailer_url, '_blank')}
-              >
-                Watch Trailer
-              </button>
-            )}
           </div>
-        </section>
+        </div>
+      )}
 
-        {movie.cast?.length > 0 && (
-          <section
-            ref={(el) => {
-              sectionRefs.current.cast = el;
-            }}
-            className="mt-8 pt-6 border-t border-zinc-800 space-y-4"
-          >
-            <h2 className="text-lg font-semibold">Cast</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {activeTab === 'cast' && (
+        <div className="space-y-4">
+          {movie.cast?.length > 0 ? (
+            <div className="grid grid-cols-3 gap-4">
               {movie.cast.slice(0, 12).map((c) => (
                 <button
                   key={`cast-${c.id}`}
@@ -398,239 +340,89 @@ const MovieDetail = () => {
                       loading="lazy"
                       src={c.person.profile_url}
                       alt={c.person.name}
-                      className="w-full aspect-square rounded-xl object-cover"
+                      className="w-full aspect-square rounded-lg object-cover"
                     />
                   ) : (
-                    <div className="w-full aspect-square rounded-xl bg-black flex items-center justify-center">
+                    <div className="w-full aspect-square rounded-lg bg-zinc-800 flex items-center justify-center text-xs">
                       {c.person?.name?.[0] || '?'}
                     </div>
                   )}
-                  <p className="mt-2 text-sm font-medium truncate">{c.person?.name}</p>
-                  <p className="text-xs text-zinc-400 truncate">{c.character}</p>
+                  <p className="mt-2 text-sm font-medium line-clamp-1">{c.person?.name}</p>
+                  <p className="text-xs text-zinc-400 line-clamp-1">{c.character}</p>
                 </button>
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <p className="text-sm text-zinc-400">No cast information available.</p>
+          )}
+        </div>
+      )}
 
-        {(movie.crew || []).length > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold">Crew</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {(movie.crew || []).map((member) => (
-                <button
-                  key={member.id}
-                  className="w-full flex items-center gap-3 text-left bg-black border border-zinc-700 rounded-xl p-3"
-                  onClick={() => navigate(`/person/${member.person?.id}`)}
-                >
-                  {member.person?.profile_url ? (
-                    <img
-                      loading="lazy"
-                      src={member.person.profile_url}
-                      alt={member.person.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-xs">
-                      {member.person?.name?.[0] || '?'}
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm text-zinc-100">{member.person?.name}</p>
-                    <p className="text-xs text-zinc-400">{member.job || 'Crew'}</p>
+      {activeTab === 'reviews' && (
+        <div className="space-y-4">
+          <div className="text-sm text-zinc-300">
+            <span className="text-yellow-400 font-semibold">User Rating:</span>{' '}
+            {reviewSummary.avg ? `${reviewSummary.avg.toFixed(1)} / 5` : 'Not Rated'}
+            {reviewSummary.count > 0 && ` • ${reviewSummary.count} ratings`}
+          </div>
+          {reviewItems.length > 0 ? (
+            <div className="space-y-3">
+              {reviewItems.slice(0, 5).map((review, idx) => (
+                <div key={`review-${idx}`} className="border-b border-zinc-800 pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">{review.user?.username || 'Anonymous'}</span>
+                    <span className="text-yellow-400 text-sm font-semibold">{review.rating || 'NR'}</span>
                   </div>
-                </button>
+                  <p className="text-sm text-zinc-400 leading-relaxed">{review.body || 'No review text.'}</p>
+                </div>
               ))}
             </div>
-          </section>
-        )}
-
-        {movie.composer_name && (
-          <section className="space-y-3">
-            <h2 className="text-lg font-semibold">Music Director</h2>
-            <button
-              className="w-full flex items-center gap-3 text-left bg-black border border-zinc-700 rounded-xl p-3"
-              onClick={() => {
-                if (musicDirector?.id) navigate(`/person/${musicDirector.id}`);
-              }}
-            >
-              {musicDirector?.profile_url ? (
-                <img loading="lazy" src={musicDirector.profile_url} alt={movie.composer_name} className="w-10 h-10 rounded-full object-cover" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center text-xs">
-                  {movie.composer_name?.[0] || '?'}
-                </div>
-              )}
-              <div>
-                <p className="text-sm text-zinc-100">{movie.composer_name}</p>
-                <p className="text-xs text-zinc-400">Music Director</p>
-              </div>
-            </button>
-          </section>
-        )}
-
-        {ottPlatforms.length > 0 && (
-          <section className="py-2">
-            <h2 className="text-lg font-semibold mb-4">Watch On</h2>
-            <div className="flex gap-5 overflow-x-auto pb-2 no-scrollbar">
-              {ottPlatforms.map(([platform, url]) => {
-                const logoSrc = platformLogos[platform];
-                return (
-                  <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="min-w-[80px] flex flex-col items-center">
-                    <div className="w-16 h-16 bg-black rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-zinc-700">
-                      {logoSrc ? (
-                        <img src={logoSrc} alt={platform} className="w-10 h-10 object-contain" />
-                      ) : (
-                        <span className="text-xs text-zinc-200 capitalize">{platform.replace('_', ' ')}</span>
-                      )}
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {musicPlatforms.length > 0 && (
-          <section className="py-2">
-            <h2 className="text-lg font-semibold mb-4">Listen On</h2>
-            <div className="flex gap-5 overflow-x-auto pb-2 no-scrollbar">
-              {musicPlatforms.map(([platform, url]) => {
-                const logoSrc = platformLogos[platform];
-                return (
-                  <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="min-w-[80px] flex flex-col items-center">
-                    <div className="w-16 h-16 bg-black rounded-xl flex items-center justify-center shadow-md hover:scale-105 transition border border-zinc-700">
-                      {logoSrc ? (
-                        <img src={logoSrc} alt={platform} className="w-10 h-10 object-contain" />
-                      ) : (
-                        <span className="text-xs text-zinc-200 capitalize">{platform.replace('_', ' ')}</span>
-                      )}
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        <section className="py-2">
-          <h2 className="text-lg font-semibold mb-3">Ratings & Reviews</h2>
-          <div
-            ref={(el) => {
-              sectionRefs.current.reviews = el;
-            }}
-            className="text-sm text-zinc-300 mb-3"
+          ) : (
+            <p className="text-sm text-zinc-400">No reviews yet. Be the first to review!</p>
+          )}
+          <button
+            className="text-sm text-yellow-400 hover:underline"
+            onClick={() => navigate(`/movie/${movie.id}/reviews`)}
           >
-            <span className="text-amber-400 font-semibold">User Rating:</span>{' '}
-            {reviewSummary.avg ? `${reviewSummary.avg.toFixed(1)} / 5` : 'NR'}
-            {reviewSummary.count ? ` ${bullet} ${reviewSummary.count} ratings` : ''}
-          </div>
-          <div className="space-y-3">
-            {reviewItems.length > 0 ? (
-              reviewItems.slice(0, 2).map((review, idx) => (
-                <div key={`review-${idx}`} className="bg-black border border-zinc-700 rounded-xl p-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{review.user?.username || 'User'}</span>
-                    <span className="text-amber-400">{review.rating || 'NR'}</span>
-                  </div>
-                  <p className="text-xs text-zinc-400 mt-2 line-clamp-2">{review.body || 'Review unavailable.'}</p>
-                </div>
-              ))
-            ) : (
-              <div className="bg-black border border-zinc-700 rounded-xl p-3 text-sm text-zinc-400">No reviews yet.</div>
-            )}
-          </div>
-          <button className="mt-3 text-sm text-zinc-400 hover:text-zinc-100 transition" onClick={() => navigate(`/movie/${movie.id}/reviews`)}>
             See All Reviews
           </button>
-        </section>
+        </div>
+      )}
 
-        {soundtrack.length > 0 && (
-          <section className="py-2">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold">Soundtrack</h2>
-              <button className="text-sm text-amber-400" onClick={() => navigate(`/albums/${soundtrack[0]?.id}`)}>
-                View Album
-              </button>
-            </div>
-            <div className="space-y-2">
-              {soundtrack.flatMap((album) => (album.tracks || []).slice(0, 3)).map((song) => (
+      {activeTab === 'related' && (
+        <div className="space-y-4">
+          {movie.similar_movies?.length > 0 ? (
+            <div className="grid grid-cols-3 gap-3">
+              {movie.similar_movies.slice(0, 9).map((item) => (
                 <button
-                  key={`song-${song.id}`}
-                  className="w-full text-left bg-black border border-zinc-700 rounded-xl p-3"
-                  onClick={() => navigate(`/songs/${song.id}`)}
+                  key={`similar-${item.id}`}
+                  className="text-left"
+                  onClick={() => navigate(`/movie/${item.id}`)}
                 >
-                  <div className="text-sm font-medium">{song.title}</div>
-                  <div className="text-xs text-zinc-400">Track {song.track_no || '-'}</div>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {(mediaVideos.length > 0 || mediaPhotos.length > 0) && (
-          <section
-            ref={(el) => {
-              sectionRefs.current.media = el;
-            }}
-            className="py-2"
-          >
-            <h2 className="text-lg font-semibold mb-3">Media</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {mediaVideos.map((url) => {
-                const ytVideoId = extractYouTubeId(url);
-                const thumb = ytVideoId ? `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg` : null;
-                return (
-                  <a
-                    key={url}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="aspect-video rounded-xl overflow-hidden bg-black border border-zinc-700 block"
-                  >
-                    {thumb ? (
-                      <img loading="lazy" src={thumb} alt="Media" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-sm text-zinc-400">Play Video</div>
-                    )}
-                  </a>
-                );
-              })}
-              {mediaPhotos.map((url, idx) => (
-                <div key={`${url}-${idx}`} className="aspect-video rounded-xl overflow-hidden bg-black border border-zinc-700">
-                  <img loading="lazy" src={url} alt="Media" className="w-full h-full object-cover" />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section className="py-2">
-          <h2 className="text-lg font-semibold mb-3">Similar Movies</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {movie.similar_movies?.length ? (
-              movie.similar_movies.slice(0, 6).map((item) => (
-                <button key={`similar-${item.id}`} className="text-left" onClick={() => navigate(`/movie/${item.id}`)}>
-                  <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-black border border-zinc-700">
+                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800">
                     {typeof item.rating === 'number' && (
-                      <div className="absolute top-2 left-2 bg-amber-500 text-black text-xs font-semibold px-2 py-0.5 rounded">
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-1.5 py-0.5 rounded">
                         {item.rating.toFixed(1)}
                       </div>
                     )}
-                    <img loading="lazy" src={item.poster_url || item.backdrop_url} alt={item.title} className="w-full h-full object-cover" />
+                    <img
+                      loading="lazy"
+                      src={item.poster_url || item.backdrop_url}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <p className="mt-2 text-sm font-medium truncate">{item.title}</p>
+                  <p className="mt-2 text-sm font-medium line-clamp-2">{item.title}</p>
                 </button>
-              ))
-            ) : (
-              <div className="col-span-2 text-sm text-zinc-400">No similar movies available.</div>
-            )}
-          </div>
-        </section>
-      </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-400">No related movies available.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
 export default MovieDetail;
-

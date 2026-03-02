@@ -7,8 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)"],
-        display: ["var(--font-playfair)"],
+        sans: ["Garet", "sans-serif"],
       },
     },
   },
