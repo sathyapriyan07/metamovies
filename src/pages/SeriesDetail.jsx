@@ -9,6 +9,8 @@ const SeriesDetail = () => {
   const navigate = useNavigate();
   const [series, setSeries] = useState(null);
   const [seasons, setSeasons] = useState([]);
+  const [selectedSeason, setSelectedSeason] = useState(null);
+  const [currentSeasonEpisodes, setCurrentSeasonEpisodes] = useState([]);
   const [episodesBySeason, setEpisodesBySeason] = useState({});
   const [dbEpisodesBySeason, setDbEpisodesBySeason] = useState({});
   const [visibleCounts, setVisibleCounts] = useState({});
@@ -33,6 +35,9 @@ const SeriesDetail = () => {
     ]);
     setSeries(seriesData);
     setSeasons(seasonsData || []);
+    if (seasonsData?.length) {
+      setSelectedSeason(seasonsData[0].id);
+    }
     const dbEpisodeMap = {};
     (dbEpisodes || []).forEach((ep) => {
       if (!dbEpisodeMap[ep.season_id]) {
@@ -57,8 +62,17 @@ const SeriesDetail = () => {
       }
     }
     setEpisodesBySeason(episodeMap);
+    if (seasonsData?.length) {
+      setCurrentSeasonEpisodes(episodeMap[seasonsData[0].id] || []);
+    }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (selectedSeason && episodesBySeason[selectedSeason]) {
+      setCurrentSeasonEpisodes(episodesBySeason[selectedSeason] || []);
+    }
+  }, [selectedSeason, episodesBySeason]);
 
   const openPlayer = (link) => {
     setCurrentEmbed(link);
@@ -298,112 +312,100 @@ const SeriesDetail = () => {
       )}
 
       {activeTab === 'seasons' && (
-        <div className="space-y-6">
-          {seasons.map((season) => {
-            const seasonEpisodes = episodesBySeason[season.id] || [];
-            const visibleCount = visibleCounts[season.id] ?? 5;
-            const visibleEpisodes = seasonEpisodes.slice(0, visibleCount);
-            return (
-              <div key={season.id} className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-base font-semibold">{season.name || `Season ${season.season_number}`}</h3>
-                    <p className="text-xs text-zinc-400 mt-1">{season.episode_count || 0} episodes</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  {visibleEpisodes.map((ep) => {
-                    const dbEpisode = dbEpisodesBySeason[season.id]?.get(ep.episode_number);
-                    const episodeKey = `${season.id}-${ep.episode_number}`;
-                    const isExpanded = expandedEpisode === episodeKey;
-                    return (
-                      <div key={ep.id} className="space-y-3 border-b border-zinc-800 pb-4 last:border-0">
-                        {/* Thumbnail */}
-                        {ep.still_path && (
-                          <div className="w-full aspect-video rounded-lg overflow-hidden bg-zinc-800">
-                            <img
-                              src={getImageUrl(ep.still_path, 'w300')}
-                              alt={ep.name}
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                            />
-                          </div>
-                        )}
+        <div className="space-y-5">
+          {/* Season Dropdown */}
+          {seasons.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-2">Select Season</label>
+              <select
+                value={selectedSeason || ''}
+                onChange={(e) => setSelectedSeason(Number(e.target.value))}
+                className="w-full bg-zinc-900 border border-zinc-700 text-white px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-yellow-500 transition"
+              >
+                {seasons.map((season) => (
+                  <option key={season.id} value={season.id}>
+                    Season {season.season_number} ({season.episode_count || 0} episodes)
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-                        {/* Episode Info */}
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-semibold text-white">
-                            {ep.episode_number}. {ep.name}
-                          </h4>
-                          <p className="text-xs text-zinc-400">
-                            {ep.runtime ? `${ep.runtime} min` : ''}
-                            {ep.runtime && ep.air_date ? ' • ' : ''}
-                            {ep.air_date || ''}
-                          </p>
-                        </div>
+          {/* Episodes List */}
+          <div className="space-y-4">
+            {currentSeasonEpisodes.length === 0 && (
+              <p className="text-sm text-zinc-400">No episodes found for this season.</p>
+            )}
+            {currentSeasonEpisodes.map((ep) => {
+              const season = seasons.find(s => s.id === selectedSeason);
+              const dbEpisode = dbEpisodesBySeason[selectedSeason]?.get(ep.episode_number);
+              const episodeKey = `${selectedSeason}-${ep.episode_number}`;
+              const isExpanded = expandedEpisode === episodeKey;
+              return (
+                <div key={ep.id} className="bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800">
+                  {/* Thumbnail */}
+                  {ep.still_path && (
+                    <div className="w-full aspect-video bg-black">
+                      <img
+                        src={getImageUrl(ep.still_path, 'w300')}
+                        alt={ep.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
 
-                        {/* Overview */}
-                        {ep.overview ? (
-                          <div>
-                            <p className={`text-sm text-zinc-300 leading-relaxed ${isExpanded ? '' : 'line-clamp-3'}`}>
-                              {ep.overview}
-                            </p>
-                            {ep.overview.length > 150 && (
-                              <button
-                                className="text-xs text-yellow-400 mt-1 hover:underline"
-                                onClick={() => setExpandedEpisode(isExpanded ? null : episodeKey)}
-                              >
-                                {isExpanded ? 'Show Less' : 'Read More'}
-                              </button>
-                            )}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-zinc-500 italic">No overview available.</p>
-                        )}
+                  {/* Episode Info */}
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-white">
+                        {ep.episode_number}. {ep.name}
+                      </h4>
+                      {dbEpisode?.vote_average && (
+                        <span className="bg-yellow-500 text-black text-xs font-semibold px-2 py-1 rounded-md">
+                          IMDb {dbEpisode.vote_average}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-zinc-400">
+                      {ep.runtime ? `${ep.runtime} min` : ''}
+                      {ep.runtime && ep.air_date ? ' • ' : ''}
+                      {ep.air_date || ''}
+                    </p>
 
-                        {/* Watch Button */}
-                        {dbEpisode?.embed_link && (
+                    {/* Overview */}
+                    {ep.overview ? (
+                      <div>
+                        <p className={`text-xs text-zinc-300 leading-relaxed ${isExpanded ? '' : 'line-clamp-2'}`}>
+                          {ep.overview}
+                        </p>
+                        {ep.overview.length > 150 && (
                           <button
-                            onClick={() => openPlayer(dbEpisode.embed_link)}
-                            className="mt-3 text-xs bg-yellow-500 text-black px-3 py-2 rounded-full font-medium hover:bg-yellow-400 transition"
+                            className="text-xs text-yellow-400 mt-1 hover:underline"
+                            onClick={() => setExpandedEpisode(isExpanded ? null : episodeKey)}
                           >
-                            ▶ Watch Episode
+                            {isExpanded ? 'Show Less' : 'Read More'}
                           </button>
                         )}
                       </div>
-                    );
-                  })}
-                  {seasonEpisodes.length > visibleCount && (
-                    <button
-                      onClick={() =>
-                        setVisibleCounts((prev) => ({
-                          ...prev,
-                          [season.id]: visibleCount + 5
-                        }))
-                      }
-                      className="text-sm text-yellow-400 hover:underline"
-                    >
-                      Load more episodes
-                    </button>
-                  )}
-                  {seasonEpisodes.length > 5 && visibleCount >= seasonEpisodes.length && (
-                    <button
-                      onClick={() =>
-                        setVisibleCounts((prev) => ({
-                          ...prev,
-                          [season.id]: 5
-                        }))
-                      }
-                      className="text-sm text-yellow-400 hover:underline"
-                    >
-                      Show fewer episodes
-                    </button>
-                  )}
+                    ) : (
+                      <p className="text-xs text-zinc-500 italic">No overview available.</p>
+                    )}
+
+                    {/* Watch Button */}
+                    {dbEpisode?.embed_link && (
+                      <button
+                        onClick={() => navigate(`/watch/tv/${series.id}/${season?.season_number}/${ep.episode_number}`)}
+                        className="mt-2 text-xs bg-yellow-500 text-black px-4 py-2 rounded-full font-medium hover:bg-yellow-400 transition"
+                      >
+                        ▶ Watch Episode
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-          {seasons.length === 0 && <p className="text-sm text-zinc-400">No seasons found.</p>}
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -413,28 +415,6 @@ const SeriesDetail = () => {
         </div>
       )}
       </div>
-
-      {/* Player Modal */}
-      {isPlayerOpen && currentEmbed && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          <div className="flex justify-end p-4">
-            <button
-              onClick={() => setIsPlayerOpen(false)}
-              className="text-white text-2xl w-10 h-10 flex items-center justify-center hover:bg-zinc-800 rounded-full transition"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="flex-1">
-            <iframe
-              src={currentEmbed}
-              className="w-full h-full"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

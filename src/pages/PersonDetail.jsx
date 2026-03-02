@@ -118,11 +118,10 @@ const PersonDetail = () => {
     return Math.abs(ageDt.getUTCFullYear() - 1970);
   }, [person?.birthday]);
 
-  const professionLabel = person?.known_for_department ? `Indian ${person.known_for_department.toLowerCase()}` : 'Indian actor';
   const previewMovies = allCredits.slice(0, 3);
   const tabs = [
     { key: 'overview', label: 'Overview' },
-    { key: 'movies', label: 'Movies' }
+    { key: 'filmography', label: 'Filmography' }
   ];
 
   if (loading) {
@@ -152,7 +151,9 @@ const PersonDetail = () => {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h1 className="text-2xl md:text-3xl font-display font-semibold tracking-tight">{person.name}</h1>
-              <p className="text-sm text-zinc-400 mt-1">{professionLabel}</p>
+              {person.known_for_department && (
+                <p className="text-sm text-zinc-400 mt-1">{person.known_for_department}</p>
+              )}
             </div>
           </div>
 
@@ -282,7 +283,7 @@ const PersonDetail = () => {
           </>
         )}
 
-        {activeTab === 'movies' && (
+        {activeTab === 'filmography' && (
           <>
             {allCredits.length > 0 && (
               <section className="space-y-3">
