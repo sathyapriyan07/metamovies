@@ -20,10 +20,6 @@ const SeriesDetail = () => {
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const [currentEmbed, setCurrentEmbed] = useState('');
 
-  useEffect(() => {
-    loadSeries();
-  }, [id]);
-
   const loadSeries = async () => {
     setLoading(true);
     const [{ data: seriesData }, { data: seasonsData }, { data: dbEpisodes }] = await Promise.all([
@@ -60,9 +56,8 @@ const SeriesDetail = () => {
     setLoading(false);
   };
 
-  const openPlayer = (link) => {
-    setCurrentEmbed(link);
-    setIsPlayerOpen(true);
+  const openPlayer = (seriesId, seasonNumber, episodeNumber) => {
+    navigate(`/watch/tv/${seriesId}/${seasonNumber}/${episodeNumber}`);
   };
 
   if (loading) {
@@ -364,7 +359,10 @@ const SeriesDetail = () => {
                         {/* Watch Button */}
                         {dbEpisode?.embed_link && (
                           <button
-                            onClick={() => openPlayer(dbEpisode.embed_link)}
+                            onClick={() => {
+                              const season = seasons.find(s => s.id === dbEpisode.season_id);
+                              openPlayer(series.id, season?.season_number, ep.episode_number);
+                            }}
                             className="mt-3 text-xs bg-yellow-500 text-black px-3 py-2 rounded-full font-medium hover:bg-yellow-400 transition"
                           >
                             ▶ Watch Episode
@@ -413,28 +411,6 @@ const SeriesDetail = () => {
         </div>
       )}
       </div>
-
-      {/* Player Modal */}
-      {isPlayerOpen && currentEmbed && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          <div className="flex justify-end p-4">
-            <button
-              onClick={() => setIsPlayerOpen(false)}
-              className="text-white text-2xl w-10 h-10 flex items-center justify-center hover:bg-zinc-800 rounded-full transition"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="flex-1">
-            <iframe
-              src={currentEmbed}
-              className="w-full h-full"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

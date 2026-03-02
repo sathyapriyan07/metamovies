@@ -39,10 +39,14 @@ const ManageSeries = () => {
       use_text_title: item.use_text_title ?? true
     });
     const { data: seasonsData } = await getSeasonsBySeries(item.id);
+    console.log('Seasons loaded:', seasonsData?.length || 0, seasonsData);
     setSeasons(seasonsData || []);
     if (seasonsData?.length) {
-      setSelectedSeason(seasonsData[0].id);
-      const { data: episodesData } = await getEpisodesBySeason(seasonsData[0].id);
+      const firstSeasonId = seasonsData[0].id;
+      console.log('Auto-selecting first season:', firstSeasonId);
+      setSelectedSeason(firstSeasonId);
+      const { data: episodesData } = await getEpisodesBySeason(firstSeasonId);
+      console.log('Initial episodes loaded:', episodesData?.length || 0);
       setEpisodes(episodesData || []);
     } else {
       setSelectedSeason(null);
@@ -52,7 +56,9 @@ const ManageSeries = () => {
 
   const handleSeasonSelect = async (seasonId) => {
     setSelectedSeason(seasonId);
-    const { data } = await getEpisodesBySeason(seasonId);
+    console.log('Selected season ID:', seasonId);
+    const { data, error } = await getEpisodesBySeason(seasonId);
+    console.log('Episodes fetched:', data?.length || 0, 'Error:', error);
     setEpisodes(data || []);
   };
 
@@ -273,7 +279,8 @@ const ManageSeries = () => {
 
                 {/* Episodes List */}
                 <div className="space-y-4">
-                  {episodes.map((ep) => (
+                  {episodes && episodes.length > 0 ? (
+                    episodes.map((ep) => (
                     <div
                       key={ep.id}
                       className="bg-zinc-800 rounded-lg p-4 space-y-3 border border-zinc-700"
@@ -337,10 +344,10 @@ const ManageSeries = () => {
                         )}
                       </div>
                     </div>
-                  ))}
-                  {episodes.length === 0 && (
+                  ))
+                  ) : (
                     <div className="text-sm text-zinc-400 text-center py-8">
-                      No episodes found for this season.
+                      {selectedSeason ? 'No episodes found for this season.' : 'Select a season to view episodes.'}
                     </div>
                   )}
                 </div>

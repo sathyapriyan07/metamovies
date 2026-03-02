@@ -31,10 +31,6 @@ const MovieDetail = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
-  useEffect(() => {
-    loadMovie();
-  }, [id]);
-
   const loadData = async () => {
     setLoading(true);
     let resolvedId = id;
@@ -199,7 +195,7 @@ const MovieDetail = () => {
           )}
           {movie.embed_link && (
             <button
-              onClick={() => setIsPlayerOpen(true)}
+              onClick={() => navigate(`/watch/movie/${movie.id}`)}
               className="bg-yellow-500 text-black text-sm font-semibold px-5 py-2 rounded-full hover:bg-yellow-400 transition"
             >
               ▶ Watch Now
@@ -480,28 +476,6 @@ const MovieDetail = () => {
         </div>
       )}
       </div>
-
-      {/* Player Modal */}
-      {isPlayerOpen && movie.embed_link && (
-        <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          <div className="flex justify-end p-4">
-            <button
-              onClick={() => setIsPlayerOpen(false)}
-              className="text-white text-2xl w-10 h-10 flex items-center justify-center hover:bg-zinc-800 rounded-full transition"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="flex-1">
-            <iframe
-              src={movie.embed_link}
-              className="w-full h-full"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
