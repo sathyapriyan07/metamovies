@@ -62,7 +62,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100 pb-24">
+    <div className="min-h-screen bg-black text-zinc-100 pb-24">
       {/* Hero Banner */}
       {hero && (
         <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
@@ -106,7 +106,7 @@ const Home = () => {
       )}
 
       {/* Content Sections */}
-      <div className="px-4 space-y-6 mt-8">
+      <div className="px-4 space-y-6 mt-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-zinc-400">Loading...</p>

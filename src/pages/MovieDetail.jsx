@@ -152,7 +152,7 @@ const MovieDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 px-4 pt-4 pb-24 space-y-6">
+    <div className="min-h-screen bg-black text-zinc-100 pb-24">
       <SeoHead
         title={pageMeta?.title || `${movie.title} - MetaMovies+`}
         description={pageMeta?.description || movie.overview?.slice(0, 160)}
@@ -174,22 +174,30 @@ const MovieDetail = () => {
       )}
 
       {/* Title Section */}
-      <div className="space-y-2">
-        <h1 className="text-xl font-semibold tracking-tight">{movie.title}</h1>
+      <div className="px-4 pt-4 space-y-2">
+        {movie.title_logo_url && !movie.use_text_title ? (
+          <img
+            src={movie.title_logo_url}
+            alt={movie.title}
+            className="max-h-14 object-contain mb-2"
+          />
+        ) : (
+          <h1 className="text-xl font-semibold tracking-tight">{movie.title}</h1>
+        )}
         {movie.imdb_rating && (
           <a
             href={movie.imdb_url || '#'}
             target={movie.imdb_url ? '_blank' : undefined}
             rel={movie.imdb_url ? 'noopener noreferrer' : undefined}
-            className="inline-block bg-yellow-400 text-black px-2 py-1 rounded text-xs font-bold"
+            className="inline-block bg-yellow-500 text-black px-2 py-1 rounded text-xs font-semibold"
           >
-            ⭐ {movie.imdb_rating}
+            IMDb {movie.imdb_rating}
           </a>
         )}
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-6 overflow-x-auto border-b border-zinc-800 pb-2 scrollbar-hide">
+      <div className="px-4 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-2 scrollbar-hide">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -206,6 +214,7 @@ const MovieDetail = () => {
       </div>
 
       {/* Tab Content */}
+      <div className="px-4 space-y-6">
       {activeTab === 'overview' && (
         <div className="space-y-6">
           {/* Trailer */}
