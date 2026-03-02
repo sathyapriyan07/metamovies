@@ -98,12 +98,21 @@ const ManageSeries = () => {
     );
   };
 
+  const updateRating = (id, value) => {
+    setEpisodes(prev =>
+      prev.map(ep => (ep.id === id ? { ...ep, vote_average: value } : ep))
+    );
+  };
+
   const saveEpisode = async (id) => {
     setSavingEpisodes(prev => ({ ...prev, [id]: true }));
     const episode = episodes.find(ep => ep.id === id);
     const { error } = await supabase
       .from('episodes')
-      .update({ embed_link: episode.embed_link || null })
+      .update({ 
+        embed_link: episode.embed_link || null,
+        vote_average: episode.vote_average ? Number(episode.vote_average) : null
+      })
       .eq('id', id);
     
     if (error) {
@@ -117,7 +126,10 @@ const ManageSeries = () => {
     for (const ep of episodes) {
       await supabase
         .from('episodes')
-        .update({ embed_link: ep.embed_link || null })
+        .update({ 
+          embed_link: ep.embed_link || null,
+          vote_average: ep.vote_average ? Number(ep.vote_average) : null
+        })
         .eq('id', ep.id);
     }
     setBulkSaving(false);
@@ -294,6 +306,20 @@ const ManageSeries = () => {
                             {ep.air_date || 'No air date'}
                           </p>
                         </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-xs font-medium text-zinc-400">IMDb Rating</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="10"
+                          value={ep.vote_average || ''}
+                          placeholder="0.0 - 10.0"
+                          className="w-full bg-black border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100"
+                          onChange={(e) => updateRating(ep.id, e.target.value)}
+                        />
                       </div>
 
                       <div className="space-y-2">
