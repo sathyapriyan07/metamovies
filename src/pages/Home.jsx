@@ -17,6 +17,8 @@ const Home = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [showVideo, setShowVideo] = useState({});
+  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     loadData();
@@ -66,6 +68,20 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [heroBanners.length, isPaused]);
 
+  // Video fade-in effect
+  useEffect(() => {
+    setShowVideo({});
+    
+    const isMobile = window.innerWidth < 640;
+    const delay = isMobile ? 3000 : 2500;
+    
+    const timer = setTimeout(() => {
+      setShowVideo({ [currentSlide]: true });
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [currentSlide]);
+
   // Swipe handlers
   const handleTouchStart = (e) => {
     setTouchStart(e.targetTouches[0].clientX);
@@ -97,6 +113,13 @@ const Home = () => {
     setCurrentSlide(index);
   };
 
+  const extractYouTubeId = (url) => {
+    if (!url) return null;
+    const regExp = /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([^&?/]+)/;
+    const match = url?.match(regExp);
+    return match ? match[1] : null;
+  };
+
   const formatRuntime = (mins) => {
     if (!mins || mins <= 0) return null;
     const h = Math.floor(mins / 60);
@@ -122,29 +145,50 @@ const Home = () => {
             const movie = banner.movie;
             if (!movie) return null;
 
+            const trailerKey = extractYouTubeId(movie.trailer_url);
+            const isActive = index === currentSlide;
+            const shouldShowVideo = showVideo[index] && trailerKey && isActive;
+
             return (
               <div
                 key={banner.id}
                 className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                  index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
                 }`}
               >
-                {/* Backdrop Image with Zoom Effect */}
+                {/* Backdrop Image */}
                 <img
                   src={movie.backdrop_url || movie.poster_url}
                   alt={movie.title}
-                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[6000ms] ${
-                    index === currentSlide ? 'scale-105' : 'scale-100'
-                  }`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-[6000ms] ${
+                    isActive ? 'scale-105' : 'scale-100'
+                  } ${shouldShowVideo ? 'opacity-0' : 'opacity-100'}`}
                   loading={index === 0 ? 'eager' : 'lazy'}
                 />
 
+                {/* Background Trailer Video */}
+                {trailerKey && isActive && (
+                  <div className={`absolute inset-0 overflow-hidden transition-opacity duration-700 ${
+                    shouldShowVideo ? 'opacity-100' : 'opacity-0'
+                  }`}>
+                    <div className="absolute top-1/2 left-1/2 w-[177.77vh] h-[56.25vw] min-w-full min-h-full -translate-x-1/2 -translate-y-1/2">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=${trailerKey}&rel=0&enablejsapi=1`}
+                        className="absolute inset-0 w-full h-full pointer-events-none"
+                        allow="autoplay; encrypted-media"
+                        allowFullScreen
+                        title={`${movie.title} Trailer`}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Cinematic Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/20" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/20 z-10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
 
                 {/* Content */}
-                <div className="relative z-10 h-full flex items-end">
+                <div className="relative z-20 h-full flex items-end">
                   <div className="px-4 sm:px-6 lg:px-8 pb-10 max-w-lg space-y-4 w-full">
                     {/* Title Logo or Text */}
                     {movie.title_logo_url && !movie.use_text_title ? (
@@ -209,13 +253,24 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Sound Toggle */}
+                {trailerKey && isActive && shouldShowVideo && (
+                  <button
+                    onClick={() => setIsMuted(!isMuted)}
+                    className="absolute bottom-6 right-6 z-30 bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg hover:bg-black/80 transition"
+                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  >
+                    {isMuted ? '🔇' : '🔊'}
+                  </button>
+                )}
               </div>
             );
           })}
 
           {/* Indicator Dots */}
           {heroBanners.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30">
               {heroBanners.map((_, index) => (
                 <button
                   key={index}
