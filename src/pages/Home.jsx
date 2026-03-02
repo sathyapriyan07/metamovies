@@ -6,7 +6,7 @@ import {
   getCollectionWithItems,
   getSeries
 } from '../services/supabase';
-import { getDominantColor, isDarkColor } from '../utils/colorExtractor';
+import { getColorPalette, isDarkColor } from '../utils/colorExtractor';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -20,8 +20,14 @@ const Home = () => {
   const [touchEnd, setTouchEnd] = useState(0);
   const [showVideo, setShowVideo] = useState({});
   const [isMuted, setIsMuted] = useState(true);
-  const [themeColors, setThemeColors] = useState({});
-  const [currentThemeColor, setCurrentThemeColor] = useState('rgb(229, 9, 20)');
+  const [palettes, setPalettes] = useState({});
+  const [currentPalette, setCurrentPalette] = useState([
+    'rgb(229, 9, 20)',
+    'rgb(139, 0, 0)',
+    'rgb(50, 50, 50)'
+  ]);
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   useEffect(() => {
     loadData();
@@ -37,11 +43,11 @@ const Home = () => {
     const sortedHero = (hero.data || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
     setHeroBanners(sortedHero);
 
-    // Extract colors for all hero banners
+    // Extract palettes for all hero banners
     sortedHero.forEach(async (banner, index) => {
       if (banner.movie?.backdrop_url) {
-        const color = await getDominantColor(banner.movie.backdrop_url);
-        setThemeColors(prev => ({ ...prev, [index]: color }));
+        const palette = await getColorPalette(banner.movie.backdrop_url);
+        setPalettes(prev => ({ ...prev, [index]: palette }));
       }
     });
 
@@ -68,11 +74,15 @@ const Home = () => {
     setSeriesItems(data || []);
   };
 
-  // Update theme color when slide changes
+  // Update palette when slide changes
   useEffect(() => {
-    const color = themeColors[currentSlide] || 'rgb(229, 9, 20)';
-    setCurrentThemeColor(color);
-  }, [currentSlide, themeColors]);
+    const palette = palettes[currentSlide] || [
+      'rgb(229, 9, 20)',
+      'rgb(139, 0, 0)',
+      'rgb(50, 50, 50)'
+    ];
+    setCurrentPalette(palette);
+  }, [currentSlide, palettes]);
 
   // Autoplay carousel
   useEffect(() => {
@@ -89,7 +99,6 @@ const Home = () => {
   useEffect(() => {
     setShowVideo({});
     
-    const isMobile = window.innerWidth < 640;
     const delay = isMobile ? 3000 : 2500;
     
     const timer = setTimeout(() => {
@@ -97,7 +106,7 @@ const Home = () => {
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [currentSlide]);
+  }, [currentSlide, isMobile]);
 
   // Swipe handlers
   const handleTouchStart = (e) => {
@@ -146,7 +155,8 @@ const Home = () => {
     return `${h}h ${m}m`;
   };
 
-  const textColor = isDarkColor(currentThemeColor) ? 'text-white' : 'text-black';
+  const textColor = isDarkColor(currentPalette[0]) ? 'text-white' : 'text-black';
+  const glowOpacity = isMobile ? '33' : '55';
 
   return (
     <div className="min-h-screen bg-black overflow-x-hidden">
@@ -171,15 +181,15 @@ const Home = () => {
             return (
               <div
                 key={banner.id}
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
                   isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
                 }`}
               >
-                {/* Backdrop Image */}
+                {/* Backdrop Image with Zoom */}
                 <img
                   src={movie.backdrop_url || movie.poster_url}
                   alt={movie.title}
-                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-[6000ms] ${
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-[10000ms] ${
                     isActive ? 'scale-105' : 'scale-100'
                   } ${shouldShowVideo ? 'opacity-0' : 'opacity-100'}`}
                   loading={index === 0 ? 'eager' : 'lazy'}
@@ -202,17 +212,34 @@ const Home = () => {
                   </div>
                 )}
 
-                {/* Dynamic Cinematic Overlays */}
+                {/* Animated Ambient Glow */}
                 <div 
-                  className="absolute inset-0 z-10 transition-all duration-700"
+                  className="absolute inset-0 z-[5] animate-ambient transition-all duration-1000"
                   style={{
-                    background: `linear-gradient(to top, black, ${currentThemeColor}99, transparent)`
+                    background: `
+                      radial-gradient(circle at 30% 40%, ${currentPalette[0]}${glowOpacity}, transparent 60%),
+                      radial-gradient(circle at 70% 60%, ${currentPalette[1]}${glowOpacity}, transparent 60%)
+                    `
                   }}
                 />
+
+                {/* Blended Cinematic Gradient */}
                 <div 
-                  className="absolute inset-0 z-10 transition-all duration-700"
+                  className="absolute inset-0 z-10 transition-all duration-1000"
                   style={{
-                    background: `linear-gradient(to right, black, ${currentThemeColor}66, transparent)`
+                    background: `
+                      radial-gradient(circle at 20% 30%, ${currentPalette[0]}${glowOpacity}, transparent 60%),
+                      radial-gradient(circle at 80% 40%, ${currentPalette[1]}${glowOpacity}, transparent 60%),
+                      linear-gradient(to top, black, ${currentPalette[2]}88, transparent)
+                    `
+                  }}
+                />
+
+                {/* Side Gradient for Text Readability */}
+                <div 
+                  className="absolute inset-0 z-10 transition-all duration-1000"
+                  style={{
+                    background: `linear-gradient(to right, black, ${currentPalette[0]}40, transparent)`
                   }}
                 />
 
@@ -224,10 +251,10 @@ const Home = () => {
                       <img
                         src={movie.title_logo_url}
                         alt={movie.title}
-                        className="max-h-20 object-contain"
+                        className="max-h-20 object-contain drop-shadow-2xl"
                       />
                     ) : (
-                      <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
+                      <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight drop-shadow-2xl">
                         {movie.title}
                       </h1>
                     )}
@@ -236,13 +263,13 @@ const Home = () => {
                     <div className="flex flex-wrap items-center gap-3">
                       {movie.imdb_rating && (
                         <span 
-                          className={`inline-flex items-center text-sm font-semibold px-3 py-1 rounded-md transition-all duration-700 ${textColor}`}
-                          style={{ backgroundColor: currentThemeColor }}
+                          className={`inline-flex items-center text-sm font-semibold px-3 py-1 rounded-md transition-all duration-1000 ${textColor} shadow-lg`}
+                          style={{ backgroundColor: currentPalette[0] }}
                         >
                           IMDb {movie.imdb_rating}
                         </span>
                       )}
-                      <div className="flex items-center gap-2 text-sm text-zinc-300">
+                      <div className="flex items-center gap-2 text-sm text-zinc-300 drop-shadow-lg">
                         {movie.release_date?.split('-')[0] && (
                           <span>{movie.release_date.split('-')[0]}</span>
                         )}
@@ -263,7 +290,7 @@ const Home = () => {
 
                     {/* Description */}
                     {movie.overview && (
-                      <p className="text-sm text-zinc-300 line-clamp-3 leading-relaxed">
+                      <p className="text-sm text-zinc-300 line-clamp-3 leading-relaxed drop-shadow-lg">
                         {movie.overview}
                       </p>
                     )}
@@ -272,14 +299,14 @@ const Home = () => {
                     <div className="flex gap-4 pt-2 flex-wrap">
                       <button 
                         onClick={() => navigate(`/movie/${movie.id}`)}
-                        className={`font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-700 w-full sm:w-auto ${textColor}`}
-                        style={{ backgroundColor: currentThemeColor }}
+                        className={`font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-1000 w-full sm:w-auto shadow-xl ${textColor}`}
+                        style={{ backgroundColor: currentPalette[0] }}
                       >
                         ▶ Watch Now
                       </button>
                       <button 
                         onClick={() => navigate(`/movie/${movie.id}`)}
-                        className="bg-zinc-800 border border-zinc-700 text-white px-6 py-3 rounded-xl hover:bg-zinc-700 transition w-full sm:w-auto"
+                        className="bg-zinc-800/80 backdrop-blur-sm border border-zinc-700 text-white px-6 py-3 rounded-xl hover:bg-zinc-700 transition w-full sm:w-auto shadow-xl"
                       >
                         + Watchlist
                       </button>
@@ -291,7 +318,7 @@ const Home = () => {
                 {trailerKey && isActive && shouldShowVideo && (
                   <button
                     onClick={() => setIsMuted(!isMuted)}
-                    className="absolute bottom-6 right-6 z-30 bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg hover:bg-black/80 transition"
+                    className="absolute bottom-6 right-6 z-30 bg-black/60 backdrop-blur-sm text-white px-3 py-2 rounded-lg hover:bg-black/80 transition shadow-xl"
                     aria-label={isMuted ? 'Unmute' : 'Mute'}
                   >
                     {isMuted ? '🔇' : '🔊'}
@@ -308,10 +335,10 @@ const Home = () => {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`h-2 rounded-full transition-all duration-300`}
+                  className={`h-2 rounded-full transition-all duration-300 shadow-lg`}
                   style={{
                     width: index === currentSlide ? '24px' : '8px',
-                    backgroundColor: index === currentSlide ? currentThemeColor : 'rgb(113, 113, 122)'
+                    backgroundColor: index === currentSlide ? currentPalette[0] : 'rgb(113, 113, 122)'
                   }}
                   aria-label={`Go to slide ${index + 1}`}
                 />

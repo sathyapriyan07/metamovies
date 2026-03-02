@@ -1,8 +1,8 @@
 /**
- * Extract dominant color from an image
+ * Extract 3-color palette from an image
  * Lightweight implementation without external dependencies
  */
-export const getDominantColor = async (imageUrl) => {
+export const getColorPalette = async (imageUrl) => {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'Anonymous';
@@ -19,43 +19,119 @@ export const getDominantColor = async (imageUrl) => {
         ctx.drawImage(img, 0, 0, 100, 100);
         const imageData = ctx.getImageData(0, 0, 100, 100).data;
         
-        // Sample colors and find dominant
-        const colorMap = {};
-        let maxCount = 0;
-        let dominantColor = [229, 9, 20]; // Default Netflix red
-        
-        for (let i = 0; i < imageData.length; i += 4 * 10) { // Sample every 10th pixel
-          const r = Math.round(imageData[i] / 10) * 10;
-          const g = Math.round(imageData[i + 1] / 10) * 10;
-          const b = Math.round(imageData[i + 2] / 10) * 10;
+        // Collect color samples
+        const colors = [];
+        for (let i = 0; i < imageData.length; i += 4 * 20) { // Sample every 20th pixel
+          const r = imageData[i];
+          const g = imageData[i + 1];
+          const b = imageData[i + 2];
           
           // Skip very dark or very light colors
           const brightness = (r * 299 + g * 587 + b * 114) / 1000;
           if (brightness < 30 || brightness > 220) continue;
           
-          const key = `${r},${g},${b}`;
-          colorMap[key] = (colorMap[key] || 0) + 1;
-          
-          if (colorMap[key] > maxCount) {
-            maxCount = colorMap[key];
-            dominantColor = [r, g, b];
-          }
+          colors.push([r, g, b]);
         }
         
-        resolve(`rgb(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]})`);
+        if (colors.length < 3) {
+          // Fallback palette
+          resolve([
+            'rgb(229, 9, 20)',
+            'rgb(139, 0, 0)',
+            'rgb(50, 50, 50)'
+          ]);
+          return;
+        }
+        
+        // K-means clustering to find 3 dominant colors
+        const palette = kMeansClustering(colors, 3);
+        
+        resolve(palette.map(c => `rgb(${Math.round(c[0])}, ${Math.round(c[1])}, ${Math.round(c[2])})`));
       } catch (error) {
-        // Fallback to default color on error
-        resolve('rgb(229, 9, 20)');
+        // Fallback palette
+        resolve([
+          'rgb(229, 9, 20)',
+          'rgb(139, 0, 0)',
+          'rgb(50, 50, 50)'
+        ]);
       }
     };
     
     img.onerror = () => {
-      resolve('rgb(229, 9, 20)');
+      resolve([
+        'rgb(229, 9, 20)',
+        'rgb(139, 0, 0)',
+        'rgb(50, 50, 50)'
+      ]);
     };
     
     // Add cache buster for CORS
     img.src = imageUrl.includes('?') ? `${imageUrl}&t=${Date.now()}` : `${imageUrl}?t=${Date.now()}`;
   });
+};
+
+/**
+ * Simple K-means clustering for color palette extraction
+ */
+const kMeansClustering = (colors, k) => {
+  // Initialize centroids randomly
+  let centroids = [];
+  for (let i = 0; i < k; i++) {
+    centroids.push(colors[Math.floor(Math.random() * colors.length)]);
+  }
+  
+  // Run k-means for 5 iterations (balance between accuracy and performance)
+  for (let iter = 0; iter < 5; iter++) {
+    const clusters = Array(k).fill(null).map(() => []);
+    
+    // Assign colors to nearest centroid
+    colors.forEach(color => {
+      let minDist = Infinity;
+      let clusterIndex = 0;
+      
+      centroids.forEach((centroid, i) => {
+        const dist = Math.sqrt(
+          Math.pow(color[0] - centroid[0], 2) +
+          Math.pow(color[1] - centroid[1], 2) +
+          Math.pow(color[2] - centroid[2], 2)
+        );
+        
+        if (dist < minDist) {
+          minDist = dist;
+          clusterIndex = i;
+        }
+      });
+      
+      clusters[clusterIndex].push(color);
+    });
+    
+    // Update centroids
+    centroids = clusters.map(cluster => {
+      if (cluster.length === 0) return centroids[0]; // Fallback
+      
+      const sum = cluster.reduce((acc, color) => [
+        acc[0] + color[0],
+        acc[1] + color[1],
+        acc[2] + color[2]
+      ], [0, 0, 0]);
+      
+      return [
+        sum[0] / cluster.length,
+        sum[1] / cluster.length,
+        sum[2] / cluster.length
+      ];
+    });
+  }
+  
+  return centroids;
+};
+
+/**
+ * Extract dominant color from an image (single color)
+ */
+export const getDominantColor = async (imageUrl) => {
+  const palette = await getColorPalette(imageUrl);
+  return palette[0];
 };
 
 /**
