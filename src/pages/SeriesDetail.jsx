@@ -14,10 +14,8 @@ const SeriesDetail = () => {
   const [visibleCounts, setVisibleCounts] = useState({});
   const [cast, setCast] = useState([]);
   const [crew, setCrew] = useState([]);
-  const [overviewExpanded, setOverviewExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const sectionRefs = useRef({});
 
   useEffect(() => {
     loadSeries();
@@ -43,8 +41,8 @@ const SeriesDetail = () => {
     const episodeMap = {};
     if (seriesData?.tmdb_id) {
       const details = await getSeriesDetails(seriesData.tmdb_id);
-      const castList = details?.credits?.cast?.slice(0, 12) || [];
-      const crewList = details?.credits?.crew?.slice(0, 12) || [];
+      const castList = details?.credits?.cast?.slice(0, 20) || [];
+      const crewList = details?.credits?.crew?.slice(0, 20) || [];
       const personIds = Array.from(new Set([...castList.map((c) => c.id), ...crewList.map((c) => c.id)]));
       const { data: persons } = await getPersonsByTmdbIds(personIds);
       const personMap = new Map((persons || []).map((p) => [p.tmdb_id, p]));
@@ -62,7 +60,7 @@ const SeriesDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-zinc-100">
-        <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Loading...</div>
+        <div className="px-4 pt-12 pb-10">Loading...</div>
       </div>
     );
   }
@@ -70,113 +68,120 @@ const SeriesDetail = () => {
   if (!series) {
     return (
       <div className="min-h-screen bg-black text-zinc-100">
-        <div className="max-w-5xl mx-auto px-4 pt-12 pb-10">Series not found</div>
+        <div className="px-4 pt-12 pb-10">Series not found</div>
       </div>
     );
   }
 
-  const watchPlatforms = series.watch_links ? Object.entries(series.watch_links).filter(([, url]) => url) : [];
-  const platformLogos = {
-    prime: '/logos/prime.png',
-    hotstar: '/logos/hotstar.png',
-    zee5: '/logos/zee5.png',
-    netflix: 'https://www.freepnglogos.com/uploads/netflix-logo-history-32.png',
-    sony_liv: '/logos/sonyliv.png'
-  };
-  const bullet = '\u2022';
-  const year = series.first_air_date?.split('-')[0];
-  const metaLine = [year, series.number_of_seasons ? `${series.number_of_seasons} Seasons` : null, series.genres?.join(` ${bullet} `)]
-    .filter(Boolean)
-    .join(` ${bullet} `);
-  const topCast = cast.slice(0, 3);
-
   const tabs = [
     { key: 'overview', label: 'Overview' },
     { key: 'cast', label: 'Cast' },
-    { key: 'media', label: 'Trailers & Clips' },
-    { key: 'reviews', label: 'Reviews' },
-    { key: 'watchlist', label: 'Watchlist' }
+    { key: 'crew', label: 'Crew' },
+    { key: 'seasons', label: 'Seasons' },
+    { key: 'related', label: 'Related' }
   ];
 
-  const scrollToSection = (tabKey) => {
-    setActiveTab(tabKey);
-    const section = sectionRefs.current[tabKey];
-    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   return (
-    <div className="min-h-screen bg-black text-zinc-100">
+    <div className="min-h-screen bg-black text-zinc-100 pb-20">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
 
-      <div className="max-w-5xl mx-auto px-4 pt-8 pb-12 space-y-6">
-        <section className="space-y-3">
-          <div className="backdrop-blur-sm">
-            <div className="min-h-[48px]">
-              {series.title_logo_url && !series.use_text_title ? (
-                <img src={series.title_logo_url} alt={series.name} className="max-h-12 w-auto object-contain max-w-full" />
-              ) : (
-                <h1 className="text-2xl md:text-3xl font-display font-semibold tracking-wide">{series.name}</h1>
-              )}
-            </div>
-            <p className="text-sm text-zinc-400 mt-2">CBFC: U/A 16+ {metaLine ? `${bullet} ${metaLine}` : ''}</p>
-          </div>
+      {/* Hero Image */}
+      {series.backdrop_url && (
+        <div className="relative w-full h-[60vh] overflow-hidden">
+          <img
+            src={series.backdrop_url}
+            alt={series.name}
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        </div>
+      )}
 
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => scrollToSection(tab.key)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 text-sm border transition ${
-                  activeTab === tab.key
-                    ? 'bg-amber-600/20 border-amber-500 text-amber-400'
-                    : 'bg-black border-zinc-700 text-zinc-300'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </section>
+      {/* Title Section */}
+      <div className="px-4 mt-4 space-y-2">
+        {series.title_logo_url && !series.use_text_title ? (
+          <img
+            src={series.title_logo_url}
+            alt={series.name}
+            className="max-h-14 object-contain mb-2"
+          />
+        ) : (
+          <h1 className="text-xl font-semibold tracking-tight">{series.name}</h1>
+        )}
+        {series.imdb_rating && (
+          <span className="inline-block bg-yellow-500 text-black px-2 py-1 rounded text-xs font-semibold">
+            IMDb {series.imdb_rating}
+          </span>
+        )}
+      </div>
 
-        <section className="mt-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4">
-            <div className="rounded-xl overflow-hidden shadow-lg bg-black backdrop-blur">
-              {series.poster_url ? (
-                <img src={series.poster_url} alt={series.name} className="w-full aspect-[2/3] object-cover" />
-              ) : (
-                <div className="w-full aspect-[2/3] bg-black" />
-              )}
-            </div>
-            <div className="rounded-xl overflow-hidden shadow-lg bg-black min-h-[220px]">
-              {series.backdrop_url ? (
-                <img src={series.backdrop_url} alt={series.name} className="w-full h-full min-h-[220px] object-cover" />
-              ) : (
-                <div className="w-full h-full min-h-[220px] bg-black" />
-              )}
-            </div>
-          </div>
+      {/* Tab Navigation */}
+      <div className="px-4 mt-5 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-3 scrollbar-hide">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`whitespace-nowrap text-sm relative pb-3 transition ${
+              activeTab === tab.key
+                ? 'text-yellow-400 font-medium after:absolute after:-bottom-[3px] after:left-0 after:h-[2px] after:w-full after:bg-yellow-400'
+                : 'text-zinc-400'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-          <div className="text-sm text-zinc-300">
-            <span className="text-amber-400 font-medium">
-              Rating: {series.tmdb_rating ? `${Number(series.tmdb_rating).toFixed(1)}/10` : 'NR'}
-            </span>
-            {series.imdb_rating ? (
-              <>
-                <span className="mx-2 text-zinc-500">{bullet}</span>
-                <span className="text-amber-400">IMDb {series.imdb_rating} &gt;</span>
-              </>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-black backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center mb-3">
-              <h3 className="font-medium">Where to Watch</h3>
+      {/* Tab Content */}
+      <div className="px-4 mt-5 space-y-5">
+      {activeTab === 'overview' && (
+        <div className="space-y-5">
+          {/* Description */}
+          {series.overview && (
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-zinc-200">Description</h3>
+              <p className="text-sm leading-relaxed text-zinc-300">{series.overview}</p>
             </div>
-            {watchPlatforms.length > 0 ? (
-              <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                {watchPlatforms.slice(0, 4).map(([platform, url]) => {
+          )}
+
+          {/* First Air Date */}
+          {series.first_air_date && (
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-zinc-200">First Aired</h3>
+              <p className="text-sm text-zinc-400">{series.first_air_date}</p>
+            </div>
+          )}
+
+          {/* Seasons */}
+          {series.number_of_seasons && (
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-zinc-200">Seasons</h3>
+              <p className="text-sm text-zinc-400">{series.number_of_seasons} seasons</p>
+            </div>
+          )}
+
+          {/* Genre */}
+          {series.genres && (
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-zinc-200">Genre</h3>
+              <p className="text-sm text-zinc-400">{Array.isArray(series.genres) ? series.genres.join(', ') : series.genres}</p>
+            </div>
+          )}
+
+          {/* Watch Platforms */}
+          {series.watch_links && Object.keys(series.watch_links).length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-zinc-200">Where to Watch</h3>
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+                {Object.entries(series.watch_links).filter(([, url]) => url).map(([platform, url]) => {
+                  const platformLogos = {
+                    prime: '/logos/prime.png',
+                    hotstar: '/logos/hotstar.png',
+                    zee5: '/logos/zee5.png',
+                    netflix: 'https://www.freepnglogos.com/uploads/netflix-logo-history-32.png',
+                    sony_liv: '/logos/sonyliv.png'
+                  };
                   const logoSrc = platformLogos[platform];
                   return (
                     <a
@@ -184,10 +189,10 @@ const SeriesDetail = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-12 h-12 rounded-lg bg-black flex items-center justify-center flex-shrink-0"
+                      className="w-14 h-14 rounded-lg bg-zinc-900 flex items-center justify-center flex-shrink-0 hover:bg-zinc-800 transition"
                     >
                       {logoSrc ? (
-                        <img src={logoSrc} alt={platform} className="w-8 h-8 object-contain" />
+                        <img src={logoSrc} alt={platform} className="w-9 h-9 object-contain" />
                       ) : (
                         <span className="text-[10px] text-zinc-300 capitalize">{platform.replace('_', ' ')}</span>
                       )}
@@ -195,243 +200,168 @@ const SeriesDetail = () => {
                   );
                 })}
               </div>
-            ) : (
-              <p className="text-sm text-zinc-400">Streaming links unavailable.</p>
-            )}
-          </div>
-
-          <div className="bg-black backdrop-blur rounded-2xl p-4">
-            <div className="flex items-center mb-3">
-              <h3 className="font-medium">Cast Preview</h3>
             </div>
-            {topCast.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
-                {topCast.map((member) => (
-                  <button
-                    key={`cast-preview-${member.id}`}
-                    className="text-left"
-                    onClick={() => member.person_id && navigate(`/person/${member.person_id}`)}
-                  >
-                    {member.profile_path ? (
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3">
+            <button className="bg-yellow-400 text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-yellow-500 transition">
+              + Add to Watchlist
+            </button>
+            <button className="bg-zinc-800 text-zinc-100 px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-zinc-700 transition">
+              Share
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'cast' && (
+        <div className="space-y-4">
+          {cast.length > 0 ? (
+            <div className="space-y-3">
+              {cast.map((member) => (
+                <button
+                  key={`cast-${member.id}`}
+                  className="w-full flex items-center gap-3 text-left"
+                  onClick={() => member.person_id && navigate(`/person/${member.person_id}`)}
+                >
+                  {member.profile_path ? (
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0">
                       <img
                         loading="lazy"
                         src={getImageUrl(member.profile_path, 'w185')}
                         alt={member.name}
-                        className="w-full aspect-square rounded-lg object-cover"
+                        className="w-full h-full object-cover"
                       />
-                    ) : (
-                      <div className="w-full aspect-square rounded-lg bg-zinc-700 flex items-center justify-center text-xs">
-                        {member.name?.[0] || '?'}
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-zinc-400">Cast data unavailable.</p>
-            )}
-          </div>
-        </section>
-
-        <section
-          ref={(el) => {
-            sectionRefs.current.overview = el;
-          }}
-          className="bg-black backdrop-blur rounded-2xl p-5 space-y-4"
-        >
-          <h2 className="font-display text-lg">Overview</h2>
-          {series.overview ? (
-            <div>
-              <p className={`text-zinc-400 leading-relaxed ${overviewExpanded ? '' : 'line-clamp-4'}`}>{series.overview}</p>
-              {series.overview.length > 160 && (
-                <button onClick={() => setOverviewExpanded(!overviewExpanded)} className="text-amber-400 text-sm mt-2">
-                  {overviewExpanded ? 'Read Less' : 'Read More'}
-                </button>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-zinc-400">No storyline available.</p>
-          )}
-          <div
-            ref={(el) => {
-              sectionRefs.current.watchlist = el;
-            }}
-            className="flex flex-wrap gap-3 pt-2"
-          >
-            <button
-              className="border border-amber-500 text-amber-400 rounded-full px-5 py-2 hover:bg-amber-500 hover:text-black transition"
-              onClick={() => navigate('/watchlist')}
-            >
-              Already Watched
-            </button>
-            <button
-              className="border border-amber-500 text-amber-400 rounded-full px-5 py-2 hover:bg-amber-500 hover:text-black transition"
-              onClick={() => navigate('/watchlist')}
-            >
-              Want to Watch
-            </button>
-          </div>
-        </section>
-
-        {cast.length > 0 && (
-          <section
-            ref={(el) => {
-              sectionRefs.current.cast = el;
-            }}
-            className="mt-8 pt-6 border-t border-zinc-800 space-y-4"
-          >
-            <h2 className="text-lg font-semibold">Cast</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {cast.map((member) => (
-                <button
-                  key={member.id}
-                  className="text-left"
-                  onClick={() => member.person_id && navigate(`/person/${member.person_id}`)}
-                >
-                  {member.profile_path ? (
-                    <img
-                      loading="lazy"
-                      src={getImageUrl(member.profile_path, 'w185')}
-                      alt={member.name}
-                      className="w-full aspect-square rounded-xl object-cover"
-                    />
+                    </div>
                   ) : (
-                    <div className="w-full aspect-square rounded-xl bg-black flex items-center justify-center">{member.name?.[0] || '?'}</div>
+                    <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-xs flex-shrink-0">
+                      {member.name?.[0] || '?'}
+                    </div>
                   )}
-                  <div className="mt-2 text-sm font-medium truncate">{member.name}</div>
-                  <div className="text-xs text-zinc-400 truncate">{member.character}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{member.name}</p>
+                    <p className="text-xs text-zinc-400 truncate">{member.character}</p>
+                  </div>
                 </button>
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <p className="text-sm text-zinc-400">No cast information available.</p>
+          )}
+        </div>
+      )}
 
-        {crew.length > 0 && (
-          <section className="space-y-4">
-            <h2 className="text-lg font-semibold">Crew</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {activeTab === 'crew' && (
+        <div className="space-y-4">
+          {crew.length > 0 ? (
+            <div className="space-y-3">
               {crew.map((member) => (
                 <button
                   key={`crew-${member.credit_id}`}
-                  className="text-left"
+                  className="w-full flex items-center gap-3 text-left"
                   onClick={() => member.person_id && navigate(`/person/${member.person_id}`)}
                 >
                   {member.profile_path ? (
-                    <img
-                      loading="lazy"
-                      src={getImageUrl(member.profile_path, 'w185')}
-                      alt={member.name}
-                      className="w-full aspect-square rounded-xl object-cover"
-                    />
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0">
+                      <img
+                        loading="lazy"
+                        src={getImageUrl(member.profile_path, 'w185')}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   ) : (
-                    <div className="w-full aspect-square rounded-xl bg-black flex items-center justify-center">{member.name?.[0] || '?'}</div>
+                    <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-xs flex-shrink-0">
+                      {member.name?.[0] || '?'}
+                    </div>
                   )}
-                  <div className="mt-2 text-sm font-medium truncate">{member.name}</div>
-                  <div className="text-xs text-zinc-400 truncate">{member.job}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{member.name}</p>
+                    <p className="text-xs text-zinc-400 truncate">{member.job}</p>
+                  </div>
                 </button>
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <p className="text-sm text-zinc-400">Crew information not available.</p>
+          )}
+        </div>
+      )}
 
-        <section
-          ref={(el) => {
-            sectionRefs.current.reviews = el;
-          }}
-          className="bg-black border border-zinc-700 rounded-2xl p-5"
-        >
-          <h2 className="text-lg font-semibold mb-2">Reviews</h2>
-          <p className="text-sm text-zinc-400">Series reviews are not available yet.</p>
-        </section>
-
-        <section
-          ref={(el) => {
-            sectionRefs.current.media = el;
-          }}
-          className="space-y-3"
-        >
-          <h2 className="text-lg font-semibold">Seasons</h2>
-          <div className="space-y-4">
-            {seasons.map((season) => {
-              const seasonEpisodes = episodesBySeason[season.id] || [];
-              const visibleCount = visibleCounts[season.id] ?? 3;
-              const visibleEpisodes = seasonEpisodes.slice(0, visibleCount);
-              return (
-                <div key={season.id} className="bg-black border border-zinc-700 rounded-2xl p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{season.name || `Season ${season.season_number}`}</p>
-                      <p className="text-xs text-zinc-400">{season.air_date || 'Unknown date'}</p>
-                    </div>
-                    <span className="text-xs text-zinc-400">{season.episode_count || 0} episodes</span>
+      {activeTab === 'seasons' && (
+        <div className="space-y-4">
+          {seasons.map((season) => {
+            const seasonEpisodes = episodesBySeason[season.id] || [];
+            const visibleCount = visibleCounts[season.id] ?? 3;
+            const visibleEpisodes = seasonEpisodes.slice(0, visibleCount);
+            return (
+              <div key={season.id} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-sm font-semibold">{season.name || `Season ${season.season_number}`}</p>
+                    <p className="text-xs text-zinc-400">{season.air_date || 'Unknown date'}</p>
                   </div>
-                  <div className="mt-3 space-y-2">
-                    {visibleEpisodes.map((ep) => {
-                      const dbEpisode = dbEpisodesBySeason[season.id]?.get(ep.episode_number);
-                      return (
-                        <div key={ep.id} className="flex gap-3 py-3 border-b border-zinc-700">
-                          {ep.still_path ? (
-                            <img src={getImageUrl(ep.still_path, 'w300')} alt={ep.name} className="w-24 h-16 object-cover rounded-md flex-shrink-0" />
-                          ) : (
-                            <div className="w-24 h-16 rounded-md bg-zinc-700" />
-                          )}
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">
-                              {ep.episode_number}. {ep.name}
-                            </p>
-                            {ep.runtime ? <p className="text-xs text-zinc-400">{ep.runtime}m</p> : null}
-                            {ep.overview && <p className="text-xs text-zinc-400 md:line-clamp-3">{ep.overview}</p>}
-                            {dbEpisode?.watch_link && (
-                              <a
-                                href={dbEpisode.watch_link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-black bg-amber-500 px-3 py-1 rounded-md w-fit"
-                              >
-                                Watch
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                    {seasonEpisodes.length > visibleCount && (
-                      <button
-                        onClick={() =>
-                          setVisibleCounts((prev) => ({
-                            ...prev,
-                            [season.id]: visibleCount + 3
-                          }))
-                        }
-                        className="text-amber-400 text-sm mt-3"
-                      >
-                        Load more episodes
-                      </button>
-                    )}
-                    {seasonEpisodes.length > 3 && visibleCount >= seasonEpisodes.length && (
-                      <button
-                        onClick={() =>
-                          setVisibleCounts((prev) => ({
-                            ...prev,
-                            [season.id]: 3
-                          }))
-                        }
-                        className="text-amber-400 text-sm mt-3"
-                      >
-                        Show fewer episodes
-                      </button>
-                    )}
-                  </div>
+                  <span className="text-xs text-zinc-400">{season.episode_count || 0} episodes</span>
                 </div>
-              );
-            })}
-            {seasons.length === 0 && <div className="text-sm text-zinc-400">No seasons found.</div>}
-          </div>
-        </section>
+                <div className="space-y-2">
+                  {visibleEpisodes.map((ep) => {
+                    const dbEpisode = dbEpisodesBySeason[season.id]?.get(ep.episode_number);
+                    return (
+                      <div key={ep.id} className="flex gap-3 py-2 border-b border-zinc-800 last:border-0">
+                        {ep.still_path ? (
+                          <img src={getImageUrl(ep.still_path, 'w300')} alt={ep.name} className="w-20 h-14 object-cover rounded flex-shrink-0" />
+                        ) : (
+                          <div className="w-20 h-14 rounded bg-zinc-800 flex-shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {ep.episode_number}. {ep.name}
+                          </p>
+                          {ep.runtime && <p className="text-xs text-zinc-400">{ep.runtime}m</p>}
+                          {dbEpisode?.watch_link && (
+                            <a
+                              href={dbEpisode.watch_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-1 inline-block text-xs font-semibold text-black bg-yellow-400 px-2 py-1 rounded"
+                            >
+                              Watch
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {seasonEpisodes.length > visibleCount && (
+                    <button
+                      onClick={() =>
+                        setVisibleCounts((prev) => ({
+                          ...prev,
+                          [season.id]: visibleCount + 3
+                        }))
+                      }
+                      className="text-yellow-400 text-sm mt-2"
+                    >
+                      Load more episodes
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          {seasons.length === 0 && <p className="text-sm text-zinc-400">No seasons found.</p>}
+        </div>
+      )}
+
+      {activeTab === 'related' && (
+        <div className="space-y-4">
+          <p className="text-sm text-zinc-400">Related series not available yet.</p>
+        </div>
+      )}
       </div>
     </div>
   );
 };
 
 export default SeriesDetail;
-
