@@ -28,33 +28,44 @@ const Series = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
-      <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
-        <h1 className="text-lg font-semibold">Series</h1>
-        <div className="mt-4 flex flex-col gap-3">
+    <div className="min-h-screen bg-black overflow-x-hidden">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        {/* Page Header */}
+        <div className="space-y-4">
+          <h1 className="text-2xl font-semibold text-white">TV Series</h1>
+          
+          {/* Search Input */}
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search series"
-            className="w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white placeholder:text-gray-500"
+            placeholder="Search series..."
+            className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-yellow-500 transition"
           />
         </div>
 
+        {/* Content */}
         {loading && page === 0 ? (
-          <p className="mt-4">Loading...</p>
+          <div className="flex items-center justify-center py-12">
+            <p className="text-zinc-400 text-sm">Loading...</p>
+          </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {items
                 .filter((s) => s.name?.toLowerCase().includes(search.toLowerCase()))
                 .map((item) => (
                   <PosterCard key={item.id} item={item} type="series" />
                 ))}
             </div>
+            
             {hasMore && (
-              <div className="mt-6">
-                <button onClick={() => setPage((p) => p + 1)} className="w-full btn-primary" disabled={loading}>
+              <div className="flex justify-center pt-6">
+                <button
+                  onClick={() => setPage((p) => p + 1)}
+                  className="bg-yellow-500 text-black font-semibold px-6 py-3 rounded-xl w-full sm:w-auto hover:bg-yellow-400 transition"
+                  disabled={loading}
+                >
                   {loading ? 'Loading...' : 'Load More'}
                 </button>
               </div>

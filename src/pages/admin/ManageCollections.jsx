@@ -68,125 +68,138 @@ const ManageCollections = () => {
 
   return (
     <AdminLayout title="Manage Collections" subtitle="Curate home page rows and featured lists.">
-      <div className="min-h-screen overflow-x-hidden">
-        <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* LEFT COLUMN */}
-            <div className="bg-zinc-900 rounded-2xl p-4 sm:p-6 space-y-6 border border-zinc-800 w-full max-w-full">
-              <h2 className="text-lg font-semibold text-white">Collections</h2>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT COLUMN - Collections List */}
+          <div className="bg-zinc-900 rounded-2xl p-4 sm:p-6 space-y-6 border border-zinc-800 shadow-lg">
+            <h2 className="text-lg font-semibold text-white">Collections</h2>
 
-              <form onSubmit={handleCreateCollection} className="space-y-4">
-                <input
-                  type="text"
-                  value={newCollectionName}
-                  onChange={(e) => setNewCollectionName(e.target.value)}
-                  placeholder="New collection name"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-yellow-500 transition"
-                />
-                <button type="submit" className="w-full bg-yellow-500 text-black font-semibold py-3 rounded-xl hover:bg-yellow-400 transition">
-                  Create Collection
-                </button>
-              </form>
+            {/* Create Form */}
+            <form onSubmit={handleCreateCollection} className="space-y-4">
+              <input
+                type="text"
+                value={newCollectionName}
+                onChange={(e) => setNewCollectionName(e.target.value)}
+                placeholder="New collection name"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition"
+              />
+              <button 
+                type="submit" 
+                className="w-full sm:w-auto bg-yellow-500 text-black font-semibold px-6 py-3 rounded-xl hover:bg-yellow-400 transition"
+              >
+                Create Collection
+              </button>
+            </form>
 
-              <div className="space-y-3 overflow-y-auto max-h-[500px]">
-                {collections.map((collection) => (
-                  <div
-                    key={collection.id}
-                    className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all w-full overflow-hidden ${
-                      selectedCollection?.id === collection.id
-                        ? 'bg-yellow-500 text-black border-yellow-500'
-                        : 'bg-zinc-800 border-zinc-700 hover:border-zinc-600 text-white'
-                    }`}
-                    onClick={() => handleSelectCollection(collection)}
+            {/* Collections List */}
+            <div className="space-y-3 overflow-y-auto max-h-[500px]">
+              {collections.map((collection) => (
+                <div
+                  key={collection.id}
+                  className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all ${
+                    selectedCollection?.id === collection.id
+                      ? 'bg-yellow-500 text-black border-yellow-500'
+                      : 'bg-zinc-800 border-zinc-700 hover:border-zinc-600 text-white'
+                  }`}
+                  onClick={() => handleSelectCollection(collection)}
+                >
+                  <span className="text-sm font-medium truncate">{collection.name}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCollection(collection.id, collection.name);
+                    }}
+                    className="shrink-0 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg transition"
                   >
-                    <span className="text-sm font-medium truncate">{collection.name}</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteCollection(collection.id, collection.name);
-                      }}
-                      className="shrink-0 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    Delete
+                  </button>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* RIGHT COLUMN */}
-            <div className="bg-zinc-900 rounded-2xl p-4 sm:p-6 space-y-6 border border-zinc-800 w-full max-w-full">
-              {selectedCollection ? (
-                <>
-                  <h2 className="text-lg font-semibold text-white">{selectedCollection.name}</h2>
+          {/* RIGHT COLUMN - Collection Items */}
+          <div className="bg-zinc-900 rounded-2xl p-4 sm:p-6 space-y-6 border border-zinc-800 shadow-lg">
+            {selectedCollection ? (
+              <>
+                <h2 className="text-lg font-semibold text-white">{selectedCollection.name}</h2>
 
-                  {/* Add Items */}
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-semibold text-zinc-300">Add Items</h3>
+                {/* Add Items Section */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-zinc-300">Add Items</h3>
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search movies..."
-                      className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-yellow-500 transition"
+                      className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition"
                     />
-                    <button onClick={handleSearch} className="w-full bg-zinc-800 border border-zinc-700 py-3 rounded-xl text-sm text-white hover:bg-zinc-700 transition">
+                    <button 
+                      onClick={handleSearch} 
+                      className="bg-zinc-800 border border-zinc-700 px-4 py-3 rounded-xl text-sm text-white hover:bg-zinc-700 transition shrink-0"
+                    >
                       Search
                     </button>
-
-                    {searchResults.length > 0 && (
-                      <div className="space-y-2 max-h-60 overflow-y-auto">
-                        {searchResults.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between gap-3 bg-zinc-800 rounded-xl p-3 border border-zinc-700 w-full overflow-hidden">
-                            <span className="text-sm truncate text-white">{item.title}</span>
-                            <button
-                              onClick={() => handleAddToCollection(item.id)}
-                              className="shrink-0 bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-lg transition"
-                            >
-                              Add
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
-                  {/* Current Items */}
-                  <div className="space-y-4 overflow-y-auto max-h-[500px]">
-                    <h3 className="text-sm font-semibold text-zinc-300">Collection Items</h3>
-                    {collectionItems.map((item) => {
-                      const content = item.movie;
-                      return (
-                        <div key={item.id} className="flex items-center justify-between gap-3 bg-zinc-800 rounded-xl p-3 border border-zinc-700 w-full overflow-hidden">
-                          <div className="flex items-center gap-3 min-w-0">
+                  {/* Search Results */}
+                  {searchResults.length > 0 && (
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {searchResults.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between gap-3 bg-zinc-800 rounded-xl p-3 border border-zinc-700">
+                          <span className="text-sm truncate text-white">{item.title}</span>
+                          <button
+                            onClick={() => handleAddToCollection(item.id)}
+                            className="shrink-0 bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-lg transition"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Current Items */}
+                <div className="space-y-4 overflow-y-auto max-h-[500px]">
+                  <h3 className="text-sm font-semibold text-zinc-300">Collection Items ({collectionItems.length})</h3>
+                  {collectionItems.length === 0 ? (
+                    <p className="text-sm text-zinc-500">No items in this collection yet.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {collectionItems.map((item) => {
+                        const content = item.movie;
+                        return (
+                          <div key={item.id} className="flex items-center gap-3 bg-zinc-800 rounded-xl p-3 border border-zinc-700">
                             <img
                               loading="lazy"
                               src={content.poster_url || 'https://via.placeholder.com/50x75'}
                               alt={content.title}
-                              className="w-12 h-16 rounded-md object-cover shrink-0"
+                              className="w-14 h-20 rounded-lg object-cover shrink-0"
                             />
-                            <div className="min-w-0">
+                            <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate text-white">{content.title}</p>
-                              <p className="text-xs text-zinc-400">Movie</p>
+                              <p className="text-xs text-zinc-500">Movie</p>
                             </div>
+                            <button
+                              onClick={() => handleRemoveFromCollection(item.id)}
+                              className="shrink-0 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg transition"
+                            >
+                              Remove
+                            </button>
                           </div>
-                          <button
-                            onClick={() => handleRemoveFromCollection(item.id)}
-                            className="shrink-0 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg transition"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center text-zinc-400 py-12">
-                  <p className="text-sm">Select a collection to manage items</p>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center py-12">
+                <p className="text-sm text-zinc-400">Select a collection to manage items</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
