@@ -13,6 +13,10 @@ const Home = () => {
   const [collections, setCollections] = useState([]);
   const [seriesItems, setSeriesItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -51,7 +55,48 @@ const Home = () => {
     setSeriesItems(data || []);
   };
 
-  const hero = heroBanners[0]?.movie || null;
+  // Autoplay carousel
+  useEffect(() => {
+    if (heroBanners.length <= 1 || isPaused) return;
+    
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroBanners.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [heroBanners.length, isPaused]);
+
+  // Swipe handlers
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      setCurrentSlide((prev) => (prev + 1) % heroBanners.length);
+    }
+    if (isRightSwipe) {
+      setCurrentSlide((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
+    }
+
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+
   const formatRuntime = (mins) => {
     if (!mins || mins <= 0) return null;
     const h = Math.floor(mins / 60);
@@ -63,46 +108,129 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-black overflow-x-hidden">
-      {/* Hero Banner */}
-      {hero && (
-        <div className="relative h-[70vh] flex items-end overflow-hidden w-full">
-          <img
-            src={hero.backdrop_url || hero.poster_url}
-            alt={hero.title}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
-          <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-8 space-y-4 max-w-xl w-full">
-            <h1 className="text-2xl font-semibold tracking-tight text-white">{hero.title}</h1>
-            <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
-              <span>{hero.release_date?.split('-')[0]}</span>
-              {hero.runtime && (
-                <>
-                  <span>•</span>
-                  <span>{formatRuntime(hero.runtime)}</span>
-                </>
-              )}
-              {hero.genres?.length > 0 && (
-                <>
-                  <span>•</span>
-                  <span>{hero.genres.slice(0, 3).join(', ')}</span>
-                </>
-              )}
+      {/* Hero Carousel */}
+      {heroBanners.length > 0 && (
+        <section 
+          className="relative h-[70vh] sm:h-[75vh] lg:h-[80vh] min-h-[520px] w-full overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {heroBanners.map((banner, index) => {
+            const movie = banner.movie;
+            if (!movie) return null;
+
+            return (
+              <div
+                key={banner.id}
+                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                  index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                }`}
+              >
+                {/* Backdrop Image with Zoom Effect */}
+                <img
+                  src={movie.backdrop_url || movie.poster_url}
+                  alt={movie.title}
+                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-[6000ms] ${
+                    index === currentSlide ? 'scale-105' : 'scale-100'
+                  }`}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                />
+
+                {/* Cinematic Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
+
+                {/* Content */}
+                <div className="relative z-10 h-full flex items-end">
+                  <div className="px-4 sm:px-6 lg:px-8 pb-10 max-w-lg space-y-4 w-full">
+                    {/* Title Logo or Text */}
+                    {movie.title_logo_url && !movie.use_text_title ? (
+                      <img
+                        src={movie.title_logo_url}
+                        alt={movie.title}
+                        className="max-h-20 object-contain"
+                      />
+                    ) : (
+                      <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
+                        {movie.title}
+                      </h1>
+                    )}
+
+                    {/* Metadata */}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {movie.imdb_rating && (
+                        <span className="inline-flex items-center bg-yellow-500 text-black text-sm font-semibold px-3 py-1 rounded-md">
+                          IMDb {movie.imdb_rating}
+                        </span>
+                      )}
+                      <div className="flex items-center gap-2 text-sm text-zinc-300">
+                        {movie.release_date?.split('-')[0] && (
+                          <span>{movie.release_date.split('-')[0]}</span>
+                        )}
+                        {movie.runtime && (
+                          <>
+                            <span>•</span>
+                            <span>{formatRuntime(movie.runtime)}</span>
+                          </>
+                        )}
+                        {movie.genres?.length > 0 && (
+                          <>
+                            <span>•</span>
+                            <span>{movie.genres.slice(0, 2).join(', ')}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    {movie.overview && (
+                      <p className="text-sm text-zinc-300 line-clamp-3 leading-relaxed">
+                        {movie.overview}
+                      </p>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-4 pt-2 flex-wrap">
+                      <button 
+                        onClick={() => navigate(`/movie/${movie.id}`)}
+                        className="bg-yellow-500 text-black font-semibold px-6 py-3 rounded-xl hover:bg-yellow-400 transition w-full sm:w-auto"
+                      >
+                        ▶ Watch Now
+                      </button>
+                      <button 
+                        onClick={() => navigate(`/movie/${movie.id}`)}
+                        className="bg-zinc-800 border border-zinc-700 text-white px-6 py-3 rounded-xl hover:bg-zinc-700 transition w-full sm:w-auto"
+                      >
+                        + Watchlist
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Indicator Dots */}
+          {heroBanners.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+              {heroBanners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentSlide 
+                      ? 'w-6 bg-yellow-500' 
+                      : 'w-2 bg-zinc-500 hover:bg-zinc-400'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
             </div>
-            {hero.overview && (
-              <p className="text-sm text-zinc-300 line-clamp-2 leading-relaxed">{hero.overview}</p>
-            )}
-            <div className="flex gap-4 pt-2 flex-wrap">
-              <button className="bg-yellow-500 text-black font-semibold px-6 py-3 rounded-xl hover:bg-yellow-400 transition">
-                Watch Now
-              </button>
-              <button className="bg-zinc-800 border border-zinc-700 text-white px-6 py-3 rounded-xl hover:bg-zinc-700 transition">
-                + Watchlist
-              </button>
-            </div>
-          </div>
-        </div>
+          )}
+        </section>
       )}
 
       {/* Content Sections */}
