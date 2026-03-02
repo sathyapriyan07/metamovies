@@ -13,6 +13,7 @@ const ManageSeries = () => {
     imdb_rating: '',
     watch_links: '{}',
     title_logo_url: '',
+    backdrop_url: '',
     use_text_title: true
   });
   const [saveState, setSaveState] = useState({ loading: false, error: '', success: '' });
@@ -36,6 +37,7 @@ const ManageSeries = () => {
       imdb_rating: item.imdb_rating ?? '',
       watch_links: JSON.stringify(item.watch_links || {}, null, 2),
       title_logo_url: item.title_logo_url || '',
+      backdrop_url: item.backdrop_url || '',
       use_text_title: item.use_text_title ?? true
     });
     const { data: seasonsData } = await getSeasonsBySeries(item.id);
@@ -80,6 +82,7 @@ const ManageSeries = () => {
         imdb_rating: seriesForm.imdb_rating ? Number(seriesForm.imdb_rating) : null,
         watch_links: watchLinks,
         title_logo_url: seriesForm.title_logo_url || null,
+        backdrop_url: seriesForm.backdrop_url || null,
         use_text_title: !!seriesForm.use_text_title
       })
       .eq('id', selectedSeries.id);
@@ -220,6 +223,16 @@ const ManageSeries = () => {
                   <input
                     value={seriesForm.title_logo_url}
                     onChange={(e) => setSeriesForm((prev) => ({ ...prev, title_logo_url: e.target.value }))}
+                    placeholder="https://..."
+                    className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-zinc-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Backdrop Image URL</label>
+                  <input
+                    value={seriesForm.backdrop_url}
+                    onChange={(e) => setSeriesForm((prev) => ({ ...prev, backdrop_url: e.target.value }))}
                     placeholder="https://..."
                     className="w-full bg-black border border-zinc-700 rounded-lg px-4 py-2.5 text-sm text-zinc-100"
                   />

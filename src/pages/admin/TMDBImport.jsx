@@ -557,7 +557,8 @@ const TMDBImport = () => {
                   air_date: episode.air_date || null,
                   runtime: episode.runtime || null,
                   still_url: getImageUrl(episode.still_path, 'w500'),
-                  tmdb_rating: typeof episode.vote_average === 'number' ? Number(episode.vote_average.toFixed(1)) : null
+                  tmdb_rating: typeof episode.vote_average === 'number' ? Number(episode.vote_average.toFixed(1)) : null,
+                  vote_average: typeof episode.vote_average === 'number' ? Number(episode.vote_average.toFixed(1)) : null
                 });
               }
             }

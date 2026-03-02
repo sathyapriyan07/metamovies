@@ -55,7 +55,7 @@ const ManageCollections = () => {
 
   const handleAddToCollection = async (itemId) => {
     if (!selectedCollection) return;
-    await addToCollection(selectedCollection.id, itemId, 'movie');
+    await addToCollection(selectedCollection.id, itemId);
     handleSelectCollection(selectedCollection);
     setSearchResults([]);
     setSearchQuery('');
@@ -68,122 +68,123 @@ const ManageCollections = () => {
 
   return (
     <AdminLayout title="Manage Collections" subtitle="Curate home page rows and featured lists.">
-      <div className="w-full px-4 py-6 overflow-x-hidden">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* LEFT COLUMN */}
-            <div className="bg-neutral-900 rounded-2xl p-5">
-              <h2 className="text-2xl font-bold mb-4">Collections</h2>
+      <div className="px-4 sm:px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT COLUMN */}
+          <div className="bg-zinc-900 rounded-2xl p-6 space-y-6 border border-zinc-800">
+            <h2 className="text-xl font-semibold">Collections</h2>
 
-              <form onSubmit={handleCreateCollection} className="mb-6">
-                <div className="flex flex-col sm:flex-row gap-2">
+            <form onSubmit={handleCreateCollection} className="space-y-3">
+              <input
+                type="text"
+                value={newCollectionName}
+                onChange={(e) => setNewCollectionName(e.target.value)}
+                placeholder="New collection name"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-yellow-500"
+              />
+              <button type="submit" className="w-full bg-yellow-500 text-black font-semibold py-3 rounded-xl hover:bg-yellow-400 transition">
+                Create
+              </button>
+            </form>
+
+            <div className="space-y-3">
+              {collections.map((collection) => (
+                <div
+                  key={collection.id}
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl border cursor-pointer transition-all ${
+                    selectedCollection?.id === collection.id
+                      ? 'bg-yellow-500 text-black border-yellow-500'
+                      : 'bg-zinc-800 border-zinc-700 hover:border-zinc-600'
+                  }`}
+                  onClick={() => handleSelectCollection(collection)}
+                >
+                  <span className="text-sm font-medium truncate">{collection.name}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCollection(collection.id, collection.name);
+                    }}
+                    className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <div className="bg-zinc-900 rounded-2xl p-6 space-y-6 border border-zinc-800">
+            {selectedCollection ? (
+              <>
+                <h2 className="text-xl font-semibold">{selectedCollection.name}</h2>
+
+                {/* Add Items */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-zinc-300">Add Items</h3>
                   <input
                     type="text"
-                    value={newCollectionName}
-                    onChange={(e) => setNewCollectionName(e.target.value)}
-                    placeholder="New collection name"
-                    className="flex-1 px-4 py-2 bg-white/10 rounded-lg border border-white/20"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search movies..."
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-yellow-500"
                   />
-                  <button type="submit" className="btn-primary">Create</button>
-                </div>
-              </form>
+                  <button onClick={handleSearch} className="w-full bg-zinc-800 border border-zinc-700 py-3 rounded-xl text-sm hover:bg-zinc-700 transition">
+                    Search
+                  </button>
 
-              <div className="space-y-3">
-                {collections.map((collection) => (
-                  <div
-                    key={collection.id}
-                    className={`flex items-center justify-between bg-neutral-800 rounded-xl p-4 cursor-pointer ${
-                      selectedCollection?.id === collection.id ? 'border border-red-500/60' : ''
-                    }`}
-                    onClick={() => handleSelectCollection(collection)}
-                  >
-                    <span className="text-sm font-medium truncate min-w-0">{collection.name}</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteCollection(collection.id, collection.name);
-                      }}
-                      className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-lg shrink-0"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN */}
-            <div className="bg-neutral-900 rounded-2xl p-5">
-              {selectedCollection ? (
-                <>
-                  <h2 className="text-2xl font-bold mb-4">{selectedCollection.name}</h2>
-
-                  {/* Add Items */}
-                  <div className="mb-6 bg-neutral-800/60 p-4 rounded-xl">
-                    <h3 className="font-bold mb-3">Add Items</h3>
-                    <div className="flex flex-col sm:flex-row gap-2 mb-3">
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search..."
-                        className="flex-1 px-4 py-2 bg-white/10 rounded-lg border border-white/20"
-                      />
-                      <button onClick={handleSearch} className="btn-secondary">Search</button>
-                    </div>
-
-                    {searchResults.length > 0 && (
-                      <div className="space-y-2 max-h-60 overflow-y-auto">
-                        {searchResults.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between gap-3 bg-neutral-800 rounded-xl p-3">
-                            <span className="text-sm truncate min-w-0">{item.title}</span>
-                            <button
-                              onClick={() => handleAddToCollection(item.id)}
-                              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded-lg shrink-0"
-                            >
-                              Add
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Current Items */}
-                  <div className="space-y-3">
-                    {collectionItems.map((item) => {
-                      const content = item.movie;
-                      return (
-                        <div key={item.id} className="flex items-center justify-between gap-3 bg-neutral-800 rounded-xl p-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <img
-                              loading="lazy"
-                              src={content.poster_url || 'https://via.placeholder.com/50x75'}
-                              alt={content.title}
-                              className="w-12 h-16 rounded-md object-cover"
-                            />
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium truncate">{content.title}</p>
-                              <p className="text-xs text-gray-400">Movie</p>
-                            </div>
-                          </div>
+                  {searchResults.length > 0 && (
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {searchResults.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between gap-3 bg-zinc-800 rounded-xl p-3 border border-zinc-700">
+                          <span className="text-sm truncate">{item.title}</span>
                           <button
-                            onClick={() => handleRemoveFromCollection(item.id)}
-                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-lg shrink-0"
+                            onClick={() => handleAddToCollection(item.id)}
+                            className="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-lg transition"
                           >
-                            Remove
+                            Add
                           </button>
                         </div>
-                      );
-                    })}
-                  </div>
-                </>
-              ) : (
-                <div className="text-center text-gray-400 py-12">
-                  Select a collection to manage items
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+
+                {/* Current Items */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-zinc-300">Collection Items</h3>
+                  {collectionItems.map((item) => {
+                    const content = item.movie;
+                    return (
+                      <div key={item.id} className="flex items-center justify-between gap-3 bg-zinc-800 rounded-xl p-3 border border-zinc-700">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <img
+                            loading="lazy"
+                            src={content.poster_url || 'https://via.placeholder.com/50x75'}
+                            alt={content.title}
+                            className="w-12 h-16 rounded-md object-cover"
+                          />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium truncate">{content.title}</p>
+                            <p className="text-xs text-zinc-400">Movie</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveFromCollection(item.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg transition"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="text-center text-zinc-400 py-12">
+                Select a collection to manage items
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -192,5 +193,3 @@ const ManageCollections = () => {
 };
 
 export default ManageCollections;
-
-
