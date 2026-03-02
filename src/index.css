@@ -33,6 +33,8 @@ html, body {
   padding: 0;
   overflow-x: hidden;
   background-color: #000000;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .scrollbar-hide {
@@ -70,6 +72,10 @@ video {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+img {
+  object-fit: cover;
 }
 
 img[loading="lazy"] {
@@ -120,10 +126,13 @@ p {
   min-height: 100vh;
   overflow-x: hidden;
   background-color: #000000;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .container {
   width: 100%;
+  max-width: 100%;
   padding: 16px;
   margin: 0 auto;
 }
@@ -148,7 +157,7 @@ p {
   border-bottom: 1px solid #1f1f1f;
   height: 50px;
   width: 100%;
-  max-width: 100%;
+  max-width: 100vw;
   overflow-x: hidden;
   padding: 0 14px;
 }
@@ -288,6 +297,8 @@ p {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -453,6 +464,8 @@ p {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (min-width: 1024px) {
@@ -590,6 +603,13 @@ p {
   display: inline-flex;
   padding: 12px 20px;
   max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .detail-grid {

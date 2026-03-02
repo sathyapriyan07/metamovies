@@ -62,10 +62,10 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 pb-20">
+    <div className="min-h-screen bg-black text-zinc-100 pb-20 w-full max-w-full overflow-x-hidden">
       {/* Hero Banner */}
       {hero && (
-        <div className="relative h-[75vh] min-h-[400px] w-full overflow-hidden">
+        <div className="relative h-[75vh] min-h-[400px] w-full max-w-full overflow-hidden">
           <img
             src={hero.backdrop_url || hero.poster_url}
             alt={hero.title}
@@ -106,7 +106,7 @@ const Home = () => {
       )}
 
       {/* Content Sections */}
-      <div className="px-4 space-y-8 mt-8">
+      <div className="px-4 sm:px-6 lg:px-8 space-y-8 mt-8 max-w-7xl mx-auto w-full">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-zinc-400">Loading...</p>

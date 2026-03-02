@@ -36,14 +36,14 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full h-[50px] bg-[#0f0f0f] border-b border-gray-800">
-        <div className="max-w-2xl mx-auto px-4 h-full">
-          <div className="h-full flex items-center justify-between">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full max-w-full h-[50px] bg-[#0f0f0f] border-b border-gray-800 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 h-full w-full">
+          <div className="h-full flex items-center justify-between w-full gap-3">
             <button className="text-[#F5C518] font-semibold text-sm" onClick={() => navigate('/')}>
               MetaMovies+
             </button>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 shrink-0">
               <button
                 className="text-white/80 hover:text-white transition"
                 onClick={() => navigate('/search')}

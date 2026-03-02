@@ -33,9 +33,9 @@ const AdminLayout = ({ title, subtitle, children }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white pt-12 pb-10">
-      <div className="max-w-2xl lg:max-w-6xl mx-auto px-4">
-        <div className="lg:flex lg:gap-6">
+    <div className="min-h-screen bg-[#0f0f0f] text-white pt-12 pb-10 w-full max-w-full overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="lg:flex lg:gap-6 w-full">
           <aside className="hidden lg:block w-60 shrink-0">
             <div className="bg-[#1a1a1a] border border-gray-800 rounded-md p-4">
               <div className="text-xs uppercase text-gray-400 mb-3">Admin</div>
@@ -57,7 +57,7 @@ const AdminLayout = ({ title, subtitle, children }) => {
             </div>
           </aside>
 
-          <div className="flex-1">
+          <div className="flex-1 w-full max-w-full overflow-x-hidden">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
                 <h1 className="text-lg font-semibold">{title}</h1>

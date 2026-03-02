@@ -154,7 +154,7 @@ const MovieDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 pb-20">
+    <div className="min-h-screen bg-black text-zinc-100 pb-20 w-full max-w-full overflow-x-hidden">
       <SeoHead
         title={pageMeta?.title || `${movie.title} - MetaMovies+`}
         description={pageMeta?.description || movie.overview?.slice(0, 160)}
@@ -164,7 +164,7 @@ const MovieDetail = () => {
 
       {/* Hero Image */}
       {movie.backdrop_url && (
-        <div className="relative w-full h-[60vh] overflow-hidden">
+        <div className="relative w-full max-w-full h-[60vh] overflow-hidden">
           <img
             src={movie.backdrop_url}
             alt={movie.title}
@@ -176,7 +176,7 @@ const MovieDetail = () => {
       )}
 
       {/* Title Section */}
-      <div className="px-4 mt-4 space-y-3">
+      <div className="px-4 sm:px-6 lg:px-8 mt-4 space-y-3 max-w-7xl mx-auto w-full">
         {movie.title_logo_url && !movie.use_text_title ? (
           <img
             src={movie.title_logo_url}
@@ -209,7 +209,7 @@ const MovieDetail = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="px-4 mt-5 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-3 scrollbar-hide">
+      <div className="px-4 sm:px-6 lg:px-8 mt-5 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-3 scrollbar-hide max-w-7xl mx-auto w-full">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -226,12 +226,12 @@ const MovieDetail = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 mt-5 space-y-5">
+      <div className="px-4 sm:px-6 lg:px-8 mt-5 space-y-5 max-w-7xl mx-auto w-full">
       {activeTab === 'overview' && (
         <div className="space-y-5">
           {/* Trailer */}
           {videoId && !videoError && (
-            <div className="aspect-video rounded-lg overflow-hidden bg-zinc-900">
+            <div className="aspect-video rounded-lg overflow-hidden bg-zinc-900 w-full max-w-full">
               <iframe
                 className="w-full h-full"
                 src={`https://www.youtube.com/embed/${videoId}`}
@@ -305,7 +305,7 @@ const MovieDetail = () => {
           {ottPlatforms.length > 0 && (
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-zinc-200">Where to Watch</h3>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide w-full">
                 {ottPlatforms.map(([platform, url]) => {
                   const logoSrc = platformLogos[platform];
                   return (
@@ -349,7 +349,7 @@ const MovieDetail = () => {
       {activeTab === 'cast' && (
         <div className="space-y-4">
           {movie.cast?.length > 0 ? (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full">
               {movie.cast.slice(0, 12).map((c) => (
                 <button
                   key={`cast-${c.id}`}
@@ -450,7 +450,7 @@ const MovieDetail = () => {
       {activeTab === 'related' && (
         <div className="space-y-4">
           {movie.similar_movies?.length > 0 ? (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 w-full">
               {movie.similar_movies.slice(0, 9).map((item) => (
                 <button
                   key={`similar-${item.id}`}

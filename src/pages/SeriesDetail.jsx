@@ -104,12 +104,12 @@ const SeriesDetail = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 pb-20">
+    <div className="min-h-screen bg-black text-zinc-100 pb-20 w-full max-w-full overflow-x-hidden">
       <SeoHead title={`${series.name} - Series`} description={series.overview?.slice(0, 160)} />
 
       {/* Hero Image */}
       {series.backdrop_url && (
-        <div className="relative w-full h-[60vh] overflow-hidden">
+        <div className="relative w-full max-w-full h-[60vh] overflow-hidden">
           <img
             src={series.backdrop_url}
             alt={series.name}
@@ -121,7 +121,7 @@ const SeriesDetail = () => {
       )}
 
       {/* Title Section */}
-      <div className="px-4 mt-4 space-y-2">
+      <div className="px-4 sm:px-6 lg:px-8 mt-4 space-y-2 max-w-7xl mx-auto w-full">
         {series.title_logo_url && !series.use_text_title ? (
           <img
             src={series.title_logo_url}
@@ -139,7 +139,7 @@ const SeriesDetail = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="px-4 mt-5 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-3 scrollbar-hide">
+      <div className="px-4 sm:px-6 lg:px-8 mt-5 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-3 scrollbar-hide max-w-7xl mx-auto w-full">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -156,7 +156,7 @@ const SeriesDetail = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 mt-5 space-y-5">
+      <div className="px-4 sm:px-6 lg:px-8 mt-5 space-y-5 max-w-7xl mx-auto w-full">
       {activeTab === 'overview' && (
         <div className="space-y-5">
           {/* Description */}
@@ -195,7 +195,7 @@ const SeriesDetail = () => {
           {series.watch_links && Object.keys(series.watch_links).length > 0 && (
             <div className="space-y-2">
               <h3 className="text-sm font-semibold text-zinc-200">Where to Watch</h3>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide w-full">
                 {Object.entries(series.watch_links).filter(([, url]) => url).map(([platform, url]) => {
                   const platformLogos = {
                     prime: '/logos/prime.png',
@@ -320,7 +320,7 @@ const SeriesDetail = () => {
               <select
                 value={selectedSeason || ''}
                 onChange={(e) => setSelectedSeason(Number(e.target.value))}
-                className="w-full bg-zinc-900 border border-zinc-700 text-white px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-yellow-500 transition"
+                className="w-full max-w-full bg-zinc-900 border border-zinc-700 text-white px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-yellow-500 transition"
               >
                 {seasons.map((season) => (
                   <option key={season.id} value={season.id}>

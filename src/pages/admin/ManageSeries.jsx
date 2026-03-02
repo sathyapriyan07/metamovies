@@ -156,9 +156,9 @@ const ManageSeries = () => {
 
   return (
     <AdminLayout title="Manage Series" subtitle="Edit series ratings, watch links, and episode embed links.">
-      <div className="flex flex-col lg:flex-row gap-6 p-6">
+      <div className="flex flex-col lg:flex-row gap-6 p-4 sm:p-6 w-full max-w-full overflow-x-hidden">
         {/* Left Sidebar - Series List */}
-        <aside className="w-full lg:w-72 shrink-0 bg-zinc-900 rounded-xl p-4 space-y-3 border border-zinc-800">
+        <aside className="w-full lg:w-72 shrink-0 bg-zinc-900 rounded-xl p-4 space-y-3 border border-zinc-800 max-w-full">
           <h2 className="text-base font-semibold text-zinc-100">Series List</h2>
           <div className="space-y-2 max-h-[70vh] overflow-y-auto">
             {seriesList.map((item) => (
@@ -179,11 +179,11 @@ const ManageSeries = () => {
         </aside>
 
         {/* Right Content */}
-        <main className="flex-1 space-y-6">
+        <main className="flex-1 space-y-6 w-full max-w-full overflow-x-hidden">
           {selectedSeries ? (
             <>
               {/* Series Ratings & Watch Links */}
-              <form onSubmit={handleSeriesSave} className="bg-zinc-900 rounded-xl p-6 space-y-5 border border-zinc-800">
+              <form onSubmit={handleSeriesSave} className="bg-zinc-900 rounded-xl p-4 sm:p-6 space-y-5 border border-zinc-800 w-full max-w-full">
                 <h2 className="text-base font-semibold text-zinc-100">Series Ratings & Watch Links</h2>
                 
                 {saveState.error && (
@@ -197,7 +197,7 @@ const ManageSeries = () => {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                   <div>
                     <label className="block text-sm font-medium text-zinc-300 mb-2">TMDB Rating</label>
                     <input
@@ -262,14 +262,14 @@ const ManageSeries = () => {
                 <button
                   type="submit"
                   disabled={saveState.loading}
-                  className="bg-yellow-500 text-black font-semibold px-6 py-3 rounded-lg w-full md:w-fit hover:bg-yellow-400 transition disabled:opacity-50"
+                  className="bg-yellow-500 text-black font-semibold px-6 py-3 rounded-lg w-full sm:w-auto hover:bg-yellow-400 transition disabled:opacity-50"
                 >
                   {saveState.loading ? 'Saving...' : 'Save Series'}
                 </button>
               </form>
 
               {/* Episode Management */}
-              <div className="bg-zinc-900 rounded-xl p-6 space-y-5 border border-zinc-800">
+              <div className="bg-zinc-900 rounded-xl p-4 sm:p-6 space-y-5 border border-zinc-800 w-full max-w-full">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base font-semibold text-zinc-100">Episode Embed Links</h2>
                   {episodes.length > 0 && (
@@ -285,7 +285,7 @@ const ManageSeries = () => {
 
                 {/* Season Selector */}
                 {seasons.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="flex gap-2 flex-wrap w-full overflow-x-auto">
                     {seasons.map((season) => (
                       <button
                         key={season.id}
@@ -337,12 +337,12 @@ const ManageSeries = () => {
 
                       <div className="space-y-2">
                         <label className="block text-xs font-medium text-zinc-400">Embed Link</label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full">
                           <input
                             type="text"
                             value={ep.embed_link || ''}
                             placeholder="https://vidsrc.to/embed/tv/..."
-                            className="flex-1 bg-black border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100"
+                            className="flex-1 min-w-0 bg-black border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100"
                             onChange={(e) => updateEmbedLink(ep.id, e.target.value)}
                           />
                           <button

@@ -140,13 +140,13 @@ const PersonDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-zinc-900 to-black text-zinc-100 w-full max-w-full overflow-x-hidden">
       <SeoHead
         title={pageMeta?.title || `${person.name} - MetaMovies+`}
         description={pageMeta?.description || person.biography?.slice(0, 160)}
         jsonLd={pageMeta?.jsonld || null}
       />
-      <div className="max-w-3xl mx-auto px-4 pt-8 pb-8 space-y-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 space-y-6 w-full">
         <section className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -168,7 +168,7 @@ const PersonDetail = () => {
             </button>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide w-full">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -184,7 +184,7 @@ const PersonDetail = () => {
             ))}
           </div>
 
-          <div className="relative rounded-2xl overflow-hidden mt-4 aspect-[4/5] bg-zinc-800/70 backdrop-blur">
+          <div className="relative rounded-2xl overflow-hidden mt-4 aspect-[4/5] bg-zinc-800/70 backdrop-blur w-full max-w-full">
             <img
               loading="lazy"
               src={person.profile_url || 'https://via.placeholder.com/800x1000'}
@@ -195,7 +195,7 @@ const PersonDetail = () => {
             <span className="absolute bottom-3 left-3 text-xs text-zinc-300 bg-black/40 px-2 py-1 rounded">Source: MetaMovies+</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 w-full">
             <div className="bg-emerald-900/30 rounded-2xl p-5">
               <p className="text-sm text-zinc-400">Age</p>
               <p className="text-xl font-semibold mt-1">{ageLabel ?? 'N/A'}</p>

@@ -59,9 +59,9 @@ import ManageSeries from './pages/admin/ManageSeries';
 
 function AppRoutes() {
   const Layout = ({ children }) => (
-    <div className="min-h-screen overflow-x-hidden bg-black text-white">
+    <div className="min-h-screen overflow-x-hidden bg-black text-white w-full max-w-full">
       <Header />
-      <main>{children}</main>
+      <main className="w-full max-w-full">{children}</main>
     </div>
   );
 

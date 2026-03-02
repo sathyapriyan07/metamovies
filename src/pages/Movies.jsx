@@ -48,8 +48,8 @@ const Movies = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
-      <div className="max-w-2xl mx-auto px-4 pt-12 pb-10">
+    <div className="min-h-screen bg-[#0f0f0f] text-white w-full max-w-full overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10 w-full">
         <h1 className="text-lg font-semibold">Movies</h1>
         <div className="mt-4 flex flex-col gap-3">
           <input
@@ -57,12 +57,12 @@ const Movies = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search movies"
-            className="w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white placeholder:text-gray-500"
+            className="w-full max-w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white placeholder:text-gray-500"
           />
           <select
             value={selectedGenre}
             onChange={(e) => handleGenreClick(e.target.value)}
-            className="w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white"
+            className="w-full max-w-full bg-[#1a1a1a] rounded-md px-3 py-2 text-sm text-white"
           >
             {genres.map((genre) => (
               <option key={genre} value={genre} className="bg-[#0f0f0f]">
@@ -76,7 +76,7 @@ const Movies = () => {
           <p className="mt-4">Loading...</p>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 mt-6 w-full">
               {movies
                 .filter((m) => m.title?.toLowerCase().includes(search.toLowerCase()))
                 .map((movie) => (
@@ -85,7 +85,7 @@ const Movies = () => {
             </div>
             {hasMore && (
               <div className="mt-6">
-                <button onClick={() => setPage((p) => p + 1)} className="w-full btn-primary" disabled={loading}>
+                <button onClick={() => setPage((p) => p + 1)} className="w-full sm:w-auto btn-primary" disabled={loading}>
                   {loading ? 'Loading...' : 'Load More'}
                 </button>
               </div>
