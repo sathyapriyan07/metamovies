@@ -62,10 +62,10 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 pb-24">
+    <div className="min-h-screen bg-black text-zinc-100 pb-20">
       {/* Hero Banner */}
       {hero && (
-        <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
+        <div className="relative h-[75vh] min-h-[400px] w-full overflow-hidden">
           <img
             src={hero.backdrop_url || hero.poster_url}
             alt={hero.title}
@@ -73,7 +73,7 @@ const Home = () => {
             loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 space-y-3">
+          <div className="absolute bottom-6 left-0 right-0 px-4 space-y-3">
             <h1 className="text-xl md:text-2xl font-semibold tracking-tight">{hero.title}</h1>
             <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
               <span>{hero.release_date?.split('-')[0]}</span>
@@ -106,7 +106,7 @@ const Home = () => {
       )}
 
       {/* Content Sections */}
-      <div className="px-4 space-y-6 mt-6">
+      <div className="px-4 space-y-8 mt-8">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-zinc-400">Loading...</p>
@@ -115,7 +115,7 @@ const Home = () => {
           <>
             {/* Movie Collections */}
             {collections.length > 0 && collections.map((collection) => (
-              <section key={collection.id} className="space-y-3">
+              <section key={collection.id} className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base font-semibold text-zinc-200">
                     {collection.name || 'Collection'}
@@ -161,7 +161,7 @@ const Home = () => {
 
             {/* Latest Series Section */}
             {seriesItems.length > 0 && (
-              <section className="space-y-3">
+              <section className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base font-semibold text-zinc-200">
                     Latest TV Shows

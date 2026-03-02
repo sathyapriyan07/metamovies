@@ -147,12 +147,13 @@ const MovieDetail = () => {
   const tabs = [
     { key: 'overview', label: 'Overview' },
     { key: 'cast', label: 'Cast' },
+    { key: 'crew', label: 'Crew' },
     { key: 'reviews', label: 'Reviews' },
     { key: 'related', label: 'Related' }
   ];
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 pb-24">
+    <div className="min-h-screen bg-black text-zinc-100 pb-20">
       <SeoHead
         title={pageMeta?.title || `${movie.title} - MetaMovies+`}
         description={pageMeta?.description || movie.overview?.slice(0, 160)}
@@ -162,7 +163,7 @@ const MovieDetail = () => {
 
       {/* Hero Image */}
       {movie.backdrop_url && (
-        <div className="relative -mx-4 h-[50vh] overflow-hidden">
+        <div className="relative w-full h-[60vh] overflow-hidden">
           <img
             src={movie.backdrop_url}
             alt={movie.title}
@@ -174,7 +175,7 @@ const MovieDetail = () => {
       )}
 
       {/* Title Section */}
-      <div className="px-4 pt-4 space-y-2">
+      <div className="px-4 mt-4 space-y-2">
         {movie.title_logo_url && !movie.use_text_title ? (
           <img
             src={movie.title_logo_url}
@@ -197,14 +198,14 @@ const MovieDetail = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="px-4 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-2 scrollbar-hide">
+      <div className="px-4 mt-5 flex gap-6 overflow-x-auto border-b border-zinc-800 pb-3 scrollbar-hide">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`whitespace-nowrap text-sm relative pb-2 transition ${
+            className={`whitespace-nowrap text-sm relative pb-3 transition ${
               activeTab === tab.key
-                ? 'text-yellow-400 font-medium after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:w-full after:bg-yellow-400'
+                ? 'text-yellow-400 font-medium after:absolute after:-bottom-[3px] after:left-0 after:h-[2px] after:w-full after:bg-yellow-400'
                 : 'text-zinc-400'
             }`}
           >
@@ -214,9 +215,9 @@ const MovieDetail = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 space-y-6">
+      <div className="px-4 mt-5 space-y-5">
       {activeTab === 'overview' && (
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Trailer */}
           {videoId && !videoError && (
             <div className="aspect-video rounded-lg overflow-hidden bg-zinc-900">
@@ -317,7 +318,7 @@ const MovieDetail = () => {
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-wrap gap-3">
             <button
               className="bg-yellow-400 text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-yellow-500 transition"
               onClick={toggleWatchlist}
@@ -363,6 +364,43 @@ const MovieDetail = () => {
             </div>
           ) : (
             <p className="text-sm text-zinc-400">No cast information available.</p>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'crew' && (
+        <div className="space-y-4">
+          {movie.crew?.length > 0 ? (
+            <div className="space-y-3">
+              {movie.crew.map((member) => (
+                <button
+                  key={`crew-${member.id}`}
+                  className="w-full flex items-center gap-3 text-left"
+                  onClick={() => member.person?.id && navigate(`/person/${member.person.id}`)}
+                >
+                  {member.person?.profile_url ? (
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0">
+                      <img
+                        loading="lazy"
+                        src={member.person.profile_url}
+                        alt={member.person.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-xs flex-shrink-0">
+                      {member.person?.name?.[0] || '?'}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{member.person?.name}</p>
+                    <p className="text-xs text-zinc-400 truncate">{member.job}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-400">Crew information not available.</p>
           )}
         </div>
       )}
