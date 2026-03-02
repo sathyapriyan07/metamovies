@@ -6,6 +6,7 @@ import {
   getCollectionWithItems,
   getSeries
 } from '../services/supabase';
+import { getDominantColor, isDarkColor } from '../utils/colorExtractor';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const Home = () => {
   const [touchEnd, setTouchEnd] = useState(0);
   const [showVideo, setShowVideo] = useState({});
   const [isMuted, setIsMuted] = useState(true);
+  const [themeColors, setThemeColors] = useState({});
+  const [currentThemeColor, setCurrentThemeColor] = useState('rgb(229, 9, 20)');
 
   useEffect(() => {
     loadData();
@@ -33,6 +36,14 @@ const Home = () => {
 
     const sortedHero = (hero.data || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
     setHeroBanners(sortedHero);
+
+    // Extract colors for all hero banners
+    sortedHero.forEach(async (banner, index) => {
+      if (banner.movie?.backdrop_url) {
+        const color = await getDominantColor(banner.movie.backdrop_url);
+        setThemeColors(prev => ({ ...prev, [index]: color }));
+      }
+    });
 
     const collectionsWithItems = await Promise.all(
       (cols.data || []).map(async (col) => {
@@ -56,6 +67,12 @@ const Home = () => {
     const { data } = await getSeries(12, 0);
     setSeriesItems(data || []);
   };
+
+  // Update theme color when slide changes
+  useEffect(() => {
+    const color = themeColors[currentSlide] || 'rgb(229, 9, 20)';
+    setCurrentThemeColor(color);
+  }, [currentSlide, themeColors]);
 
   // Autoplay carousel
   useEffect(() => {
@@ -129,6 +146,8 @@ const Home = () => {
     return `${h}h ${m}m`;
   };
 
+  const textColor = isDarkColor(currentThemeColor) ? 'text-white' : 'text-black';
+
   return (
     <div className="min-h-screen bg-black overflow-x-hidden">
       {/* Hero Carousel */}
@@ -183,9 +202,19 @@ const Home = () => {
                   </div>
                 )}
 
-                {/* Cinematic Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/20 z-10" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10" />
+                {/* Dynamic Cinematic Overlays */}
+                <div 
+                  className="absolute inset-0 z-10 transition-all duration-700"
+                  style={{
+                    background: `linear-gradient(to top, black, ${currentThemeColor}99, transparent)`
+                  }}
+                />
+                <div 
+                  className="absolute inset-0 z-10 transition-all duration-700"
+                  style={{
+                    background: `linear-gradient(to right, black, ${currentThemeColor}66, transparent)`
+                  }}
+                />
 
                 {/* Content */}
                 <div className="relative z-20 h-full flex items-end">
@@ -206,7 +235,10 @@ const Home = () => {
                     {/* Metadata */}
                     <div className="flex flex-wrap items-center gap-3">
                       {movie.imdb_rating && (
-                        <span className="inline-flex items-center bg-yellow-500 text-black text-sm font-semibold px-3 py-1 rounded-md">
+                        <span 
+                          className={`inline-flex items-center text-sm font-semibold px-3 py-1 rounded-md transition-all duration-700 ${textColor}`}
+                          style={{ backgroundColor: currentThemeColor }}
+                        >
                           IMDb {movie.imdb_rating}
                         </span>
                       )}
@@ -240,7 +272,8 @@ const Home = () => {
                     <div className="flex gap-4 pt-2 flex-wrap">
                       <button 
                         onClick={() => navigate(`/movie/${movie.id}`)}
-                        className="bg-yellow-500 text-black font-semibold px-6 py-3 rounded-xl hover:bg-yellow-400 transition w-full sm:w-auto"
+                        className={`font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-700 w-full sm:w-auto ${textColor}`}
+                        style={{ backgroundColor: currentThemeColor }}
                       >
                         ▶ Watch Now
                       </button>
@@ -275,11 +308,11 @@ const Home = () => {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === currentSlide 
-                      ? 'w-6 bg-yellow-500' 
-                      : 'w-2 bg-zinc-500 hover:bg-zinc-400'
-                  }`}
+                  className={`h-2 rounded-full transition-all duration-300`}
+                  style={{
+                    width: index === currentSlide ? '24px' : '8px',
+                    backgroundColor: index === currentSlide ? currentThemeColor : 'rgb(113, 113, 122)'
+                  }}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
