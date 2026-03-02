@@ -81,7 +81,7 @@ const ManageSeries = () => {
 
   const handleEpisodeFieldChange = async (episodeId, field, value) => {
     const updates =
-      field === 'watch_link'
+      field === 'watch_link' || field === 'embed_link'
         ? { [field]: value === '' ? null : value }
         : { [field]: value === '' ? null : Number(value) };
     await supabase.from('episodes').update(updates).eq('id', episodeId);
@@ -172,26 +172,28 @@ const ManageSeries = () => {
                 </div>
                 <div className="space-y-2 max-h-[40vh] overflow-y-auto">
                   {episodes.map((ep) => (
-                    <div key={ep.id} className="flex items-center gap-2 bg-[#111] border border-gray-800 rounded-md p-2">
-                      <div className="text-xs text-gray-300 w-10">E{ep.episode_number}</div>
-                      <div className="flex-1 text-xs text-gray-300">{ep.name}</div>
+                    <div key={ep.id} className="bg-[#111] border border-gray-800 rounded-md p-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs text-gray-300 w-10">E{ep.episode_number}</div>
+                        <div className="flex-1 text-xs text-gray-300">{ep.name}</div>
+                        <input
+                          defaultValue={ep.tmdb_rating || ''}
+                          onBlur={(e) => handleEpisodeFieldChange(ep.id, 'tmdb_rating', e.target.value)}
+                          placeholder="TMDB"
+                          className="w-16 bg-[#1a1a1a] border border-gray-800 rounded px-2 py-1 text-xs"
+                        />
+                        <input
+                          defaultValue={ep.imdb_rating || ''}
+                          onBlur={(e) => handleEpisodeFieldChange(ep.id, 'imdb_rating', e.target.value)}
+                          placeholder="IMDb"
+                          className="w-16 bg-[#1a1a1a] border border-gray-800 rounded px-2 py-1 text-xs"
+                        />
+                      </div>
                       <input
-                        defaultValue={ep.tmdb_rating || ''}
-                        onBlur={(e) => handleEpisodeFieldChange(ep.id, 'tmdb_rating', e.target.value)}
-                        placeholder="TMDB"
-                        className="w-16 bg-[#1a1a1a] border border-gray-800 rounded px-2 py-1 text-xs"
-                      />
-                      <input
-                        defaultValue={ep.imdb_rating || ''}
-                        onBlur={(e) => handleEpisodeFieldChange(ep.id, 'imdb_rating', e.target.value)}
-                        placeholder="IMDb"
-                        className="w-16 bg-[#1a1a1a] border border-gray-800 rounded px-2 py-1 text-xs"
-                      />
-                      <input
-                        defaultValue={ep.watch_link || ''}
-                        onBlur={(e) => handleEpisodeFieldChange(ep.id, 'watch_link', e.target.value)}
-                        placeholder="Watch URL"
-                        className="flex-1 bg-[#1a1a1a] border border-gray-800 rounded px-2 py-1 text-xs"
+                        defaultValue={ep.embed_link || ''}
+                        onBlur={(e) => handleEpisodeFieldChange(ep.id, 'embed_link', e.target.value)}
+                        placeholder="Embed Link (iframe src)"
+                        className="w-full bg-[#1a1a1a] border border-gray-800 rounded px-2 py-1 text-xs"
                       />
                     </div>
                   ))}

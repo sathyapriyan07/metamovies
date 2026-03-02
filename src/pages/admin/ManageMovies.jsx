@@ -53,6 +53,11 @@ const ManageMovies = () => {
   const [playerError, setPlayerError] = useState('');
   const [savingPlayer, setSavingPlayer] = useState(false);
 
+  const [editingEmbedLink, setEditingEmbedLink] = useState(null);
+  const [embedLink, setEmbedLink] = useState('');
+  const [embedLinkError, setEmbedLinkError] = useState('');
+  const [savingEmbedLink, setSavingEmbedLink] = useState(false);
+
   const [allPlatforms, setAllPlatforms] = useState([]);
   const [editingPlatformsMovie, setEditingPlatformsMovie] = useState(null);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
@@ -321,6 +326,12 @@ const ManageMovies = () => {
     setPlayerError('');
   };
 
+  const handleEditEmbedLink = (movie) => {
+    setEditingEmbedLink(movie);
+    setEmbedLink(movie.embed_link || '');
+    setEmbedLinkError('');
+  };
+
   const handleEditPlatforms = async (movie) => {
     setEditingPlatformsMovie(movie);
     setPlatformSearch('');
@@ -531,6 +542,34 @@ const ManageMovies = () => {
     }
   };
 
+  const handleSaveEmbedLink = async () => {
+    if (!editingEmbedLink) return;
+    setEmbedLinkError('');
+
+    if (embedLink && !validateEmbedUrl(embedLink)) {
+      setEmbedLinkError('Embed URL must be a valid http(s) URL.');
+      return;
+    }
+
+    try {
+      setSavingEmbedLink(true);
+      const { error } = await updateMovie(editingEmbedLink.id, {
+        embed_link: embedLink ? embedLink.trim() : null
+      });
+      if (error) throw error;
+
+      showToast('Embed link updated successfully', 'success');
+      setEditingEmbedLink(null);
+      setEmbedLink('');
+      loadMovies();
+    } catch (error) {
+      console.error('Error updating embed link:', error);
+      setEmbedLinkError(error.message || 'Failed to update embed link');
+    } finally {
+      setSavingEmbedLink(false);
+    }
+  };
+
   const togglePlatform = (platformId) => {
     setSelectedPlatforms((prev) => (
       prev.includes(platformId) ? prev.filter((id) => id !== platformId) : [...prev, platformId]
@@ -656,6 +695,12 @@ const ManageMovies = () => {
                     className="px-3 py-2 bg-white/12 hover:bg-white/18 border border-white/16 hover:scale-[1.02] will-change-transform rounded-lg text-xs font-medium shadow-md transition-all duration-200"
                   >
                     Player
+                  </button>
+                  <button
+                    onClick={() => handleEditEmbedLink(movie)}
+                    className="px-3 py-2 bg-white/12 hover:bg-white/18 border border-white/16 hover:scale-[1.02] will-change-transform rounded-lg text-xs font-medium shadow-md transition-all duration-200"
+                  >
+                    Embed Link
                   </button>
                   <button
                     onClick={() => handleToggleTrending(movie)}
@@ -1177,6 +1222,52 @@ const ManageMovies = () => {
                     setPlayerError('');
                   }}
                   disabled={savingPlayer}
+                  className="flex-1 btn-ghost disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Embed Link Modal */}
+        {editingEmbedLink && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="glass-dark p-6 rounded-xl max-w-xl w-full">
+              <h2 className="text-2xl font-bold mb-4">Edit Embed Link - {editingEmbedLink.title}</h2>
+              <div>
+                <label className="block text-sm font-medium mb-2">Embed Link (iframe src)</label>
+                <input
+                  type="url"
+                  value={embedLink}
+                  onChange={(e) => {
+                    setEmbedLink(e.target.value);
+                    setEmbedLinkError('');
+                  }}
+                  placeholder="https://vidsrc.to/embed/movie/12345"
+                  className="w-full px-4 py-3 glass-input"
+                />
+                <p className="text-xs text-gray-400 mt-2">This URL will be used in the Watch Now player iframe.</p>
+              </div>
+
+              {embedLinkError && <p className="text-red-400 text-sm mt-2">{embedLinkError}</p>}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSaveEmbedLink}
+                  disabled={savingEmbedLink}
+                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingEmbedLink ? 'Saving...' : 'Save Embed Link'}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingEmbedLink(null);
+                    setEmbedLink('');
+                    setEmbedLinkError('');
+                  }}
+                  disabled={savingEmbedLink}
                   className="flex-1 btn-ghost disabled:opacity-50"
                 >
                   Cancel

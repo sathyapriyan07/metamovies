@@ -17,6 +17,8 @@ const SeriesDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedEpisode, setExpandedEpisode] = useState(null);
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [currentEmbed, setCurrentEmbed] = useState('');
 
   useEffect(() => {
     loadSeries();
@@ -56,6 +58,11 @@ const SeriesDetail = () => {
     }
     setEpisodesBySeason(episodeMap);
     setLoading(false);
+  };
+
+  const openPlayer = (link) => {
+    setCurrentEmbed(link);
+    setIsPlayerOpen(true);
   };
 
   if (loading) {
@@ -354,16 +361,14 @@ const SeriesDetail = () => {
                           <p className="text-sm text-zinc-500 italic">No overview available.</p>
                         )}
 
-                        {/* Watch Link */}
-                        {dbEpisode?.watch_link && (
-                          <a
-                            href={dbEpisode.watch_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block text-xs font-semibold text-black bg-yellow-400 px-3 py-1.5 rounded-full hover:bg-yellow-500 transition"
+                        {/* Watch Button */}
+                        {dbEpisode?.embed_link && (
+                          <button
+                            onClick={() => openPlayer(dbEpisode.embed_link)}
+                            className="mt-3 text-xs bg-yellow-500 text-black px-3 py-2 rounded-full font-medium hover:bg-yellow-400 transition"
                           >
-                            Watch Episode
-                          </a>
+                            ▶ Watch Episode
+                          </button>
                         )}
                       </div>
                     );
@@ -408,6 +413,28 @@ const SeriesDetail = () => {
         </div>
       )}
       </div>
+
+      {/* Player Modal */}
+      {isPlayerOpen && currentEmbed && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="flex justify-end p-4">
+            <button
+              onClick={() => setIsPlayerOpen(false)}
+              className="text-white text-2xl w-10 h-10 flex items-center justify-center hover:bg-zinc-800 rounded-full transition"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex-1">
+            <iframe
+              src={currentEmbed}
+              className="w-full h-full"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

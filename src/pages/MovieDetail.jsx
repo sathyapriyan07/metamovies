@@ -29,6 +29,7 @@ const MovieDetail = () => {
   const [pageMeta, setPageMeta] = useState(null);
   const [musicDirector, setMusicDirector] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   useEffect(() => {
     loadMovie();
@@ -175,7 +176,7 @@ const MovieDetail = () => {
       )}
 
       {/* Title Section */}
-      <div className="px-4 mt-4 space-y-2">
+      <div className="px-4 mt-4 space-y-3">
         {movie.title_logo_url && !movie.use_text_title ? (
           <img
             src={movie.title_logo_url}
@@ -185,16 +186,26 @@ const MovieDetail = () => {
         ) : (
           <h1 className="text-xl font-semibold tracking-tight">{movie.title}</h1>
         )}
-        {movie.imdb_rating && (
-          <a
-            href={movie.imdb_url || '#'}
-            target={movie.imdb_url ? '_blank' : undefined}
-            rel={movie.imdb_url ? 'noopener noreferrer' : undefined}
-            className="inline-block bg-yellow-500 text-black px-2 py-1 rounded text-xs font-semibold"
-          >
-            IMDb {movie.imdb_rating}
-          </a>
-        )}
+        <div className="flex items-center gap-3">
+          {movie.imdb_rating && (
+            <a
+              href={movie.imdb_url || '#'}
+              target={movie.imdb_url ? '_blank' : undefined}
+              rel={movie.imdb_url ? 'noopener noreferrer' : undefined}
+              className="inline-block bg-yellow-500 text-black px-2 py-1 rounded text-xs font-semibold"
+            >
+              IMDb {movie.imdb_rating}
+            </a>
+          )}
+          {movie.embed_link && (
+            <button
+              onClick={() => setIsPlayerOpen(true)}
+              className="bg-yellow-500 text-black text-sm font-semibold px-5 py-2 rounded-full hover:bg-yellow-400 transition"
+            >
+              ▶ Watch Now
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tab Navigation */}
@@ -469,6 +480,28 @@ const MovieDetail = () => {
         </div>
       )}
       </div>
+
+      {/* Player Modal */}
+      {isPlayerOpen && movie.embed_link && (
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          <div className="flex justify-end p-4">
+            <button
+              onClick={() => setIsPlayerOpen(false)}
+              className="text-white text-2xl w-10 h-10 flex items-center justify-center hover:bg-zinc-800 rounded-full transition"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex-1">
+            <iframe
+              src={movie.embed_link}
+              className="w-full h-full"
+              allowFullScreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
