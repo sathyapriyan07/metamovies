@@ -349,11 +349,11 @@ const MovieDetail = () => {
       {activeTab === 'cast' && (
         <div className="space-y-4">
           {movie.cast?.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full">
+            <div className="space-y-3">
               {movie.cast.slice(0, 12).map((c) => (
                 <button
                   key={`cast-${c.id}`}
-                  className="text-left"
+                  className="w-full flex items-center gap-4 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 transition-all duration-200 text-left"
                   onClick={() => c.person?.id && navigate(`/person/${c.person.id}`)}
                 >
                   {c.person?.profile_url ? (
@@ -361,15 +361,17 @@ const MovieDetail = () => {
                       loading="lazy"
                       src={c.person.profile_url}
                       alt={c.person.name}
-                      className="w-full aspect-square rounded-lg object-cover"
+                      className="w-16 h-16 rounded-full object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-full aspect-square rounded-lg bg-zinc-800 flex items-center justify-center text-xs">
+                    <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center text-lg font-medium flex-shrink-0">
                       {c.person?.name?.[0] || '?'}
                     </div>
                   )}
-                  <p className="mt-2 text-xs font-medium line-clamp-1">{c.person?.name}</p>
-                  <p className="text-xs text-zinc-400 line-clamp-1">{c.character}</p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-medium text-base truncate">{c.person?.name}</h3>
+                    <p className="text-sm text-zinc-400 truncate">{c.character}</p>
+                  </div>
                 </button>
               ))}
             </div>
