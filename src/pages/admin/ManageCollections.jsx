@@ -72,19 +72,19 @@ const ManageCollections = () => {
         <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* LEFT COLUMN */}
-            <div className="bg-zinc-900 rounded-2xl p-5 sm:p-6 space-y-6 border border-zinc-800 w-full max-w-full">
-              <h2 className="text-xl font-semibold">Collections</h2>
+            <div className="bg-zinc-900 rounded-2xl p-4 sm:p-6 space-y-6 border border-zinc-800 w-full max-w-full">
+              <h2 className="text-lg font-semibold text-white">Collections</h2>
 
-              <form onSubmit={handleCreateCollection} className="space-y-3">
+              <form onSubmit={handleCreateCollection} className="space-y-4">
                 <input
                   type="text"
                   value={newCollectionName}
                   onChange={(e) => setNewCollectionName(e.target.value)}
                   placeholder="New collection name"
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-yellow-500"
+                  className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-yellow-500 transition"
                 />
                 <button type="submit" className="w-full bg-yellow-500 text-black font-semibold py-3 rounded-xl hover:bg-yellow-400 transition">
-                  Create
+                  Create Collection
                 </button>
               </form>
 
@@ -95,7 +95,7 @@ const ManageCollections = () => {
                     className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all w-full overflow-hidden ${
                       selectedCollection?.id === collection.id
                         ? 'bg-yellow-500 text-black border-yellow-500'
-                        : 'bg-zinc-800 border-zinc-700 hover:border-zinc-600'
+                        : 'bg-zinc-800 border-zinc-700 hover:border-zinc-600 text-white'
                     }`}
                     onClick={() => handleSelectCollection(collection)}
                   >
@@ -115,22 +115,22 @@ const ManageCollections = () => {
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="bg-zinc-900 rounded-2xl p-5 sm:p-6 space-y-6 border border-zinc-800 w-full max-w-full">
+            <div className="bg-zinc-900 rounded-2xl p-4 sm:p-6 space-y-6 border border-zinc-800 w-full max-w-full">
               {selectedCollection ? (
                 <>
-                  <h2 className="text-xl font-semibold">{selectedCollection.name}</h2>
+                  <h2 className="text-lg font-semibold text-white">{selectedCollection.name}</h2>
 
                   {/* Add Items */}
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <h3 className="text-sm font-semibold text-zinc-300">Add Items</h3>
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search movies..."
-                      className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-yellow-500"
+                      className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-yellow-500 transition"
                     />
-                    <button onClick={handleSearch} className="w-full bg-zinc-800 border border-zinc-700 py-3 rounded-xl text-sm hover:bg-zinc-700 transition">
+                    <button onClick={handleSearch} className="w-full bg-zinc-800 border border-zinc-700 py-3 rounded-xl text-sm text-white hover:bg-zinc-700 transition">
                       Search
                     </button>
 
@@ -138,7 +138,7 @@ const ManageCollections = () => {
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {searchResults.map((item) => (
                           <div key={item.id} className="flex items-center justify-between gap-3 bg-zinc-800 rounded-xl p-3 border border-zinc-700 w-full overflow-hidden">
-                            <span className="text-sm truncate">{item.title}</span>
+                            <span className="text-sm truncate text-white">{item.title}</span>
                             <button
                               onClick={() => handleAddToCollection(item.id)}
                               className="shrink-0 bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-lg transition"
@@ -152,7 +152,7 @@ const ManageCollections = () => {
                   </div>
 
                   {/* Current Items */}
-                  <div className="space-y-3 overflow-y-auto max-h-[500px]">
+                  <div className="space-y-4 overflow-y-auto max-h-[500px]">
                     <h3 className="text-sm font-semibold text-zinc-300">Collection Items</h3>
                     {collectionItems.map((item) => {
                       const content = item.movie;
@@ -166,7 +166,7 @@ const ManageCollections = () => {
                               className="w-12 h-16 rounded-md object-cover shrink-0"
                             />
                             <div className="min-w-0">
-                              <p className="text-sm font-medium truncate">{content.title}</p>
+                              <p className="text-sm font-medium truncate text-white">{content.title}</p>
                               <p className="text-xs text-zinc-400">Movie</p>
                             </div>
                           </div>
@@ -183,7 +183,7 @@ const ManageCollections = () => {
                 </>
               ) : (
                 <div className="text-center text-zinc-400 py-12">
-                  Select a collection to manage items
+                  <p className="text-sm">Select a collection to manage items</p>
                 </div>
               )}
             </div>

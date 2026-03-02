@@ -62,19 +62,19 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 pb-20 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-black overflow-x-hidden">
       {/* Hero Banner */}
       {hero && (
-        <div className="relative h-[75vh] min-h-[400px] w-full max-w-full overflow-hidden">
+        <div className="relative h-[70vh] flex items-end overflow-hidden w-full">
           <img
             src={hero.backdrop_url || hero.poster_url}
             alt={hero.title}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-          <div className="absolute bottom-6 left-0 right-0 px-4 space-y-3">
-            <h1 className="text-xl md:text-2xl font-semibold tracking-tight">{hero.title}</h1>
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
+          <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-8 space-y-4 max-w-xl w-full">
+            <h1 className="text-2xl font-semibold tracking-tight text-white">{hero.title}</h1>
             <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
               <span>{hero.release_date?.split('-')[0]}</span>
               {hero.runtime && (
@@ -91,13 +91,13 @@ const Home = () => {
               )}
             </div>
             {hero.overview && (
-              <p className="text-sm text-zinc-300 line-clamp-2 max-w-2xl leading-relaxed">{hero.overview}</p>
+              <p className="text-sm text-zinc-300 line-clamp-2 leading-relaxed">{hero.overview}</p>
             )}
-            <div className="flex gap-3 pt-2">
-              <button className="bg-amber-400 text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-amber-500 transition">
+            <div className="flex gap-4 pt-2 flex-wrap">
+              <button className="bg-yellow-500 text-black font-semibold px-6 py-3 rounded-xl hover:bg-yellow-400 transition">
                 Watch Now
               </button>
-              <button className="bg-white/20 backdrop-blur-sm text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-white/30 transition">
+              <button className="bg-zinc-800 border border-zinc-700 text-white px-6 py-3 rounded-xl hover:bg-zinc-700 transition">
                 + Watchlist
               </button>
             </div>
@@ -106,10 +106,10 @@ const Home = () => {
       )}
 
       {/* Content Sections */}
-      <div className="px-4 sm:px-6 lg:px-8 space-y-8 mt-8 max-w-7xl mx-auto w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <p className="text-zinc-400">Loading...</p>
+            <p className="text-zinc-400 text-sm">Loading...</p>
           </div>
         ) : (
           <>
@@ -117,42 +117,46 @@ const Home = () => {
             {collections.length > 0 && collections.map((collection) => (
               <section key={collection.id} className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-zinc-200">
+                  <h2 className="text-lg font-semibold text-white">
                     {collection.name || 'Collection'}
                   </h2>
                   <button 
-                    className="text-sm text-amber-400 hover:underline"
+                    className="text-sm text-yellow-500 hover:text-yellow-400 transition"
                     onClick={() => navigate('/movies')}
                   >
                     See All
                   </button>
                 </div>
-                <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
+                <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
                   {collection.items.map((item) => (
                     <div 
                       key={item.id} 
-                      className="w-28 flex-shrink-0 snap-start cursor-pointer group"
+                      className="w-32 flex-shrink-0 snap-start cursor-pointer group"
                       onClick={() => navigate(`/movie/${item.id}`)}
                     >
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-md bg-zinc-800">
-                        {typeof item.rating === 'number' && (
-                          <div className="absolute top-1.5 right-1.5 bg-amber-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded z-10">
-                            {item.rating.toFixed(1)}
-                          </div>
-                        )}
-                        <img
-                          src={item.poster_url || item.backdrop_url}
-                          alt={item.title || item.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
+                      <div className="space-y-2">
+                        <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-900">
+                          {typeof item.rating === 'number' && (
+                            <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs font-semibold px-2 py-1 rounded-md z-10">
+                              {item.rating.toFixed(1)}
+                            </div>
+                          )}
+                          <img
+                            src={item.poster_url || item.backdrop_url}
+                            alt={item.title || item.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-white line-clamp-2 leading-tight">
+                            {item.title || item.name}
+                          </p>
+                          <p className="text-xs text-zinc-500">
+                            {item.release_date?.split('-')[0]}
+                          </p>
+                        </div>
                       </div>
-                      <p className="mt-1.5 text-xs text-zinc-300 line-clamp-2 leading-tight">
-                        {item.title || item.name}
-                      </p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">
-                        {item.release_date?.split('-')[0]}
-                      </p>
                     </div>
                   ))}
                 </div>
@@ -163,42 +167,46 @@ const Home = () => {
             {seriesItems.length > 0 && (
               <section className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-zinc-200">
+                  <h2 className="text-lg font-semibold text-white">
                     Latest TV Shows
                   </h2>
                   <button 
-                    className="text-sm text-amber-400 hover:underline"
+                    className="text-sm text-yellow-500 hover:text-yellow-400 transition"
                     onClick={() => navigate('/series')}
                   >
                     See All
                   </button>
                 </div>
-                <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
+                <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
                   {seriesItems.map((item) => (
                     <div 
                       key={item.id} 
-                      className="w-28 flex-shrink-0 snap-start cursor-pointer group"
+                      className="w-32 flex-shrink-0 snap-start cursor-pointer group"
                       onClick={() => navigate(`/series/${item.id}`)}
                     >
-                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-md bg-zinc-800">
-                        {typeof item.rating === 'number' && (
-                          <div className="absolute top-1.5 right-1.5 bg-amber-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded z-10">
-                            {item.rating.toFixed(1)}
-                          </div>
-                        )}
-                        <img
-                          src={item.poster_url || item.backdrop_url}
-                          alt={item.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
+                      <div className="space-y-2">
+                        <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-900">
+                          {typeof item.rating === 'number' && (
+                            <div className="absolute top-2 right-2 bg-yellow-500 text-black text-xs font-semibold px-2 py-1 rounded-md z-10">
+                              {item.rating.toFixed(1)}
+                            </div>
+                          )}
+                          <img
+                            src={item.poster_url || item.backdrop_url}
+                            alt={item.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-white line-clamp-2 leading-tight">
+                            {item.name}
+                          </p>
+                          <p className="text-xs text-zinc-500">
+                            {item.first_air_date?.split('-')[0]}
+                          </p>
+                        </div>
                       </div>
-                      <p className="mt-1.5 text-xs text-zinc-300 line-clamp-2 leading-tight">
-                        {item.name}
-                      </p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">
-                        {item.first_air_date?.split('-')[0]}
-                      </p>
                     </div>
                   ))}
                 </div>
@@ -207,7 +215,7 @@ const Home = () => {
 
             {collections.length === 0 && seriesItems.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-zinc-400">No content available yet.</p>
+                <p className="text-zinc-400 text-sm">No content available yet.</p>
               </div>
             )}
           </>
