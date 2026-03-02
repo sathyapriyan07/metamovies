@@ -74,8 +74,8 @@ const Home = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 space-y-3">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{hero.title}</h1>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400">
+            <h1 className="text-xl md:text-2xl font-semibold tracking-tight">{hero.title}</h1>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
               <span>{hero.release_date?.split('-')[0]}</span>
               {hero.runtime && (
                 <>
@@ -91,7 +91,7 @@ const Home = () => {
               )}
             </div>
             {hero.overview && (
-              <p className="text-sm text-zinc-300 line-clamp-2 max-w-2xl">{hero.overview}</p>
+              <p className="text-sm text-zinc-300 line-clamp-2 max-w-2xl leading-relaxed">{hero.overview}</p>
             )}
             <div className="flex gap-3 pt-2">
               <button className="bg-amber-400 text-black px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-amber-500 transition">
@@ -106,7 +106,7 @@ const Home = () => {
       )}
 
       {/* Content Sections */}
-      <div className="px-4 space-y-8 mt-8">
+      <div className="px-4 space-y-6 mt-8">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-zinc-400">Loading...</p>
@@ -115,9 +115,9 @@ const Home = () => {
           <>
             {/* Movie Collections */}
             {collections.length > 0 && collections.map((collection) => (
-              <section key={collection.id} className="space-y-4">
+              <section key={collection.id} className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg md:text-xl font-semibold tracking-tight text-zinc-200">
+                  <h2 className="text-base font-semibold text-zinc-200">
                     {collection.name || 'Collection'}
                   </h2>
                   <button 
@@ -127,16 +127,16 @@ const Home = () => {
                     See All
                   </button>
                 </div>
-                <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
+                <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
                   {collection.items.map((item) => (
                     <div 
                       key={item.id} 
-                      className="w-36 flex-shrink-0 snap-start cursor-pointer group"
+                      className="w-28 flex-shrink-0 snap-start cursor-pointer group"
                       onClick={() => navigate(`/movie/${item.id}`)}
                     >
-                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-md bg-zinc-800">
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-md bg-zinc-800">
                         {typeof item.rating === 'number' && (
-                          <div className="absolute top-2 right-2 bg-amber-400 text-black text-xs font-bold px-2 py-1 rounded-md z-10">
+                          <div className="absolute top-1.5 right-1.5 bg-amber-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded z-10">
                             {item.rating.toFixed(1)}
                           </div>
                         )}
@@ -147,10 +147,10 @@ const Home = () => {
                           loading="lazy"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-zinc-300 line-clamp-2 leading-snug">
+                      <p className="mt-1.5 text-xs text-zinc-300 line-clamp-2 leading-tight">
                         {item.title || item.name}
                       </p>
-                      <p className="text-xs text-zinc-500 mt-0.5">
+                      <p className="text-[10px] text-zinc-500 mt-0.5">
                         {item.release_date?.split('-')[0]}
                       </p>
                     </div>
@@ -161,9 +161,9 @@ const Home = () => {
 
             {/* Latest Series Section */}
             {seriesItems.length > 0 && (
-              <section className="space-y-4">
+              <section className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg md:text-xl font-semibold tracking-tight text-zinc-200">
+                  <h2 className="text-base font-semibold text-zinc-200">
                     Latest TV Shows
                   </h2>
                   <button 
@@ -173,16 +173,16 @@ const Home = () => {
                     See All
                   </button>
                 </div>
-                <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
+                <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
                   {seriesItems.map((item) => (
                     <div 
                       key={item.id} 
-                      className="w-36 flex-shrink-0 snap-start cursor-pointer group"
+                      className="w-28 flex-shrink-0 snap-start cursor-pointer group"
                       onClick={() => navigate(`/series/${item.id}`)}
                     >
-                      <div className="relative aspect-[2/3] rounded-xl overflow-hidden shadow-md bg-zinc-800">
+                      <div className="relative aspect-[2/3] rounded-lg overflow-hidden shadow-md bg-zinc-800">
                         {typeof item.rating === 'number' && (
-                          <div className="absolute top-2 right-2 bg-amber-400 text-black text-xs font-bold px-2 py-1 rounded-md z-10">
+                          <div className="absolute top-1.5 right-1.5 bg-amber-400 text-black text-[10px] font-bold px-1.5 py-0.5 rounded z-10">
                             {item.rating.toFixed(1)}
                           </div>
                         )}
@@ -193,10 +193,10 @@ const Home = () => {
                           loading="lazy"
                         />
                       </div>
-                      <p className="mt-2 text-sm text-zinc-300 line-clamp-2 leading-snug">
+                      <p className="mt-1.5 text-xs text-zinc-300 line-clamp-2 leading-tight">
                         {item.name}
                       </p>
-                      <p className="text-xs text-zinc-500 mt-0.5">
+                      <p className="text-[10px] text-zinc-500 mt-0.5">
                         {item.first_air_date?.split('-')[0]}
                       </p>
                     </div>

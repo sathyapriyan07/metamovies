@@ -175,7 +175,7 @@ const MovieDetail = () => {
 
       {/* Title Section */}
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">{movie.title}</h1>
+        <h1 className="text-xl font-semibold tracking-tight">{movie.title}</h1>
         {movie.imdb_rating && (
           <a
             href={movie.imdb_url || '#'}
@@ -226,64 +226,64 @@ const MovieDetail = () => {
 
           {/* Description */}
           {movie.overview && (
-            <div className="space-y-2">
-              <h3 className="text-zinc-200 font-semibold text-sm">Description</h3>
-              <p className="text-zinc-300 leading-relaxed text-sm">{movie.overview}</p>
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-zinc-200">Description</h3>
+              <p className="text-sm leading-relaxed text-zinc-300">{movie.overview}</p>
             </div>
           )}
 
           {/* Release Date */}
           {year && (
             <div className="space-y-1">
-              <h3 className="text-zinc-200 font-semibold text-sm">Release</h3>
-              <p className="text-zinc-400 text-sm">{movie.release_date}</p>
+              <h3 className="text-sm font-semibold text-zinc-200">Release</h3>
+              <p className="text-sm text-zinc-400">{movie.release_date}</p>
             </div>
           )}
 
           {/* Runtime */}
           {runtime && (
             <div className="space-y-1">
-              <h3 className="text-zinc-200 font-semibold text-sm">Runtime</h3>
-              <p className="text-zinc-400 text-sm">{runtime}</p>
+              <h3 className="text-sm font-semibold text-zinc-200">Runtime</h3>
+              <p className="text-sm text-zinc-400">{runtime}</p>
             </div>
           )}
 
           {/* Genre */}
           {genresText && (
             <div className="space-y-1">
-              <h3 className="text-zinc-200 font-semibold text-sm">Genre</h3>
-              <p className="text-zinc-400 text-sm">{genresText}</p>
+              <h3 className="text-sm font-semibold text-zinc-200">Genre</h3>
+              <p className="text-sm text-zinc-400">{genresText}</p>
             </div>
           )}
 
           {/* Spoken Languages */}
           {movie.spoken_languages && (
             <div className="space-y-1">
-              <h3 className="text-zinc-200 font-semibold text-sm">Spoken Languages</h3>
-              <p className="text-zinc-400 text-sm">{movie.spoken_languages}</p>
+              <h3 className="text-sm font-semibold text-zinc-200">Spoken Languages</h3>
+              <p className="text-sm text-zinc-400">{movie.spoken_languages}</p>
             </div>
           )}
 
           {/* Production Countries */}
           {movie.production_countries && (
             <div className="space-y-1">
-              <h3 className="text-zinc-200 font-semibold text-sm">Production Countries</h3>
-              <p className="text-zinc-400 text-sm">{movie.production_countries}</p>
+              <h3 className="text-sm font-semibold text-zinc-200">Production Countries</h3>
+              <p className="text-sm text-zinc-400">{movie.production_countries}</p>
             </div>
           )}
 
           {/* Production Companies */}
           {movie.production_companies && (
             <div className="space-y-1">
-              <h3 className="text-zinc-200 font-semibold text-sm">Production Companies</h3>
-              <p className="text-zinc-400 text-sm">{movie.production_companies}</p>
+              <h3 className="text-sm font-semibold text-zinc-200">Production Companies</h3>
+              <p className="text-sm text-zinc-400">{movie.production_companies}</p>
             </div>
           )}
 
           {/* Watch Platforms */}
           {ottPlatforms.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-zinc-200 font-semibold text-sm">Where to Watch</h3>
+              <h3 className="text-sm font-semibold text-zinc-200">Where to Watch</h3>
               <div className="flex gap-3 overflow-x-auto scrollbar-hide">
                 {ottPlatforms.map(([platform, url]) => {
                   const logoSrc = platformLogos[platform];
@@ -347,7 +347,7 @@ const MovieDetail = () => {
                       {c.person?.name?.[0] || '?'}
                     </div>
                   )}
-                  <p className="mt-2 text-sm font-medium line-clamp-1">{c.person?.name}</p>
+                  <p className="mt-2 text-xs font-medium line-clamp-1">{c.person?.name}</p>
                   <p className="text-xs text-zinc-400 line-clamp-1">{c.character}</p>
                 </button>
               ))}
@@ -371,7 +371,7 @@ const MovieDetail = () => {
                 <div key={`review-${idx}`} className="border-b border-zinc-800 pb-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">{review.user?.username || 'Anonymous'}</span>
-                    <span className="text-yellow-400 text-sm font-semibold">{review.rating || 'NR'}</span>
+                    <span className="text-sm font-semibold text-yellow-400">{review.rating || 'NR'}</span>
                   </div>
                   <p className="text-sm text-zinc-400 leading-relaxed">{review.body || 'No review text.'}</p>
                 </div>
@@ -412,7 +412,7 @@ const MovieDetail = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="mt-2 text-sm font-medium line-clamp-2">{item.title}</p>
+                  <p className="mt-2 text-xs font-medium line-clamp-2">{item.title}</p>
                 </button>
               ))}
             </div>
