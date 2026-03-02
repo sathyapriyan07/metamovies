@@ -30,10 +30,36 @@ const MovieDetail = () => {
   const [musicDirector, setMusicDirector] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [relatedMovies, setRelatedMovies] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
 
   useEffect(() => {
     loadMovie();
   }, [id]);
+
+  useEffect(() => {
+    if (movie?.id && activeTab === 'related') {
+      fetchRelatedMovies();
+    }
+  }, [movie?.id, activeTab]);
+
+  const fetchRelatedMovies = async () => {
+    if (!movie?.id) return;
+    setLoadingRelated(true);
+    try {
+      const apiKey = import.meta.env.VITE_TMDB_API_KEY;
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movie.tmdb_id || movie.id}/similar?api_key=${apiKey}&language=en-US&page=1`
+      );
+      const data = await res.json();
+      const filtered = (data.results || []).filter(m => m.id !== movie.id).slice(0, 12);
+      setRelatedMovies(filtered);
+    } catch (err) {
+      console.error('Failed to fetch related movies:', err);
+      setRelatedMovies([]);
+    }
+    setLoadingRelated(false);
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -353,24 +379,26 @@ const MovieDetail = () => {
               {movie.cast.slice(0, 12).map((c) => (
                 <button
                   key={`cast-${c.id}`}
-                  className="w-full flex items-center gap-4 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 transition-all duration-200 text-left"
+                  className="w-full flex items-center gap-3 text-left"
                   onClick={() => c.person?.id && navigate(`/person/${c.person.id}`)}
                 >
                   {c.person?.profile_url ? (
-                    <img
-                      loading="lazy"
-                      src={c.person.profile_url}
-                      alt={c.person.name}
-                      className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                    />
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0">
+                      <img
+                        loading="lazy"
+                        src={c.person.profile_url}
+                        alt={c.person.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center text-lg font-medium flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-xs flex-shrink-0">
                       {c.person?.name?.[0] || '?'}
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-medium text-base truncate">{c.person?.name}</h3>
-                    <p className="text-sm text-zinc-400 truncate">{c.character}</p>
+                    <p className="text-sm font-medium text-white truncate">{c.person?.name}</p>
+                    <p className="text-xs text-zinc-400 truncate">{c.character}</p>
                   </div>
                 </button>
               ))}
@@ -451,28 +479,42 @@ const MovieDetail = () => {
 
       {activeTab === 'related' && (
         <div className="space-y-4">
-          {movie.similar_movies?.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 w-full">
-              {movie.similar_movies.slice(0, 9).map((item) => (
+          {loadingRelated ? (
+            <p className="text-sm text-zinc-400">Loading related movies...</p>
+          ) : relatedMovies.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 w-full">
+              {relatedMovies.map((item) => (
                 <button
-                  key={`similar-${item.id}`}
-                  className="text-left"
-                  onClick={() => navigate(`/movie/${item.id}`)}
+                  key={`related-${item.id}`}
+                  className="text-left group"
+                  onClick={() => {
+                    window.scrollTo(0, 0);
+                    navigate(`/movie/${item.id}`);
+                  }}
                 >
-                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800">
-                    {typeof item.rating === 'number' && (
-                      <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-1.5 py-0.5 rounded">
-                        {item.rating.toFixed(1)}
+                  <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-800 group-hover:scale-105 transition-transform duration-300">
+                    {item.vote_average > 0 && (
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-black text-xs font-bold px-1.5 py-0.5 rounded z-10">
+                        {item.vote_average.toFixed(1)}
                       </div>
                     )}
-                    <img
-                      loading="lazy"
-                      src={item.poster_url || item.backdrop_url}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
+                    {item.poster_path ? (
+                      <img
+                        loading="lazy"
+                        src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-zinc-600">
+                        No Image
+                      </div>
+                    )}
                   </div>
-                  <p className="mt-2 text-xs font-medium line-clamp-2">{item.title}</p>
+                  <p className="mt-2 text-xs font-medium line-clamp-2 text-zinc-200">{item.title}</p>
+                  {item.release_date && (
+                    <p className="text-xs text-zinc-500">{item.release_date.split('-')[0]}</p>
+                  )}
                 </button>
               ))}
             </div>
