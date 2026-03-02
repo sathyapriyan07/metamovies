@@ -55,8 +55,6 @@ import ManageReviews from './pages/admin/ManageReviews';
 import ManageTrending from './pages/admin/ManageTrending';
 import ManageSEO from './pages/admin/ManageSEO';
 import DeezerImport from './pages/admin/DeezerImport';
-import WatchMovie from './pages/WatchMovie';
-import WatchEpisode from './pages/WatchEpisode';
 import ManageSeries from './pages/admin/ManageSeries';
 
 function AppRoutes() {
@@ -77,8 +75,6 @@ function AppRoutes() {
         <Route path="/platforms/:id" element={<PlatformDetail />} />
         <Route path="/movie/:id" element={<MovieDetail />} />
         <Route path="/series/:id" element={<SeriesDetail />} />
-        <Route path="/watch/movie/:id" element={<WatchMovie />} />
-        <Route path="/watch/tv/:seriesId/:seasonNumber/:episodeNumber" element={<WatchEpisode />} />
         <Route path="/watch/:id" element={<Watch />} />
         <Route path="/movie/:id/cast-crew" element={<CastCrew />} />
         <Route path="/person/:id" element={<PersonDetail />} />
