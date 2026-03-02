@@ -84,3 +84,43 @@ Added embedded streaming player functionality to Movie and Series detail pages u
 - Add quality selector support
 - Prevent body scroll when modal open
 - Add keyboard shortcut (ESC to close)
+
+
+## Admin Controls
+
+### Managing Movie Embed Links
+**Location**: Admin Panel → Manage Movies
+
+1. Click "Embed Link" button on any movie card
+2. Enter the iframe embed URL (e.g., `https://vidsrc.to/embed/movie/12345`)
+3. Click "Save Embed Link"
+4. The Watch Now button will appear on the movie detail page
+
+**Field**: `movies.embed_link` (TEXT)
+
+### Managing Episode Embed Links
+**Location**: Admin Panel → Manage Series
+
+1. Select a series from the list
+2. Select a season using the season buttons (S1, S2, etc.)
+3. Each episode row shows:
+   - Episode number and name
+   - TMDB rating input
+   - IMDb rating input
+   - Embed Link input (full width)
+4. Enter embed URL and blur/tab out to auto-save
+5. The Watch Episode button will appear for that episode
+
+**Field**: `episodes.embed_link` (TEXT)
+
+### URL Format Examples
+- VidSrc: `https://vidsrc.to/embed/movie/12345`
+- VidSrc (TV): `https://vidsrc.to/embed/tv/12345/1/1` (series/season/episode)
+- Custom: Any iframe-compatible embed URL
+
+### Admin UI Features
+- **Movies**: Dedicated modal with URL validation
+- **Episodes**: Inline editing with auto-save on blur
+- **Validation**: Checks for valid http(s) URLs
+- **Toast notifications**: Success/error feedback
+- **Responsive**: Works on mobile and desktop
